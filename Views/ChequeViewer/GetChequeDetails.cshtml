@@ -1,0 +1,112 @@
+
+
+@model ChequeDetailsViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل الشيك";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // افتراضي، يمكن تعديله حسب هيكل المشروع
+}
+
+<style>
+    body {
+        direction: rtl; /* تفعيل RTL */
+        text-align: right;
+    }
+    .container-fluid {
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <h2 class="mb-4">@ViewData["Title"]</h2>
+
+    <!-- Placeholder for Search Form -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>نموذج البحث</h4>
+        </div>
+        <div class="card-body">
+            <!-- Search form content will go here -->
+
+            <form asp-controller="ChequeViewer" asp-action="GetChequeDetails" method="get">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label for="chequeNumber" class="form-label">رقم الشيك:</label>
+                        <input type="text" class="form-control" id="chequeNumber" name="chequeNumber" value="@ViewBag.ChequeNumber" placeholder="أدخل رقم الشيك">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="bankName" class="form-label">اسم البنك:</label>
+                        <input type="text" class="form-control" id="bankName" name="bankName" value="@ViewBag.BankName" placeholder="أدخل اسم البنك">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary">بحث</button>
+                        <button type="button" class="btn btn-secondary" onclick="window.location.href=\'/ChequeViewer/GetChequeDetails\'" >مسح</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Placeholder for Data Display Table -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>بيانات الشيك</h4>
+        </div>
+        <div class="card-body">
+            <!-- Cheque details table will go here -->
+
+            @if (Model != null && Model.Cheques != null && Model.Cheques.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>رقم الشيك</th>
+                                <th>اسم البنك</th>
+                                <th>المبلغ</th>
+                                <th>تاريخ الاستحقاق</th>
+                                <th>اسم المستفيد</th>
+                                <th>حالة الشيك</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>@Model.Cheques.FirstOrDefault()?.ChequeNumber</td>
+                                                                <td>@Model.Cheques.FirstOrDefault()?.BankName</td>
+                                <td>@Model.Cheques.FirstOrDefault()?.Amount.ToString("N2")</td>
+                                <td>@Model.Cheques.FirstOrDefault()?.DueDate.ToShortDateString()</td>
+                                <td>@Model.Cheques.FirstOrDefault()?.PayeeName</td>
+                                <td>@Model.Cheques.FirstOrDefault()?.Status</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info" role="alert">
+                    لا توجد تفاصيل شيكات لعرضها. يرجى استخدام نموذج البحث.
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Placeholder for Print Button -->
+    <div class="text-left mb-4">
+        <button class="btn btn-primary" onclick="window.print()">طباعة الشيك</button>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Bootstrap 5 JS and other scripts will be linked via _Layout.cshtml -->
+    <!-- Custom scripts for this page can be added here -->
+}
+
+
+
+
+
+

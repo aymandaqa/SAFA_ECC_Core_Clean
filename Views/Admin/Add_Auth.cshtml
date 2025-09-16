@@ -1,0 +1,272 @@
+@model SAFA_ECC_Core_Clean.ViewModels.AddAuthViewModel
+@{
+    ViewData["Title"] = "إدارة التفويضات";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <h4 class="page-title">إدارة التفويضات</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">الرئيسية</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index")">الإدارة</a></li>
+                        <li class="breadcrumb-item active">إدارة التفويضات</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="mdi mdi-check-circle me-2"></i>
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="mdi mdi-alert-circle me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="header-title mb-0">التفويضات المعلقة</h4>
+                        <div>
+                            <a href="@Url.Action("AddAuth_User")" class="btn btn-primary">
+                                <i class="mdi mdi-plus me-1"></i>
+                                إضافة تفويض جديد
+                            </a>
+                            <a href="@Url.Action("Auth_User_list")" class="btn btn-outline-secondary">
+                                <i class="mdi mdi-format-list-bulleted me-1"></i>
+                                قائمة التفويضات
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.PendingAuthorizations != null && Model.PendingAuthorizations.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered dt-responsive nowrap w-100" id="authTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>المستخدم</th>
+                                        <th>اسم المستخدم</th>
+                                        <th>المجموعة</th>
+                                        <th>نوع المعاملة</th>
+                                        <th>المستوى الأول</th>
+                                        <th>المستوى الثاني</th>
+                                        <th>تاريخ الإنشاء</th>
+                                        <th>منشئ بواسطة</th>
+                                        <th>الحالة</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var auth in Model.PendingAuthorizations)
+                                    {
+                                        <tr>
+                                            <td>@auth.Auth_user_ID</td>
+                                            <td>@auth.Auth_user_Name</td>
+                                            <td>@auth.group_ID</td>
+                                            <td>
+                                                <span class="badge bg-info">@auth.Auth_Trans__name</span>
+                                            </td>
+                                            <td>
+                                                @if (auth.Auth_level1 == true)
+                                                {
+                                                    <span class="badge bg-success">نعم</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">لا</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (auth.Auth_level2 == true)
+                                                {
+                                                    <span class="badge bg-success">نعم</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">لا</span>
+                                                }
+                                            </td>
+                                            <td>@auth.Creation_Date?.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td>@auth.Created_By</td>
+                                            <td>
+                                                @switch (auth.status)
+                                                {
+                                                    case "Pending":
+                                                        <span class="badge bg-warning">معلق</span>
+                                                        break;
+                                                    case "APPROVED":
+                                                        <span class="badge bg-success">معتمد</span>
+                                                        break;
+                                                    case "REJECTED":
+                                                        <span class="badge bg-danger">مرفوض</span>
+                                                        break;
+                                                    default:
+                                                        <span class="badge bg-secondary">@auth.status</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (auth.status == "Pending")
+                                                {
+                                                    <div class="btn-group" role="group">
+                                                        <button type="button" class="btn btn-success btn-sm" onclick="authorizeTransaction(@auth.ID, 'APPROVE')">
+                                                            <i class="mdi mdi-check me-1"></i>
+                                                            اعتماد
+                                                        </button>
+                                                        <button type="button" class="btn btn-danger btn-sm" onclick="authorizeTransaction(@auth.ID, 'REJECT')">
+                                                            <i class="mdi mdi-close me-1"></i>
+                                                            رفض
+                                                        </button>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">تم المعالجة</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="mdi mdi-shield-check-outline display-4 text-muted"></i>
+                            <h4 class="mt-3">لا توجد تفويضات معلقة</h4>
+                            <p class="text-muted">جميع التفويضات تم معالجتها أو لا توجد طلبات جديدة.</p>
+                            <a href="@Url.Action("AddAuth_User")" class="btn btn-primary">
+                                <i class="mdi mdi-plus me-1"></i>
+                                إضافة تفويض جديد
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal للتأكيد -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">تأكيد الإجراء</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">هل أنت متأكد من هذا الإجراء؟</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-primary" id="confirmButton">تأكيد</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#authTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Arabic.json"
+                },
+                "order": [[ 6, "desc" ]], // ترتيب حسب تاريخ الإنشاء
+                "pageLength": 25,
+                "responsive": true
+            });
+        });
+
+        let currentAuthId = null;
+        let currentAction = null;
+
+        function authorizeTransaction(authId, action) {
+            currentAuthId = authId;
+            currentAction = action;
+            
+            let message = action === 'APPROVE' ? 
+                'هل أنت متأكد من اعتماد هذا التفويض؟' : 
+                'هل أنت متأكد من رفض هذا التفويض؟';
+            
+            $('#confirmMessage').text(message);
+            $('#confirmButton').removeClass('btn-success btn-danger').addClass(action === 'APPROVE' ? 'btn-success' : 'btn-danger');
+            $('#confirmModal').modal('show');
+        }
+
+        $('#confirmButton').click(function() {
+            if (currentAuthId && currentAction) {
+                // إنشاء نموذج وإرساله
+                let form = $('<form>', {
+                    'method': 'POST',
+                    'action': '@Url.Action("AuthorizeTransaction")'
+                });
+                
+                form.append($('<input>', {
+                    'type': 'hidden',
+                    'name': 'authId',
+                    'value': currentAuthId
+                }));
+                
+                form.append($('<input>', {
+                    'type': 'hidden',
+                    'name': 'action',
+                    'value': currentAction
+                }));
+                
+                form.append($('<input>', {
+                    'type': 'hidden',
+                    'name': '__RequestVerificationToken',
+                    'value': $('input[name="__RequestVerificationToken"]').val()
+                }));
+                
+                $('body').append(form);
+                form.submit();
+            }
+            
+            $('#confirmModal').modal('hide');
+        });
+    </script>
+}
+
+<style>
+    .table th {
+        background-color: #495057;
+        color: white;
+        border-color: #495057;
+    }
+    
+    .badge {
+        font-size: 0.75em;
+    }
+    
+    .btn-group .btn {
+        margin-right: 2px;
+    }
+    
+    .btn-group .btn:last-child {
+        margin-right: 0;
+    }
+</style>
+

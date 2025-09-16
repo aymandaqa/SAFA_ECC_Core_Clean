@@ -1,0 +1,249 @@
+﻿@{
+    ViewData["Title"] = "الصفحة الرئيسية";
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="card-title mb-1">
+                                <i class="fas fa-university me-2"></i>
+                                مرحباً بك في نظام ECC SAFA
+                            </h2>
+                            <p class="card-text mb-0">نظام إدارة الشيكات الإلكتروني المتطور</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <h5 class="mb-1">أهلاً وسهلاً، @ViewBag.FullName</h5>
+                            <small>@DateTime.Now.ToString("yyyy/MM/dd - HH:mm")</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-primary mb-3">
+                        <i class="fas fa-file-invoice-dollar fa-3x"></i>
+                    </div>
+                    <h5 class="card-title">الشيكات الواردة</h5>
+                    <h3 class="text-primary">1,234</h3>
+                    <small class="text-muted">اليوم</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-success mb-3">
+                        <i class="fas fa-paper-plane fa-3x"></i>
+                    </div>
+                    <h5 class="card-title">الشيكات الصادرة</h5>
+                    <h3 class="text-success">856</h3>
+                    <small class="text-muted">اليوم</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-warning mb-3">
+                        <i class="fas fa-clock fa-3x"></i>
+                    </div>
+                    <h5 class="card-title">الشيكات المؤجلة</h5>
+                    <h3 class="text-warning">342</h3>
+                    <small class="text-muted">قيد الانتظار</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-danger mb-3">
+                        <i class="fas fa-exclamation-triangle fa-3x"></i>
+                    </div>
+                    <h5 class="card-title">الشيكات المرتدة</h5>
+                    <h3 class="text-danger">23</h3>
+                    <small class="text-muted">تحتاج متابعة</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Menu -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-th-large me-2"></i>
+                        القوائم الرئيسية
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Inward Menu -->
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <div class="card border-primary h-100">
+                                <div class="card-header bg-primary text-white text-center">
+                                    <i class="fas fa-arrow-down me-2"></i>الشيكات الواردة
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group list-group-flush">
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-plus-circle me-2"></i>إدخال شيك وارد
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-search me-2"></i>البحث في الشيكات
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-chart-bar me-2"></i>تقارير الشيكات الواردة
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Outward Menu -->
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <div class="card border-success h-100">
+                                <div class="card-header bg-success text-white text-center">
+                                    <i class="fas fa-arrow-up me-2"></i>الشيكات الصادرة
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group list-group-flush">
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-plus-circle me-2"></i>إدخال شيك صادر
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-search me-2"></i>البحث في الشيكات
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-chart-bar me-2"></i>تقارير الشيكات الصادرة
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PDC Menu -->
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <div class="card border-warning h-100">
+                                <div class="card-header bg-warning text-white text-center">
+                                    <i class="fas fa-calendar-alt me-2"></i>الشيكات المؤجلة
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group list-group-flush">
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-plus-circle me-2"></i>إدخال شيك مؤجل
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-search me-2"></i>البحث في الشيكات المؤجلة
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-chart-bar me-2"></i>تقارير الشيكات المؤجلة
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Administration Menu -->
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <div class="card border-info h-100">
+                                <div class="card-header bg-info text-white text-center">
+                                    <i class="fas fa-cogs me-2"></i>الإدارة
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group list-group-flush">
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-users me-2"></i>إدارة المستخدمين
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-shield-alt me-2"></i>الصلاحيات
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-building me-2"></i>إدارة الشركات
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reports Menu -->
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <div class="card border-secondary h-100">
+                                <div class="card-header bg-secondary text-white text-center">
+                                    <i class="fas fa-chart-line me-2"></i>التقارير
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group list-group-flush">
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-file-alt me-2"></i>التقارير اليومية
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-calendar-week me-2"></i>التقارير الأسبوعية
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-calendar me-2"></i>التقارير الشهرية
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Settings Menu -->
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <div class="card border-dark h-100">
+                                <div class="card-header bg-dark text-white text-center">
+                                    <i class="fas fa-tools me-2"></i>الإعدادات
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group list-group-flush">
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-database me-2"></i>إعدادات النظام
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-university me-2"></i>إعدادات البنوك
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <i class="fas fa-backup me-2"></i>النسخ الاحتياطي
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .list-group-item-action:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+        transition: all 0.2s ease;
+    }
+    
+    .fa-3x {
+        font-size: 2.5em;
+    }
+</style>

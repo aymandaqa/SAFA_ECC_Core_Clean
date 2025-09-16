@@ -1,0 +1,807 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = SAFA_ECC_Core_Clean
+build_property.RootNamespace = SAFA_ECC_Core_Clean
+build_property.ProjectDir = /home/ubuntu/SAFA_ECC_Core_Clean/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = /home/ubuntu/SAFA_ECC_Core_Clean
+build_property._RazorSourceGeneratorDebug = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/AddAuth_User.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vQWRkQXV0aF9Vc2VyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/Addgroup.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vQWRkZ3JvdXAuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/AddgroupPermission.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vQWRkZ3JvdXBQZXJtaXNzaW9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/AddUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vQWRkVXNlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/AdduserPermission.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vQWRkdXNlclBlcm1pc3Npb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/Add_Auth.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vQWRkX0F1dGguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/Add_Password_Policies.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vQWRkX1Bhc3N3b3JkX1BvbGljaWVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/AuditLogs.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vQXVkaXRMb2dzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/Auth_User_list.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vQXV0aF9Vc2VyX2xpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/backupRestore.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vYmFja3VwUmVzdG9yZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/dataExport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vZGF0YUV4cG9ydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/deletegroup.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vZGVsZXRlZ3JvdXAuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/DeleteUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vRGVsZXRlVXNlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/editgroup.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vZWRpdGdyb3VwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/EditUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vRWRpdFVzZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/grouplist.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vZ3JvdXBsaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/groupPermissions.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vZ3JvdXBQZXJtaXNzaW9ucy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/index2.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vaW5kZXgyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/PasswordPolicies.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vUGFzc3dvcmRQb2xpY2llcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/reportGeneration.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vcmVwb3J0R2VuZXJhdGlvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/securitySettings.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vc2VjdXJpdHlTZXR0aW5ncy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/systemConfiguration.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vc3lzdGVtQ29uZmlndXJhdGlvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/systemMonitoring.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vc3lzdGVtTW9uaXRvcmluZy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/SystemSettings.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vU3lzdGVtU2V0dGluZ3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/userlist.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vdXNlcmxpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Admin/userPermissions.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vdXNlclBlcm1pc3Npb25zLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Authentication/inword_details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQXV0aGVudGljYXRpb24vaW53b3JkX2RldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Authentication/Outword_details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQXV0aGVudGljYXRpb24vT3V0d29yZF9kZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Authentication/Outword_details_onus.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQXV0aGVudGljYXRpb24vT3V0d29yZF9kZXRhaWxzX29udXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Authentication/PDC_details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQXV0aGVudGljYXRpb24vUERDX2RldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Authentication/Pendding_OutWord_Request1.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQXV0aGVudGljYXRpb24vUGVuZGRpbmdfT3V0V29yZF9SZXF1ZXN0MS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Authentication/Pendding_Request.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQXV0aGVudGljYXRpb24vUGVuZGRpbmdfUmVxdWVzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Authentication/Rejected_Request.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQXV0aGVudGljYXRpb24vUmVqZWN0ZWRfUmVxdWVzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/ChequeViewer/ChequesSearch.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2hlcXVlVmlld2VyL0NoZXF1ZXNTZWFyY2guY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/ChequeViewer/ChequesSearch_old.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2hlcXVlVmlld2VyL0NoZXF1ZXNTZWFyY2hfb2xkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/ChequeViewer/GetChequeDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2hlcXVlVmlld2VyL0dldENoZXF1ZURldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/ChequeViewer/Get_Cheque_Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2hlcXVlVmlld2VyL0dldF9DaGVxdWVfRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/ChequeViewer/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2hlcXVlVmlld2VyL0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/ChequeViewer/PrintAllOutwardCHQ.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2hlcXVlVmlld2VyL1ByaW50QWxsT3V0d2FyZENIUS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/ChequeViewer/PrintCheque_Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2hlcXVlVmlld2VyL1ByaW50Q2hlcXVlX0RldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/ChequeViewer/Print_Cheque_Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2hlcXVlVmlld2VyL1ByaW50X0NoZXF1ZV9EZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/ChequeViewer/Print_Cheque_Details_FromDB.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2hlcXVlVmlld2VyL1ByaW50X0NoZXF1ZV9EZXRhaWxzX0Zyb21EQi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/ChequeViewer/test1.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2hlcXVlVmlld2VyL3Rlc3QxLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Commissions/Authorize.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWlzc2lvbnMvQXV0aG9yaXplLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Commissions/CommisionReport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWlzc2lvbnMvQ29tbWlzaW9uUmVwb3J0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Commissions/CommisionsDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWlzc2lvbnMvQ29tbWlzaW9uc0RldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Commissions/EditCommisionRecord.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWlzc2lvbnMvRWRpdENvbW1pc2lvblJlY29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Commissions/EditExcemptionRecord.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWlzc2lvbnMvRWRpdEV4Y2VtcHRpb25SZWNvcmQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Commissions/ExcemptionsDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWlzc2lvbnMvRXhjZW1wdGlvbnNEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Commissions/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWlzc2lvbnMvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Commissions/Report.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWlzc2lvbnMvUmVwb3J0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/E_Channels/E_ChannelsChq.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRV9DaGFubmVscy9FX0NoYW5uZWxzQ2hxLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Facilities/CONCENTRATE_DETAILS.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRmFjaWxpdGllcy9DT05DRU5UUkFURV9ERVRBSUxTLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Facilities/CONCENTRATE_EMAILS_SETTING.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRmFjaWxpdGllcy9DT05DRU5UUkFURV9FTUFJTFNfU0VUVElORy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Facilities/CUSTOMER_CONCENTRATE.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRmFjaWxpdGllcy9DVVNUT01FUl9DT05DRU5UUkFURS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Facilities/ReportPage.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRmFjaWxpdGllcy9SZXBvcnRQYWdlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Files/Import_Export_Files.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRmlsZXMvSW1wb3J0X0V4cG9ydF9GaWxlcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Financial/group_Financial_Auth.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRmluYW5jaWFsL2dyb3VwX0ZpbmFuY2lhbF9BdXRoLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Financial/User_Financial_Auth.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRmluYW5jaWFsL1VzZXJfRmluYW5jaWFsX0F1dGguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9Qcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/ADDEmail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0FEREVtYWlsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/AddEmailView.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0FkZEVtYWlsVmlldy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/amanitest.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL2FtYW5pdGVzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/ChequeViewer.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0NoZXF1ZVZpZXdlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0RldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/EmailDetail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0VtYWlsRGV0YWlsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/EmailList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0VtYWlsTGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/Email_List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0VtYWlsX0xpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/FixedError.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0ZpeGVkRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/FixRetCHQ.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0ZpeFJldENIUS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/Fix_Ret_CHQ.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0ZpeF9SZXRfQ0hRLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/GET_RETURN_CHQ_BY_CLRCENTER.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0dFVF9SRVRVUk5fQ0hRX0JZX0NMUkNFTlRFUi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/Indextest.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0luZGV4dGVzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/InitialAcceptCheques.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0luaXRpYWxBY2NlcHRDaGVxdWVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/InitialRejectCheques.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0luaXRpYWxSZWplY3RDaGVxdWVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/InsufficientFunds.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0luc3VmZmljaWVudEZ1bmRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/InwardCustomerDues.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0lud2FyZEN1c3RvbWVyRHVlcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/InwardCustomerDuesReport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0lud2FyZEN1c3RvbWVyRHVlc1JlcG9ydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/InwardDataChequeViewr.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0lud2FyZERhdGFDaGVxdWVWaWV3ci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/InwardDataChequeViewrONUS.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0lud2FyZERhdGFDaGVxdWVWaWV3ck9OVVMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/InwardDateVerficationDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0lud2FyZERhdGVWZXJmaWNhdGlvbkRldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/InwardFinanicalWFDetailsONUS.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0lud2FyZEZpbmFuaWNhbFdGRGV0YWlsc09OVVMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/InwardFinanicalWFDetailsPMADIS.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0lud2FyZEZpbmFuaWNhbFdGRGV0YWlsc1BNQURJUy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/InwardFixederrorDetailsONUS.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0lud2FyZEZpeGVkZXJyb3JEZXRhaWxzT05VUy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/InwardFixederrorDetailsPMADIS.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0lud2FyZEZpeGVkZXJyb3JEZXRhaWxzUE1BRElTLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/InwardSearch.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0lud2FyZFNlYXJjaC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/Inward_DateVerficationDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0lud2FyZF9EYXRlVmVyZmljYXRpb25EZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/InwordDateVerfication.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0lud29yZERhdGVWZXJmaWNhdGlvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/INWTIMEOUT.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL0lOV1RJTUVPVVQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/MagicScreen.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL01hZ2ljU2NyZWVuLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/Magic_screen.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL01hZ2ljX3NjcmVlbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/PMADATAVerficationDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL1BNQURBVEFWZXJmaWNhdGlvbkRldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/PMADATAVerficationDetails_OnUS.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL1BNQURBVEFWZXJmaWNhdGlvbkRldGFpbHNfT25VUy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/PMADataVerification.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL1BNQURhdGFWZXJpZmljYXRpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/PMA_Data.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL1BNQV9EYXRhLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/PMA_DATAVerficationDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL1BNQV9EQVRBVmVyZmljYXRpb25EZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/PMA_DATAVerficationDetails_OnUS.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL1BNQV9EQVRBVmVyZmljYXRpb25EZXRhaWxzX09uVVMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/Posting_Restrictions.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL1Bvc3RpbmdfUmVzdHJpY3Rpb25zLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/Print_CHQ_QR.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL1ByaW50X0NIUV9RUi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/Reject_CHQ.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL1JlamVjdF9DSFEuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/Resend_INW_file.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL1Jlc2VuZF9JTldfZmlsZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/ReturnInwardStoppedChequeDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL1JldHVybklud2FyZFN0b3BwZWRDaGVxdWVEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/ReturnOnUsStoppedChequeDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL1JldHVybk9uVXNTdG9wcGVkQ2hlcXVlRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/ReturnStoppedCheques.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL1JldHVyblN0b3BwZWRDaGVxdWVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/T24_JOB.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL1QyNF9KT0IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/test_amani.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL3Rlc3RfYW1hbmkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/ViewDetailsinwarad.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL1ZpZXdEZXRhaWxzaW53YXJhZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/ViewDetailsOutward.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL1ZpZXdEZXRhaWxzT3V0d2FyZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/VIPCHQ.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL1ZJUENIUS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Inward/WFChqStatus.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSW53YXJkL1dGQ2hxU3RhdHVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Login/Block.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvTG9naW4vQmxvY2suY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Login/BlockView.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvTG9naW4vQmxvY2tWaWV3LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Login/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvTG9naW4vSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Login/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvTG9naW4vTG9naW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/LoginChangePassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvTG9naW5DaGFuZ2VQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/AllInwardoutwardChq.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9BbGxJbndhcmRvdXR3YXJkQ2hxLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/AllOutChq.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9BbGxPdXRDaHEuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/check_img.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9jaGVja19pbWcuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/Deleteoutchq.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9EZWxldGVvdXRjaHEuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/Get_ReturnedINHOUSESlipDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9HZXRfUmV0dXJuZWRJTkhPVVNFU2xpcERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/Get_ReturnedSlipDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9HZXRfUmV0dXJuZWRTbGlwRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/Get_ReturnedSlipDetails_20230904.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9HZXRfUmV0dXJuZWRTbGlwRGV0YWlsc18yMDIzMDkwNC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/Hold_CHQ.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9Ib2xkX0NIUS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/outward_views.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9vdXR3YXJkX3ZpZXdzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/OUTWORD.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9PVVRXT1JELmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/Out_VerficationDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9PdXRfVmVyZmljYXRpb25EZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/Pendding_OutWord_Request.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9QZW5kZGluZ19PdXRXb3JkX1JlcXVlc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/PospondingChq.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9Qb3Nwb25kaW5nQ2hxLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/PrintOutwordRecipt.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9QcmludE91dHdvcmRSZWNpcHQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/Rejected_Out_Request.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9SZWplY3RlZF9PdXRfUmVxdWVzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/RepresentReturnDis.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9SZXByZXNlbnRSZXR1cm5EaXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/RepresnetDisDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9SZXByZXNuZXREaXNEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/retunedchqstates.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9yZXR1bmVkY2hxc3RhdGVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/returndiscountchq.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9yZXR1cm5kaXNjb3VudGNocS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/ReturnedOutwardSlips.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9SZXR1cm5lZE91dHdhcmRTbGlwcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/ReturnOwtward.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9SZXR1cm5Pd3R3YXJkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/TimeOutRequest.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9UaW1lT3V0UmVxdWVzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/Update_oUTWORD_Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC9VcGRhdGVfb1VUV09SRF9EZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/update_Post_Outword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC91cGRhdGVfUG9zdF9PdXR3b3JkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Outward/update_Reverse_Outword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3V0d2FyZC91cGRhdGVfUmV2ZXJzZV9PdXR3b3JkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/Authrization_code.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL0F1dGhyaXphdGlvbl9jb2RlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/Banks_Branchs.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL0JhbmtzX0JyYW5jaHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/CHQ_STATUS.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL0NIUV9TVEFUVVMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/FaildPostDateVerficationDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL0ZhaWxkUG9zdERhdGVWZXJmaWNhdGlvbkRldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/FaildPostDateVerficationDetails_Auth.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL0ZhaWxkUG9zdERhdGVWZXJmaWNhdGlvbkRldGFpbHNfQXV0aC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/FaildT24Tranzactiuon.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL0ZhaWxkVDI0VHJhbnphY3RpdW9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/GET_G1_G14_REPORT.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL0dFVF9HMV9HMTRfUkVQT1JULmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/Outward_Parameter.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL091dHdhcmRfUGFyYW1ldGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/PDCCheques.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL1BEQ0NoZXF1ZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/PDCCheques20240429.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL1BEQ0NoZXF1ZXMyMDI0MDQyOS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/PDCCheques202412.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL1BEQ0NoZXF1ZXMyMDI0MTIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/PDCCheques_Auth.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL1BEQ0NoZXF1ZXNfQXV0aC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/PDC_G12_G14.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL1BEQ19HMTJfRzE0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/PDC_OUTWORD.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL1BEQ19PVVRXT1JELmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/PDC_Report.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL1BEQ19SZXBvcnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/PDC_Withdrow.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL1BEQ19XaXRoZHJvdy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/PostDateUpdateDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL1Bvc3REYXRlVXBkYXRlRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/PDC/PostDateVerfication.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUERDL1Bvc3REYXRlVmVyZmljYXRpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Reports/AllReports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0cy9BbGxSZXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Reports/BankReports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0cy9CYW5rUmVwb3J0cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Reports/ChequeReports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0cy9DaGVxdWVSZXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Reports/CustomerReports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0cy9DdXN0b21lclJlcG9ydHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Reports/DailyReports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0cy9EYWlseVJlcG9ydHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Reports/Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0cy9EYXNoYm9hcmQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Reports/FinancialReports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0cy9GaW5hbmNpYWxSZXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Reports/MonthlyReports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0cy9Nb250aGx5UmVwb3J0cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Reports/SystemReports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0cy9TeXN0ZW1SZXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Reports/TransactionReports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0cy9UcmFuc2FjdGlvblJlcG9ydHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Reports/UserReports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0cy9Vc2VyUmVwb3J0cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL0Vycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Shared/_BreadcrumbNavigation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19CcmVhZGNydW1iTmF2aWdhdGlvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Shared/_ConfirmationModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19Db25maXJtYXRpb25Nb2RhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Shared/_ErrorPage.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19FcnJvclBhZ2UuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Shared/_LoadingPage.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19Mb2FkaW5nUGFnZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Shared/_LoginLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19Mb2dpbkxheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Shared/_NotificationPanel.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19Ob3RpZmljYXRpb25QYW5lbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Shared/_PartialFooter.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19QYXJ0aWFsRm9vdGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Shared/_PartialHeader.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19QYXJ0aWFsSGVhZGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Shared/_PartialSidebar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19QYXJ0aWFsU2lkZWJhci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/System/AuditLog.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3lzdGVtL0F1ZGl0TG9nLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/System/PermissionSettings.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3lzdGVtL1Blcm1pc3Npb25TZXR0aW5ncy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/System/RoleManagement.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3lzdGVtL1JvbGVNYW5hZ2VtZW50LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/System/SystemConfiguration.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3lzdGVtL1N5c3RlbUNvbmZpZ3VyYXRpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/System/UserManagement.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3lzdGVtL1VzZXJNYW5hZ2VtZW50LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Test/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGVzdC9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Users/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVXNlcnMvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/ubuntu/SAFA_ECC_Core_Clean/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-dj1z2rs6i5

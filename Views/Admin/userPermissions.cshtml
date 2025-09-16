@@ -1,0 +1,151 @@
+@model SAFA_ECC_Core_Clean.ViewModels.UserPermissionsViewModel
+
+@{
+    ViewData["Title"] = "إدارة صلاحيات المستخدمين";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div dir="rtl" class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title text-right">إدارة صلاحيات المستخدمين</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="UserPermissions" method="get" class="mb-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control" asp-for="SearchTerm" placeholder="ابحث باسم المستخدم أو البريد الإلكتروني" />
+                            <button type="submit" class="btn btn-primary">بحث</button>
+                        </div>
+                    </form>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped text-right">
+                            <thead>
+                                <tr>
+                                    <th>اسم المستخدم</th>
+                                    <th>البريد الإلكتروني</th>
+                                    <th>الأدوار</th>
+                                    <th>مفعل</th>
+                                    <th>إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null && Model.Users != null && Model.Users.Any())
+                                {
+                                    @foreach (var user in Model.Users)
+                                    {
+                                        <tr>
+                                            <td>@user.UserName</td>
+                                            <td>@user.Email</td>
+                                            <td>@(string.Join("، ", user.Roles))</td>
+                                            <td>
+                                                <input type="checkbox" asp-for="@user.IsActive" disabled="disabled" />
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal" data-user-id="@user.Id">تعديل</button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center">لا توجد بيانات لعرضها.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Modal لتعديل المستخدم -->
+                    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header bg-primary text-white">
+                                    <h5 class="modal-title" id="editUserModalLabel">تعديل صلاحيات المستخدم</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                                </div>
+                                <form asp-action="UpdateUserPermissions" method="post">
+                                    <div class="modal-body text-right">
+                                        <input type="hidden" id="editUserId" name="Id" />
+                                        <div class="mb-3">
+                                            <label for="editUserName" class="form-label">اسم المستخدم:</label>
+                                            <input type="text" class="form-control" id="editUserName" name="UserName" readonly />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="editUserEmail" class="form-label">البريد الإلكتروني:</label>
+                                            <input type="email" class="form-control" id="editUserEmail" name="Email" readonly />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="editUserRoles" class="form-label">الأدوار:</label>
+                                            <select multiple class="form-control" id="editUserRoles" name="Roles">
+                                                <!-- سيتم ملء الخيارات بواسطة JavaScript -->
+                                            </select>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="editUserIsActive" name="IsActive">
+                                            <label class="form-check-label" for="editUserIsActive">
+                                                مفعل
+                                            </label>
+                                        </div>
+                                        <div asp-validation-summary="All" class="text-danger"></div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                                        <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $(\'#editUserModal\\').on(\'show.bs.modal\', function (event) {
+                var button = $(event.relatedTarget); // الزر الذي أطلق المودال
+                var userId = button.data(\'user-id\'); // استخراج معرف المستخدم من سمة data-user-id
+
+                // هنا يجب عليك إجراء طلب AJAX لجلب بيانات المستخدم بناءً على userId
+                // وملء حقول المودال بها. لغرض هذا المثال، سنستخدم بيانات وهمية.
+
+                // بيانات وهمية (يجب استبدالها ببيانات حقيقية من الخادم)
+                var usersData = [
+                    { Id: \'1\', UserName: \'admin\', Email: \'admin@example.com\', Roles: [\'Admin\', \'Editor\'], AvailableRoles: [\'Admin\', \'Editor\', \'Viewer\'], IsActive: true },
+                    { Id: \'2\', UserName: \'user1\', Email: \'user1@example.com\', Roles: [\'Viewer\'], AvailableRoles: [\'Admin\', \'Editor\', \'Viewer\'], IsActive: true },
+                    { Id: \'3\', UserName: \'user2\', Email: \'user2@example.com\', Roles: [], AvailableRoles: [\'Admin\', \'Editor\', \'Viewer\'], IsActive: false }
+                ];
+
+                var user = usersData.find(u => u.Id === userId);
+
+                if (user) {
+                    var modal = $(this);
+                    modal.find(\'#editUserId\').val(user.Id);
+                    modal.find(\'#editUserName\').val(user.UserName);
+                    modal.find(\'#editUserEmail\').val(user.Email);
+                    modal.find(\'#editUserIsActive\').prop(\'checked\', user.IsActive);
+
+                    var rolesSelect = modal.find(\'#editUserRoles\');
+                    rolesSelect.empty(); // مسح الخيارات القديمة
+
+                    user.AvailableRoles.forEach(function (role) {
+                        var option = $(\'<option></option>\').val(role).text(role);
+                        if (user.Roles.includes(role)) {
+                            option.attr(\'selected\', \'selected\');
+                        }
+                        rolesSelect.append(option);
+                    });
+                }
+            });
+        });
+    </script>
+}

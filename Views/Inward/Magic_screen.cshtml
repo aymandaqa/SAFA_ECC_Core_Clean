@@ -1,0 +1,132 @@
+
+@page
+@model SAFA_ECC_Core_Clean.ViewModels.MagicScreenViewModel
+
+@* 
+    ملاحظة هامة:
+    SAFA_ECC_Core_Clean.ViewModels.MagicScreenViewModel
+    يجب أن يكون هذا الـ ViewModel معرفًا في مشروع SAFA_ECC_Core_Clean.ViewModels.
+    لقد تم استخدام خصائصه (مثل Model.SearchCriteria.Field1 و Model.Results) في هذه الصفحة.
+    تأكد من أن هيكل الـ ViewModel في مشروعك يتطابق مع الاستخدام هنا.
+*@
+
+@{ 
+    ViewData["Title"] = "الشاشة السحرية";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        direction: rtl; /* تعيين اتجاه النص من اليمين إلى اليسار */
+        text-align: right; /* محاذاة النص إلى اليمين */
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <h1>@ViewData["Title"]</h1>
+
+
+    <!-- 
+        هنا يمكنك استخدام خصائص الـ ViewModel (SAFA_ECC_Core_Clean.ViewModels.MagicScreenViewModel)
+        لعرض البيانات أو ربط عناصر التحكم بها.
+        مثال: @Model.SomeProperty
+    -->
+
+    <!-- نموذج البحث -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">نموذج البحث</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="inputField1" class="form-label">الحقل الأول</label>
+                                <input type="text" class="form-control" id="inputField1" placeholder="أدخل قيمة" asp-for="SearchCriteria.Field1">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="inputField2" class="form-label">الحقل الثاني</label>
+                                <input type="text" class="form-control" id="inputField2" placeholder="أدخل قيمة أخرى" asp-for="SearchCriteria.Field2">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="selectField" class="form-label">اختيار</label>
+                                <select class="form-select" id="selectField" asp-for="SearchCriteria.SelectedOption">
+                                    <option selected>اختر...</option>
+                                    <option value="1">الخيار الأول</option>
+                                    <option value="2">الخيار الثاني</option>
+                                    <option value="3">الخيار الثالث</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary me-2">بحث</button>
+                            <button type="reset" class="btn btn-secondary">مسح</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نتائج البحث -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">نتائج البحث</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">العمود الأول</th>
+                                    <th scope="col">العمود الثاني</th>
+                                    <th scope="col">العمود الثالث</th>
+                                    <th scope="col">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Results != null && Model.Results.Any())
+                                {
+                                    @foreach (var item in Model.Results)
+                                    {
+                                        <tr>
+                                            <th scope="row">@item.Id</th>
+                                            <td>@item.Column1</td>
+                                            <td>@item.Column2</td>
+                                            <td>@item.Column3</td>
+                                            <td>
+                                                <button class="btn btn-info btn-sm">عرض</button>
+                                                <button class="btn btn-warning btn-sm">تعديل</button>
+                                                <button class="btn btn-danger btn-sm">حذف</button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center">لا توجد نتائج لعرضها.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- زر رئيسي -->
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <button class="btn btn-success btn-lg">زر رئيسي</button>
+        </div>
+    </div>
+
+
+</div>

@@ -1,0 +1,96 @@
+@model SAFA_ECC_Core_Clean.ViewModels.OutwordDetailsViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل الصادر";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid" dir="rtl">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-right">@ViewData["Title"]</h1>
+            <hr />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white text-right">
+                    <h5>تفاصيل التفويض</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row text-right">
+                        <dt class="col-sm-3">رقم التفويض:</dt>
+                        <dd class="col-sm-9">@Model.AuthorizationNumber</dd>
+
+                        <dt class="col-sm-3">تاريخ التفويض:</dt>
+                        <dd class="col-sm-9">@Model.AuthorizationDate.ToShortDateString()</dd>
+
+                        <dt class="col-sm-3">الحالة:</dt>
+                        <dd class="col-sm-9">@Model.Status</dd>
+
+                        <dt class="col-sm-3">المبلغ الإجمالي:</dt>
+                        <dd class="col-sm-9">@Model.TotalAmount.ToString("N2")</dd>
+
+                        <dt class="col-sm-3">الملاحظات:</dt>
+                        <dd class="col-sm-9">@Model.Notes</dd>
+                    </dl>
+                    <div class="text-left mt-3">
+                        <a asp-action="EditAuthorization" asp-route-id="@Model.AuthorizationId" class="btn btn-warning">تعديل التفويض</a>
+                        <a asp-action="DeleteAuthorization" asp-route-id="@Model.AuthorizationId" class="btn btn-danger">حذف التفويض</a>
+                        <a asp-action="Index" class="btn btn-secondary">العودة للقائمة</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white text-right">
+                    <h5>تفاصيل المعاملات</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Transactions != null && Model.Transactions.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover text-right">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>رقم المعاملة</th>
+                                        <th>تاريخ المعاملة</th>
+                                        <th>الوصف</th>
+                                        <th>المبلغ</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var transaction in Model.Transactions)
+                                    {
+                                        <tr>
+                                            <td>@transaction.TransactionNumber</td>
+                                            <td>@transaction.TransactionDate.ToShortDateString()</td>
+                                            <td>@transaction.Description</td>
+                                            <td>@transaction.Amount.ToString("N2")</td>
+                                            <td>
+                                                <a asp-action="EditTransaction" asp-route-id="@transaction.TransactionId" class="btn btn-sm btn-outline-warning">تعديل</a>
+                                                <a asp-action="DeleteTransaction" asp-route-id="@transaction.TransactionId" class="btn btn-sm btn-outline-danger">حذف</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-right">لا توجد معاملات لعرضها.</p>
+                    }
+                    <div class="text-left mt-3">
+                        <a asp-action="AddTransaction" asp-route-authorizationId="@Model.AuthorizationId" class="btn btn-success">إضافة معاملة جديدة</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+

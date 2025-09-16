@@ -1,0 +1,90 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model Out_VerificationDetailsViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل التحقق الصادر";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h2 class="text-end mb-4">@ViewData["Title"]</h2>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white text-end">
+            معلومات التحقق الأساسية
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="VerificationId" class="form-label float-end">معرف التحقق:</label>
+                        <input asp-for="VerificationId" class="form-control text-end" readonly />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="RequestDate" class="form-label float-end">تاريخ الطلب:</label>
+                        <input asp-for="RequestDate" class="form-control text-end" type="date" readonly />
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="RequesterName" class="form-label float-end">اسم الطالب:</label>
+                        <input asp-for="RequesterName" class="form-control text-end" readonly />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Status" class="form-label float-end">الحالة:</label>
+                        <input asp-for="Status" class="form-control text-end" readonly />
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label asp-for="Description" class="form-label float-end">الوصف:</label>
+                        <textarea asp-for="Description" class="form-control text-end" rows="3" readonly></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-info text-white text-end">
+            تفاصيل العناصر للتحقق
+        </div>
+        <div class="card-body">
+            @if (Model.Items != null && Model.Items.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover text-end">
+                        <thead class="table-light">
+                            <tr>
+                                <th>اسم العنصر</th>
+                                <th>الكمية</th>
+                                <th>ملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td>@item.ItemName</td>
+                                    <td>@item.Quantity</td>
+                                    <td>@item.Notes</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-center">لا توجد عناصر للتحقق.</p>
+            }
+        </div>
+    </div>
+
+    <div class="text-end mb-4">
+        <a asp-action="Index" class="btn btn-secondary">العودة إلى القائمة</a>
+        <button type="button" class="btn btn-success">اعتماد</button>
+        <button type="button" class="btn btn-danger">رفض</button>
+    </div>
+</div>
+

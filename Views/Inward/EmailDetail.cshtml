@@ -1,0 +1,88 @@
+@model SAFA_ECC_Core_Clean.ViewModels.EmailDetailViewModel
+
+@{
+    ViewData["Title"] = "تفاصيل البريد الإلكتروني";
+}
+
+<div class="container-fluid" dir="rtl">
+    <h1 class="mt-4 mb-4 text-right">@ViewData["Title"]</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row-reverse align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">تفاصيل الرسالة</h6>
+            <a asp-action="Index" class="btn btn-secondary btn-sm">
+                <i class="fas fa-arrow-right fa-sm text-white-50"></i> العودة إلى قائمة البريد
+            </a>
+        </div>
+        <div class="card-body text-right">
+            <dl class="row">
+                <dt class="col-sm-3">
+                    الموضوع:
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Subject)
+                </dd>
+                <dt class="col-sm-3">
+                    المرسل:
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Sender)
+                </dd>
+                <dt class="col-sm-3">
+                    المستلم:
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Recipient)
+                </dd>
+                <dt class="col-sm-3">
+                    التاريخ:
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Date)
+                </dd>
+            </dl>
+            <hr />
+            <div class="form-group">
+                <label class="font-weight-bold">نص الرسالة:</label>
+                <div class="border p-3 rounded bg-light" style="min-height: 200px;">
+                    @Html.Raw(Model.Body)
+                </div>
+            </div>
+            <hr />
+            @if (Model.Attachments != null && Model.Attachments.Any())
+            {
+                <div class="form-group">
+                    <label class="font-weight-bold">المرفقات:</label>
+                    <ul class="list-group list-group-flush">
+                        @foreach (var attachment in Model.Attachments)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @attachment.FileName
+                                <a href="@attachment.DownloadUrl" class="btn btn-info btn-sm" download>
+                                    <i class="fas fa-download"></i> تحميل
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="card shadow mb-4 mt-4">
+        <div class="card-header py-3 text-right">
+            <h6 class="m-0 font-weight-bold text-primary">الإجراءات</h6>
+        </div>
+        <div class="card-body text-right">
+            <button type="button" class="btn btn-primary ml-2">الرد</button>
+            <button type="button" class="btn btn-info ml-2">إعادة توجيه</button>
+            <button type="button" class="btn btn-danger">حذف</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة أي سكريبتات خاصة بالصفحة هنا
+    </script>
+}

@@ -1,0 +1,87 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model AuditLogsViewModel
+
+@{ 
+    ViewData["Title"] = "سجلات التدقيق";
+}
+
+<h1 class="text-center mb-4">سجلات التدقيق</h1>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white text-end">
+        <h5 class="mb-0">قائمة سجلات التدقيق</h5>
+    </div>
+    <div class="card-body">
+        @if (Model.AuditLogs != null && Model.AuditLogs.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered table-hover text-end">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>@Html.DisplayNameFor(model => model.AuditLogs.FirstOrDefault()!.Id)</th>
+                            <th>@Html.DisplayNameFor(model => model.AuditLogs.FirstOrDefault()!.Timestamp)</th>
+                            <th>@Html.DisplayNameFor(model => model.AuditLogs.FirstOrDefault()!.UserName)</th>
+                            <th>@Html.DisplayNameFor(model => model.AuditLogs.FirstOrDefault()!.Action)</th>
+                            <th>@Html.DisplayNameFor(model => model.AuditLogs.FirstOrDefault()!.EntityType)</th>
+                            <th>@Html.DisplayNameFor(model => model.AuditLogs.FirstOrDefault()!.EntityId)</th>
+                            <th>@Html.DisplayNameFor(model => model.AuditLogs.FirstOrDefault()!.IpAddress)</th>
+                            <th>@Html.DisplayNameFor(model => model.AuditLogs.FirstOrDefault()!.Details)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var log in Model.AuditLogs)
+                        {
+                            <tr>
+                                <td>@log.Id</td>
+                                <td>@log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                <td>@log.UserName</td>
+                                <td>@log.Action</td>
+                                <td>@log.EntityType</td>
+                                <td>@log.EntityId</td>
+                                <td>@log.IpAddress</td>
+                                <td>@log.Details</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <nav aria-label="Page navigation example" dir="rtl">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")"><a class="page-link" href="#">@i</a></li>
+                    }
+                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <p class="text-center mt-3">عرض @(Model.AuditLogs?.Count ?? 0) سجل من أصل @(Model.TotalRecords)</p>
+        }
+        else
+        {
+            <div class="alert alert-info text-center" role="alert">
+                لا توجد سجلات تدقيق لعرضها.
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة أي سكريبتات خاصة بالصفحة هنا، مثل البحث أو التصفية الديناميكية
+        // على سبيل المثال، لتفعيل Tooltips في Bootstrap:
+        // var tooltipTriggerList = [].slice.call(document.querySelectorAll(\'[data-bs-toggle="tooltip"]\'))
+        // var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        //     return new bootstrap.Tooltip(tooltipTriggerEl)
+        // })
+    </script>
+}

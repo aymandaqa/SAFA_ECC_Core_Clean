@@ -1,0 +1,106 @@
+@model SAFA_ECC_Core_Clean.ViewModels.ImportExportViewModel
+
+@{ 
+    ViewData["Title"] = "استيراد وتصدير الملفات";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center mb-4">@ViewData["Title"]</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- قسم الاستيراد -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white text-end">
+                    <h4>استيراد البيانات</h4>
+                </div>
+                <div class="card-body text-end">
+                    <form asp-action="Import" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="importFile" class="form-label">اختر ملف للاستيراد:</label>
+                            <input type="file" class="form-control" id="importFile" name="importFile" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">استيراد</button>
+                    </form>
+                    <hr>
+                    <h5>سجل الاستيراد</h5>
+                    <table class="table table-striped table-bordered text-end">
+                        <thead>
+                            <tr>
+                                <th>تاريخ الاستيراد</th>
+                                <th>اسم الملف</th>
+                                <th>الحالة</th>
+                                <th>الرسالة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- بيانات سجل الاستيراد من ViewModel -->
+                            @* @foreach (var log in Model.ImportLogs)
+                            {
+                                <tr>
+                                    <td>@log.ImportDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@log.FileName</td>
+                                    <td>@log.Status</td>
+                                    <td>@log.Message</td>
+                                </tr>
+                            } *@
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- قسم التصدير -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white text-end">
+                    <h4>تصدير البيانات</h4>
+                </div>
+                <div class="card-body text-end">
+                    <form asp-action="Export" method="get">
+                        <div class="mb-3">
+                            <label for="exportType" class="form-label">اختر نوع التصدير:</label>
+                            <select class="form-select" id="exportType" name="exportType">
+                                <option value="excel">Excel</option>
+                                <option value="csv">CSV</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">تصدير</button>
+                    </form>
+                    <hr>
+                    <h5>سجل التصدير</h5>
+                    <table class="table table-striped table-bordered text-end">
+                        <thead>
+                            <tr>
+                                <th>تاريخ التصدير</th>
+                                <th>نوع التصدير</th>
+                                <th>الحالة</th>
+                                <th>الرسالة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- بيانات سجل التصدير من ViewModel -->
+                            @* @foreach (var log in Model.ExportLogs)
+                            {
+                                <tr>
+                                    <td>@log.ExportDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@log.ExportType</td>
+                                    <td>@log.Status</td>
+                                    <td>@log.Message</td>
+                                </tr>
+                            } *@
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- يمكن إضافة أي سكربتات خاصة بالصفحة هنا -->
+}

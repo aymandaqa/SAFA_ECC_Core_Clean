@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SAFA_ECC_Core</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SAFA_ECC_Core.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container d-flex justify-content-center align-items-center min-vh-100">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SAFA_ECC_Core</a>
+            </div>
+        </nav>
+    </header>
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2023 - SAFA_ECC_Core - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+</body>
+</html>
+
+
+
+@* 
+    ملاحظات حول استخدام ViewModels:
+    تُستخدم ViewModels (نماذج العرض) عادةً في الصفحات الفرعية (Views) التي يتم عرضها داخل هذا التخطيط (_LoginLayout.cshtml).
+    يجب أن تقوم كل صفحة فرعية بتعريف ViewModel الخاص بها من SAFA_ECC_Core_Clean.ViewModels لتمرير البيانات اللازمة إليها.
+    
+    مثال:
+    @model SAFA_ECC_Core_Clean.ViewModels.LoginViewModel
+
+    تطبيق التصميم والهيكل العام:
+    هذه الصفحة (_LoginLayout.cshtml) توفر الهيكل الأساسي (Layout) للصفحات المشتركة المتعلقة بتسجيل الدخول أو المصادقة.
+    يجب أن تلتزم الصفحات الفرعية التي تستخدم هذا التخطيط بالأنماط (styles) والسكريبتات (scripts) المضمنة هنا لضمان الاتساق في التصميم.
+    تم تصميم هذا التخطيط ليكون متوافقًا مع Bootstrap 5 ويدعم اللغة العربية (RTL).
+*@
+

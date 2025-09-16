@@ -1,0 +1,88 @@
+
+@using SAFA_ECC_Core_Clean.ViewModels
+@model ReturnOutwardViewModel
+
+@{ 
+    ViewData["Title"] = "إرجاع صادر";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h2 class="text-end mb-4">@ViewData["Title"]</h2>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white text-end">
+            <h5 class="mb-0">تفاصيل الإرجاع الصادر</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="ReturnOutward" method="post">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="ItemId" class="form-label float-end">رقم الصنف:</label>
+                        <input asp-for="ItemId" class="form-control text-end" />
+                        <span asp-validation-for="ItemId" class="text-danger float-end"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Quantity" class="form-label float-end">الكمية المرتجعة:</label>
+                        <input asp-for="Quantity" class="form-control text-end" />
+                        <span asp-validation-for="Quantity" class="text-danger float-end"></span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label asp-for="Reason" class="form-label float-end">سبب الإرجاع:</label>
+                        <textarea asp-for="Reason" class="form-control text-end" rows="3"></textarea>
+                        <span asp-validation-for="Reason" class="text-danger float-end"></span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-success me-2">حفظ الإرجاع</button>
+                    <a asp-action="Index" class="btn btn-secondary">إلغاء</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white text-end">
+            <h5 class="mb-0">سجل الإرجاعات الصادرة</h5>
+        </div>
+        <div class="card-body">
+            @if (Model != null && Model.RecentReturns != null && Model.RecentReturns.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered text-end">
+                        <thead>
+                            <tr>
+                                <th class="text-end">رقم الإرجاع</th>
+                                <th class="text-end">رقم الصنف</th>
+                                <th class="text-end">الكمية</th>
+                                <th class="text-end">السبب</th>
+                                <th class="text-end">تاريخ الإرجاع</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.RecentReturns)
+                            {
+                                <tr>
+                                    <td>@item.ReturnId</td>
+                                    <td>@item.ItemId</td>
+                                    <td>@item.Quantity</td>
+                                    <td>@item.Reason</td>
+                                    <td>@item.ReturnDate.ToShortDateString()</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-end">لا توجد إرجاعات صادرة لعرضها.</p>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

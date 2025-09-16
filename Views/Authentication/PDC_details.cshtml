@@ -1,0 +1,102 @@
+@model PDCDetailsViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل التفويض والمعاملات";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h1 class="text-right mb-4">@ViewData["Title"]</h1>
+
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Content will be added here -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Add any necessary scripts here -->
+}
+
+
+
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">تفاصيل التفويض</h5>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">رقم التفويض:</dt>
+            <dd class="col-sm-9">@Model.AuthorizationId</dd>
+
+            <dt class="col-sm-3">تاريخ التفويض:</dt>
+            <dd class="col-sm-9">@Model.AuthorizationDate.ToShortDateString()</dd>
+
+            <dt class="col-sm-3">حالة التفويض:</dt>
+            <dd class="col-sm-9">@Model.AuthorizationStatus</dd>
+
+            <dt class="col-sm-3">المبلغ الإجمالي:</dt>
+            <dd class="col-sm-9">@Model.TotalAmount.ToString("C")</dd>
+
+            <dt class="col-sm-3">الجهة المانحة:</dt>
+            <dd class="col-sm-9">@Model.GrantingEntity</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">تفاصيل المعاملات</h5>
+    </div>
+    <div class="card-body">
+        @if (Model.Transactions != null && Model.Transactions.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>رقم المعاملة</th>
+                            <th>تاريخ المعاملة</th>
+                            <th>الوصف</th>
+                            <th>المبلغ</th>
+                            <th>الحالة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var transaction in Model.Transactions)
+                        {
+                            <tr>
+                                <td>@transaction.TransactionId</td>
+                                <td>@transaction.TransactionDate.ToShortDateString()</td>
+                                <td>@transaction.Description</td>
+                                <td>@transaction.Amount.ToString("C")</td>
+                                <td>@transaction.Status</td>
+                                <td>
+                                    <a asp-action="EditTransaction" asp-route-id="@transaction.TransactionId" class="btn btn-sm btn-warning">تعديل</a>
+                                    <a asp-action="DeleteTransaction" asp-route-id="@transaction.TransactionId" class="btn btn-sm btn-danger">حذف</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">لا توجد معاملات لعرضها.</p>
+        }
+    </div>
+    <div class="card-footer text-right">
+        <a asp-action="CreateTransaction" asp-route-authId="@Model.AuthorizationId" class="btn btn-success">إضافة معاملة جديدة</a>
+    </div>
+</div>
+
+<div class="text-center mt-4">
+    <a asp-action="Index" class="btn btn-secondary">العودة إلى القائمة</a>
+    <a asp-action="Edit" asp-route-id="@Model.AuthorizationId" class="btn btn-primary">تعديل التفويض</a>
+    <a asp-action="Delete" asp-route-id="@Model.AuthorizationId" class="btn btn-danger">حذف التفويض</a>
+</div>
+

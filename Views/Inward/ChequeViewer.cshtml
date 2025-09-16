@@ -1,0 +1,122 @@
+
+@using SAFA_ECC_Core_Clean.ViewModels
+@model ChequeViewerViewModel
+
+@{ 
+    ViewData["Title"] = "عرض الشيكات الواردة";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="text-center mb-4">@ViewData["Title"]</h1>
+
+<div class="container-fluid" dir="rtl">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">خيارات البحث</h6>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="chequeNumber" class="form-label">رقم الشيك:</label>
+                                <input type="text" class="form-control" id="chequeNumber" placeholder="أدخل رقم الشيك">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="bankName" class="form-label">اسم البنك:</label>
+                                <input type="text" class="form-control" id="bankName" placeholder="أدخل اسم البنك">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="chequeDate" class="form-label">تاريخ الشيك:</label>
+                                <input type="date" class="form-control" id="chequeDate">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="amount" class="form-label">المبلغ:</label>
+                                <input type="number" class="form-control" id="amount" placeholder="أدخل المبلغ">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="status" class="form-label">الحالة:</label>
+                                <select class="form-select" id="status">
+                                    <option selected>اختر الحالة...</option>
+                                    <option value="1">معلق</option>
+                                    <option value="2">مقبول</option>
+                                    <option value="3">مرفوض</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end justify-content-end">
+                                <button type="submit" class="btn btn-primary me-2">بحث</button>
+                                <button type="reset" class="btn btn-secondary">مسح</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">نتائج البحث</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover text-center" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>رقم الشيك</th>
+                                    <th>اسم البنك</th>
+                                    <th>تاريخ الشيك</th>
+                                    <th>المبلغ</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @* هنا سيتم عرض بيانات الشيكات ديناميكياً *@
+                                <tr>
+                                    <td>123456789</td>
+                                    <td>بنك فلسطين</td>
+                                    <td>2025-09-16</td>
+                                    <td>1500.00</td>
+                                    <td>معلق</td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm">عرض</button>
+                                        <button class="btn btn-success btn-sm">قبول</button>
+                                        <button class="btn btn-danger btn-sm">رفض</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>987654321</td>
+                                    <td>البنك الإسلامي العربي</td>
+                                    <td>2025-09-15</td>
+                                    <td>2300.50</td>
+                                    <td>مقبول</td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm">عرض</button>
+                                        <button class="btn btn-success btn-sm" disabled>قبول</button>
+                                        <button class="btn btn-danger btn-sm">رفض</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة أكواد JavaScript هنا للتعامل مع البحث أو عرض البيانات ديناميكياً
+        $(document).ready(function() {
+            // تهيئة DataTable إذا كانت مستخدمة
+            // $(\'#dataTable\').DataTable();
+        });
+    </script>
+}

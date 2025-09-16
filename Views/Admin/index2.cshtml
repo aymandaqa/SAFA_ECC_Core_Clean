@@ -1,0 +1,228 @@
+@model SAFA_ECC_Core_Clean.ViewModels.AdminDashboard2ViewModel
+@{
+    ViewData["Title"] = "لوحة التحكم المتقدمة";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <h4 class="page-title">لوحة التحكم المتقدمة</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">الرئيسية</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index")">الإدارة</a></li>
+                        <li class="breadcrumb-item active">لوحة التحكم المتقدمة</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- إحصائيات النظام -->
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="header-title">إحصائيات النظام</h4>
+                </div>
+                <div class="card-body">
+                    @if (Model.SystemStats != null)
+                    {
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <h3 class="text-primary">@Model.SystemStats.TotalTransactions</h3>
+                                    <p class="text-muted mb-0">إجمالي المعاملات</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <h3 class="text-success">@Model.SystemStats.ProcessedToday</h3>
+                                    <p class="text-muted mb-0">معالج اليوم</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <h3 class="text-warning">@Model.SystemStats.PendingProcessing</h3>
+                                    <p class="text-muted mb-0">في الانتظار</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <h3 class="text-danger">@Model.SystemStats.ErrorCount</h3>
+                                    <p class="text-muted mb-0">أخطاء</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">لا توجد إحصائيات متاحة</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الأنشطة الحديثة -->
+    <div class="row">
+        <div class="col-xl-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="header-title">الأنشطة الحديثة</h4>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentActivities != null && Model.RecentActivities.Any())
+                    {
+                        <div class="timeline-alt pb-0">
+                            @foreach (var activity in Model.RecentActivities)
+                            {
+                                <div class="timeline-item">
+                                    <i class="mdi mdi-circle bg-info-lighten text-info timeline-icon"></i>
+                                    <div class="timeline-item-info">
+                                        <h5 class="mt-0 mb-1">@activity.ActivityType</h5>
+                                        <p class="font-14">@activity.Description <small class="text-muted">بواسطة @activity.UserName</small></p>
+                                        <p class="text-muted font-12 mb-0"><i class="mdi mdi-clock-outline"></i> @activity.ActivityDate?.ToString("dd/MM/yyyy HH:mm")</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">لا توجد أنشطة حديثة</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="header-title">إحصائيات تسجيل الدخول</h4>
+                </div>
+                <div class="card-body">
+                    @if (Model.UserLoginStats != null)
+                    {
+                        <div class="text-center">
+                            <h3 class="text-primary">@Model.UserLoginStats?.TodayLogins</h3>
+                            <p class="text-muted mb-3">تسجيلات دخول اليوم</p>
+                            
+                            <h4 class="text-success">@Model.UserLoginStats?.ActiveSessions</h4>
+                            <p class="text-muted mb-3">جلسات نشطة</p>
+                            
+                            <h4 class="text-warning">@Model.UserLoginStats?.FailedAttempts</h4>
+                            <p class="text-muted mb-0">محاولات فاشلة</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">لا توجد إحصائيات تسجيل دخول</p>
+                    }
+                </div>
+            </div>
+
+            <!-- روابط سريعة -->
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="header-title">روابط سريعة</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="@Url.Action("SystemReports")" class="btn btn-outline-primary">
+                            <i class="mdi mdi-chart-line me-1"></i>
+                            تقارير النظام
+                        </a>
+                        <a href="@Url.Action("UserManagement")" class="btn btn-outline-success">
+                            <i class="mdi mdi-account-group me-1"></i>
+                            إدارة المستخدمين
+                        </a>
+                        <a href="@Url.Action("SystemSettings")" class="btn btn-outline-info">
+                            <i class="mdi mdi-cog me-1"></i>
+                            إعدادات النظام
+                        </a>
+                        <a href="@Url.Action("BackupRestore")" class="btn btn-outline-warning">
+                            <i class="mdi mdi-backup-restore me-1"></i>
+                            النسخ الاحتياطي
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- رسم بياني للأداء -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="header-title">أداء النظام</h4>
+                </div>
+                <div class="card-body">
+                    <div id="performance-chart" style="height: 300px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة JavaScript هنا للرسوم البيانية
+        $(document).ready(function() {
+            // مثال على رسم بياني بسيط
+            if (typeof Chart !== 'undefined') {
+                var ctx = document.getElementById('performance-chart');
+                if (ctx) {
+                    // إضافة رسم بياني هنا
+                }
+            }
+        });
+    </script>
+}
+
+<style>
+    .timeline-alt {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .timeline-alt:before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e3eaef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-icon {
+        position: absolute;
+        left: -22px;
+        top: 0;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        border: 2px solid #e3eaef;
+    }
+    
+    .timeline-item-info {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        border-left: 3px solid #727cf5;
+    }
+</style>
+

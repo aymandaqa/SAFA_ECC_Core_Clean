@@ -1,0 +1,98 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@{
+    ViewData["Title"] = "جميع التقارير";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="text-center mb-4">جميع التقارير</h1>
+
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">خيارات التصفية</h6>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label for="reportType">نوع التقرير:</label>
+                        <select id="reportType" class="form-control" asp-items="Html.GetEnumSelectList<SAFA_ECC_Core_Clean.ViewModels.ReportTypeViewModel>()">
+                            <option value="">-- اختر نوع التقرير --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="startDate">تاريخ البدء:</label>
+                        <input type="date" id="startDate" class="form-control" />
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="endDate">تاريخ الانتهاء:</label>
+                        <input type="date" id="endDate" class="form-control" />
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12 text-left">
+                        <button type="submit" class="btn btn-primary">عرض التقرير</button>
+                        <button type="reset" class="btn btn-secondary">إعادة تعيين</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4 mt-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">نتائج التقرير</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>اسم التقرير</th>
+                            <th>التاريخ</th>
+                            <th>الحالة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- سيتم ملء البيانات هنا بواسطة JavaScript أو Model -->
+                        <tr>
+                            <td>1</td>
+                            <td>تقرير المبيعات الشهري</td>
+                            <td>2025-09-01</td>
+                            <td>مكتمل</td>
+                            <td>
+                                <a href="#" class="btn btn-info btn-sm">عرض</a>
+                                <a href="#" class="btn btn-success btn-sm">تنزيل</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>تقرير المخزون الأسبوعي</td>
+                            <td>2025-09-08</td>
+                            <td>قيد المعالجة</td>
+                            <td>
+                                <a href="#" class="btn btn-info btn-sm">عرض</a>
+                                <a href="#" class="btn btn-success btn-sm">تنزيل</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // تهيئة DataTable
+            $(\'#dataTable\').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Arabic.json"
+                }
+            });
+        });
+    </script>
+}

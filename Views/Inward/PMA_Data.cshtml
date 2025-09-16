@@ -1,0 +1,541 @@
+@model SAFA_ECC_Core_Clean.ViewModels.PMADataViewModel
+@{
+    ViewData["Title"] = "بيانات PMA - سلطة النقد الفلسطينية";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">بيانات PMA - سلطة النقد الفلسطينية</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">الرئيسية</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Inward")">الشيكات الواردة</a></li>
+                        <li class="breadcrumb-item active">بيانات PMA</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">إجمالي الملفات</p>
+                            <h4 class="mb-0">@Model.TotalFiles.ToString("N0")</h4>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                <span class="avatar-title">
+                                    <i class="bx bx-file font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">ملفات اليوم</p>
+                            <h4 class="mb-0">@Model.TodayFiles.ToString("N0")</h4>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-success">
+                                <span class="avatar-title">
+                                    <i class="bx bx-calendar-today font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">ملفات معلقة</p>
+                            <h4 class="mb-0">@Model.PendingFiles.ToString("N0")</h4>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-warning">
+                                <span class="avatar-title">
+                                    <i class="bx bx-time-five font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">ملفات مرفوضة</p>
+                            <h4 class="mb-0">@Model.RejectedFiles.ToString("N0")</h4>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-danger">
+                                <span class="avatar-title">
+                                    <i class="bx bx-x-circle font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Upload and Processing -->
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">رفع ملف PMA جديد</h4>
+                </div>
+                <div class="card-body">
+                    <form id="pmaUploadForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label">ملف PMA</label>
+                            <input type="file" class="form-control" id="pmaFile" accept=".xml,.txt,.csv" required>
+                            <div class="form-text">الصيغ المدعومة: XML, TXT, CSV</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">نوع الملف</label>
+                            <select class="form-select" id="fileType" required>
+                                <option value="">اختر نوع الملف</option>
+                                <option value="Inward">شيكات واردة</option>
+                                <option value="Returns">شيكات مرجعة</option>
+                                <option value="Clearing">مقاصة</option>
+                                <option value="Settlement">تسوية</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">تاريخ الملف</label>
+                            <input type="date" class="form-control" id="fileDate" value="@DateTime.Today.ToString("yyyy-MM-dd")" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">ملاحظات</label>
+                            <textarea class="form-control" id="fileRemarks" rows="3" placeholder="ملاحظات اختيارية"></textarea>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bx bx-upload me-1"></i> رفع ومعالجة الملف
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">إعدادات المعالجة</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="autoProcess" checked>
+                            <label class="form-check-label" for="autoProcess">
+                                معالجة تلقائية
+                            </label>
+                        </div>
+                        <div class="form-text">معالجة الملفات تلقائياً عند الرفع</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="validateData" checked>
+                            <label class="form-check-label" for="validateData">
+                                التحقق من البيانات
+                            </label>
+                        </div>
+                        <div class="form-text">التحقق من صحة البيانات قبل المعالجة</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="sendNotifications">
+                            <label class="form-check-label" for="sendNotifications">
+                                إرسال إشعارات
+                            </label>
+                        </div>
+                        <div class="form-text">إرسال إشعارات عند اكتمال المعالجة</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">حجم الدفعة</label>
+                        <select class="form-select" id="batchSize">
+                            <option value="100">100 سجل</option>
+                            <option value="500" selected>500 سجل</option>
+                            <option value="1000">1000 سجل</option>
+                            <option value="5000">5000 سجل</option>
+                        </select>
+                        <div class="form-text">عدد السجلات في كل دفعة معالجة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Files History -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="card-title">تاريخ ملفات PMA</h4>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="refreshFiles()">
+                                <i class="bx bx-refresh"></i> تحديث
+                            </button>
+                            <button type="button" class="btn btn-outline-success btn-sm" onclick="downloadTemplate()">
+                                <i class="bx bx-download"></i> تحميل قالب
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover" id="filesTable">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>اسم الملف</th>
+                                    <th>النوع</th>
+                                    <th>تاريخ الرفع</th>
+                                    <th>الحجم</th>
+                                    <th>عدد السجلات</th>
+                                    <th>الحالة</th>
+                                    <th>المعالج</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var file in Model.Files)
+                                {
+                                    <tr>
+                                        <td>@file.File_Name</td>
+                                        <td>
+                                            @switch (file.File_Type)
+                                            {
+                                                case "Inward":
+                                                    <span class="badge bg-primary">شيكات واردة</span>
+                                                    break;
+                                                case "Returns":
+                                                    <span class="badge bg-danger">شيكات مرجعة</span>
+                                                    break;
+                                                case "Clearing":
+                                                    <span class="badge bg-info">مقاصة</span>
+                                                    break;
+                                                case "Settlement":
+                                                    <span class="badge bg-success">تسوية</span>
+                                                    break;
+                                                default:
+                                                    <span class="badge bg-secondary">@file.File_Type</span>
+                                                    break;
+                                            }
+                                        </td>
+                                        <td>@file.Upload_Date.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>@((file.File_Size / 1024.0).ToString("N1")) KB</td>
+                                        <td class="text-center">@file.Records_Count?.ToString("N0")</td>
+                                        <td>
+                                            @switch (file.Status)
+                                            {
+                                                case "Pending":
+                                                    <span class="badge bg-warning">معلق</span>
+                                                    break;
+                                                case "Processing":
+                                                    <span class="badge bg-info">قيد المعالجة</span>
+                                                    break;
+                                                case "Completed":
+                                                    <span class="badge bg-success">مكتمل</span>
+                                                    break;
+                                                case "Failed":
+                                                    <span class="badge bg-danger">فشل</span>
+                                                    break;
+                                                case "Rejected":
+                                                    <span class="badge bg-danger">مرفوض</span>
+                                                    break;
+                                                default:
+                                                    <span class="badge bg-light text-dark">@file.Status</span>
+                                                    break;
+                                            }
+                                        </td>
+                                        <td>@file.Uploaded_By</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <button type="button" class="btn btn-outline-info" onclick="viewFileDetails(@file.Serial)" title="عرض التفاصيل">
+                                                    <i class="bx bx-show"></i>
+                                                </button>
+                                                @if (file.Status == "Pending" || file.Status == "Failed")
+                                                {
+                                                    <button type="button" class="btn btn-outline-success" onclick="processFile(@file.Serial)" title="معالجة">
+                                                        <i class="bx bx-play"></i>
+                                                    </button>
+                                                }
+                                                @if (file.Status == "Completed")
+                                                {
+                                                    <button type="button" class="btn btn-outline-primary" onclick="downloadReport(@file.Serial)" title="تحميل التقرير">
+                                                        <i class="bx bx-download"></i>
+                                                    </button>
+                                                }
+                                                <button type="button" class="btn btn-outline-danger" onclick="deleteFile(@file.Serial)" title="حذف">
+                                                    <i class="bx bx-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- File Details Modal -->
+<div class="modal fade" id="fileDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">تفاصيل الملف</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="fileDetailsContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Processing Progress Modal -->
+<div class="modal fade" id="processingModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">معالجة الملف</h5>
+            </div>
+            <div class="modal-body text-center">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">جاري المعالجة...</span>
+                </div>
+                <p id="processingMessage">جاري معالجة الملف، يرجى الانتظار...</p>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: 0%" id="processingProgress"></div>
+                </div>
+                <small class="text-muted mt-2 d-block" id="processingDetails"></small>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+$(document).ready(function() {
+    // Initialize DataTable
+    $('#filesTable').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Arabic.json"
+        },
+        "pageLength": 25,
+        "order": [[2, "desc"]], // Sort by upload date descending
+        "columnDefs": [
+            { "orderable": false, "targets": [7] } // Disable sorting for actions column
+        ]
+    });
+
+    // Handle file upload form
+    $('#pmaUploadForm').on('submit', function(e) {
+        e.preventDefault();
+        uploadPMAFile();
+    });
+});
+
+function uploadPMAFile() {
+    const formData = new FormData();
+    const fileInput = document.getElementById('pmaFile');
+    const file = fileInput.files[0];
+
+    if (!file) {
+        Swal.fire('تنبيه', 'يرجى اختيار ملف للرفع', 'warning');
+        return;
+    }
+
+    formData.append('file', file);
+    formData.append('fileType', $('#fileType').val());
+    formData.append('fileDate', $('#fileDate').val());
+    formData.append('remarks', $('#fileRemarks').val());
+    formData.append('autoProcess', $('#autoProcess').is(':checked'));
+    formData.append('validateData', $('#validateData').is(':checked'));
+    formData.append('batchSize', $('#batchSize').val());
+    formData.append('__RequestVerificationToken', $('input[name="__RequestVerificationToken"]').val());
+
+    // Show processing modal
+    $('#processingModal').modal('show');
+    updateProgress(0, 'بدء رفع الملف...');
+
+    $.ajax({
+        url: '@Url.Action("UploadPMAFile", "Inward")',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        xhr: function() {
+            const xhr = new window.XMLHttpRequest();
+            xhr.upload.addEventListener("progress", function(evt) {
+                if (evt.lengthComputable) {
+                    const percentComplete = (evt.loaded / evt.total) * 100;
+                    updateProgress(percentComplete, 'جاري رفع الملف...');
+                }
+            }, false);
+            return xhr;
+        },
+        success: function(response) {
+            if (response.success) {
+                updateProgress(100, 'تم رفع الملف بنجاح');
+                setTimeout(function() {
+                    $('#processingModal').modal('hide');
+                    Swal.fire('تم!', response.message, 'success');
+                    refreshFiles();
+                    $('#pmaUploadForm')[0].reset();
+                }, 1000);
+            } else {
+                $('#processingModal').modal('hide');
+                Swal.fire('خطأ', response.message, 'error');
+            }
+        },
+        error: function() {
+            $('#processingModal').modal('hide');
+            Swal.fire('خطأ', 'حدث خطأ أثناء رفع الملف', 'error');
+        }
+    });
+}
+
+function updateProgress(percent, message, details = '') {
+    $('#processingProgress').css('width', percent + '%');
+    $('#processingMessage').text(message);
+    $('#processingDetails').text(details);
+}
+
+function viewFileDetails(fileId) {
+    $.get('@Url.Action("GetFileDetails", "Inward")/' + fileId, function(data) {
+        $('#fileDetailsContent').html(data);
+        $('#fileDetailsModal').modal('show');
+    }).fail(function() {
+        Swal.fire('خطأ', 'حدث خطأ أثناء تحميل تفاصيل الملف', 'error');
+    });
+}
+
+function processFile(fileId) {
+    Swal.fire({
+        title: 'تأكيد المعالجة',
+        text: 'هل أنت متأكد من معالجة هذا الملف؟',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'نعم، معالجة',
+        cancelButtonText: 'إلغاء'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $('#processingModal').modal('show');
+            updateProgress(0, 'بدء معالجة الملف...');
+
+            $.post('@Url.Action("ProcessFile", "Inward")', {
+                fileId: fileId,
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+            }).done(function(response) {
+                if (response.success) {
+                    updateProgress(100, 'تم معالجة الملف بنجاح');
+                    setTimeout(function() {
+                        $('#processingModal').modal('hide');
+                        Swal.fire('تم!', response.message, 'success');
+                        refreshFiles();
+                    }, 1000);
+                } else {
+                    $('#processingModal').modal('hide');
+                    Swal.fire('خطأ', response.message, 'error');
+                }
+            }).fail(function() {
+                $('#processingModal').modal('hide');
+                Swal.fire('خطأ', 'حدث خطأ أثناء معالجة الملف', 'error');
+            });
+        }
+    });
+}
+
+function downloadReport(fileId) {
+    window.location.href = '@Url.Action("DownloadReport", "Inward")/' + fileId;
+}
+
+function deleteFile(fileId) {
+    Swal.fire({
+        title: 'تأكيد الحذف',
+        text: 'هل أنت متأكد من حذف هذا الملف؟ لا يمكن التراجع عن هذا الإجراء.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'نعم، حذف',
+        cancelButtonText: 'إلغاء'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '@Url.Action("DeleteFile", "Inward")/' + fileId,
+                type: 'DELETE',
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire('تم!', response.message, 'success');
+                        refreshFiles();
+                    } else {
+                        Swal.fire('خطأ', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('خطأ', 'حدث خطأ أثناء حذف الملف', 'error');
+                }
+            });
+        }
+    });
+}
+
+function refreshFiles() {
+    location.reload();
+}
+
+function downloadTemplate() {
+    window.location.href = '@Url.Action("DownloadPMATemplate", "Inward")';
+}
+
+// Auto-refresh every 30 seconds for processing files
+setInterval(function() {
+    const processingRows = $('tbody tr').filter(function() {
+        return $(this).find('.badge:contains("قيد المعالجة")').length > 0;
+    });
+    
+    if (processingRows.length > 0) {
+        refreshFiles();
+    }
+}, 30000);
+</script>
+}
+

@@ -1,0 +1,98 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model OutwardViewModel // Assuming OutwardViewModel exists in SAFA_ECC_Core_Clean.ViewModels
+
+@{
+    ViewData["Title"] = "وثيقة الصادر";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Assuming a shared layout exists
+}
+
+<div class="container-fluid" dir="rtl" lang="ar">
+    <h1 class="text-end mb-4">وثيقة الصادر</h1>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header text-end">
+                    <h4>إضافة وثيقة صادرة جديدة</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateOutward" asp-controller="Outward" method="post">
+                        <div class="mb-3 text-end">
+                            <label asp-for="DocumentNumber" class="form-label">رقم الوثيقة</label>
+                            <input asp-for="DocumentNumber" class="form-control" />
+                            <span asp-validation-for="DocumentNumber" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3 text-end">
+                            <label asp-for="Subject" class="form-label">الموضوع</label>
+                            <input asp-for="Subject" class="form-control" />
+                            <span asp-validation-for="Subject" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3 text-end">
+                            <label asp-for="IssueDate" class="form-label">تاريخ الإصدار</label>
+                            <input asp-for="IssueDate" type="date" class="form-control" />
+                            <span asp-validation-for="IssueDate" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3 text-end">
+                            <label asp-for="Recipient" class="form-label">الجهة المستلمة</label>
+                            <input asp-for="Recipient" class="form-control" />
+                            <span asp-validation-for="Recipient" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary float-end">حفظ الوثيقة</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header text-end">
+                    <h4>قائمة الوثائق الصادرة</h4>
+                </div>
+                <div class="card-body">
+                    @if (Model != null && Model.OutwardDocuments != null && Model.OutwardDocuments.Any())
+                    {
+                        <table class="table table-bordered table-striped text-end">
+                            <thead>
+                                <tr>
+                                    <th scope="col">رقم الوثيقة</th>
+                                    <th scope="col">الموضوع</th>
+                                    <th scope="col">تاريخ الإصدار</th>
+                                    <th scope="col">الجهة المستلمة</th>
+                                    <th scope="col">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.OutwardDocuments)
+                                {
+                                    <tr>
+                                        <td>@item.DocumentNumber</td>
+                                        <td>@item.Subject</td>
+                                        <td>@item.IssueDate.ToShortDateString()</td>
+                                        <td>@item.Recipient</td>
+                                        <td>
+                                            <a asp-action="Details" asp-controller="Outward" asp-route-id="@item.Id" class="btn btn-info btn-sm">عرض</a>
+                                            <a asp-action="Edit" asp-controller="Outward" asp-route-id="@item.Id" class="btn btn-warning btn-sm">تعديل</a>
+                                            <a asp-action="Delete" asp-controller="Outward" asp-route-id="@item.Id" class="btn btn-danger btn-sm">حذف</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="text-end">لا توجد وثائق صادرة لعرضها.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12 text-end">
+            <a asp-action="Create" asp-controller="Outward" class="btn btn-success">إضافة وثيقة جديدة</a>
+        </div>
+    </div>
+</div>

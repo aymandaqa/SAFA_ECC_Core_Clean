@@ -1,0 +1,68 @@
+
+@model SAFA_ECC_Core_Clean.ViewModels.AddgroupPermissionViewModel
+
+@{
+    ViewData["Title"] = "إضافة صلاحية لمجموعة";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // افتراض أن هناك تخطيط إداري
+}
+
+<div class="container-fluid" dir="rtl">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary text-right">@ViewData["Title"]</h6>
+                </div>
+                <div class="card-body">
+                    <form asp-action="AddgroupPermission" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger text-right"></div>
+
+                        
+                        <div class="form-group mb-3">
+                            <label asp-for="GroupId" class="control-label float-end">المجموعة</label>
+                            <select asp-for="GroupId" class="form-control text-right"></select>
+                            <span asp-validation-for="GroupId" class="text-danger float-end"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="PermissionId" class="control-label float-end">الصلاحية</label>
+                            <select asp-for="PermissionId" class="form-control text-right"></select>
+                            <span asp-validation-for="PermissionId" class="text-danger float-end"></span>
+                        </div>
+
+                        <div class="form-group form-check mb-3">
+                            <input class="form-check-input float-end" type="checkbox" asp-for="CanView" />
+                            <label class="form-check-label me-4" asp-for="CanView">عرض</label>
+                        </div>
+
+                        <div class="form-group form-check mb-3">
+                            <input class="form-check-input float-end" type="checkbox" asp-for="CanAdd" />
+                            <label class="form-check-label me-4" asp-for="CanAdd">إضافة</label>
+                        </div>
+
+                        <div class="form-group form-check mb-3">
+                            <input class="form-check-input float-end" type="checkbox" asp-for="CanEdit" />
+                            <label class="form-check-label me-4" asp-for="CanEdit">تعديل</label>
+                        </div>
+
+                        <div class="form-group form-check mb-3">
+                            <input class="form-check-input float-end" type="checkbox" asp-for="CanDelete" />
+                            <label class="form-check-label me-4" asp-for="CanDelete">حذف</label>
+                        </div>
+
+
+                        <div class="form-group text-right mt-4">
+                            <button type="submit" class="btn btn-primary">حفظ</button>
+                            <a asp-action="Index" class="btn btn-secondary">إلغاء</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

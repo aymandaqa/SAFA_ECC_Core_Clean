@@ -1,0 +1,59 @@
+@model SAFA_ECC_Core_Clean.ViewModels.GroupPermissionsViewModel
+
+@{ 
+    ViewData["Title"] = "إدارة صلاحيات المجموعة";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title float-right">إدارة صلاحيات المجموعة</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="GroupPermissions" method="post" class="form-horizontal" dir="rtl">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="GroupId" />
+
+                        <div class="form-group row">
+                            <label asp-for="GroupName" class="col-md-2 control-label text-md-right"></label>
+                            <div class="col-md-10">
+                                <input asp-for="GroupName" class="form-control" readonly />
+                                <span asp-validation-for="GroupName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-2 control-label text-md-right">الصلاحيات:</label>
+                            <div class="col-md-10">
+                                @if (Model.Permissions != null)
+                                @for (int i = 0; i < Model.Permissions.Count; i++)
+                                {
+                                    <div class="form-check form-check-inline">
+                                        <input type="hidden" asp-for="Permissions[i].Id" />
+                                        <input type="hidden" asp-for="Permissions[i].Name" />
+                                        <input asp-for="Permissions[i].IsAssigned" type="checkbox" class="form-check-input" id="permission_@Model.Permissions[i].Id" />
+                                        <label class="form-check-label" for="permission_@Model.Permissions[i].Id">@Model.Permissions[i].Name</label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-offset-2 col-md-10">
+                                <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+                                <a asp-action="Index" class="btn btn-secondary">إلغاء</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

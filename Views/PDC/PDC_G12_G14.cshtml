@@ -1,0 +1,109 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model PDCViewModel
+
+@{ 
+    ViewData["Title"] = "PDC G12-G14";
+}
+
+<div class="container-fluid" dir="rtl">
+    <h1 class="text-center mb-4">كتالوج بيانات المنتج (PDC) - G12-G14</h1>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">إدخال بيانات المنتج</h5>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="productName" class="form-label">اسم المنتج:</label>
+                        <input type="text" class="form-control" id="productName" placeholder="أدخل اسم المنتج">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="productCode" class="form-label">رمز المنتج:</label>
+                        <input type="text" class="form-control" id="productCode" placeholder="أدخل رمز المنتج">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="productCategory" class="form-label">الفئة:</label>
+                        <select class="form-select" id="productCategory">
+                            <option selected>اختر فئة...</option>
+                            <option value="1">فئة 1</option>
+                            <option value="2">فئة 2</option>
+                            <option value="3">فئة 3</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="productPrice" class="form-label">السعر:</label>
+                        <input type="number" class="form-control" id="productPrice" placeholder="أدخل السعر">
+                    </div>
+                    <div class="col-12">
+                        <label for="productDescription" class="form-label">الوصف:</label>
+                        <textarea type="text" class="form-control" id="productDescription" rows="3" placeholder="أدخل وصف المنتج"></textarea>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-success me-2">حفظ</button>
+                    <button type="reset" class="btn btn-secondary">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">قائمة المنتجات</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover text-right">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">اسم المنتج</th>
+                            <th scope="col">رمز المنتج</th>
+                            <th scope="col">الفئة</th>
+                            <th scope="col">السعر</th>
+                            <th scope="col">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>منتج أ</td>
+                            <td>P001</td>
+                            <td>فئة 1</td>
+                            <td>100.00</td>
+                            <td>
+                                <button class="btn btn-info btn-sm">عرض</button>
+                                <button class="btn btn-warning btn-sm">تعديل</button>
+                                <button class="btn btn-danger btn-sm">حذف</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">2</th>
+                            <td>منتج ب</td>
+                            <td>P002</td>
+                            <td>فئة 2</td>
+                            <td>250.50</td>
+                            <td>
+                                <button class="btn btn-info btn-sm">عرض</button>
+                                <button class="btn btn-warning btn-sm">تعديل</button>
+                                <button class="btn btn-danger btn-sm">حذف</button>
+                            </td>
+                        </tr>
+                        <!-- يمكن إضافة المزيد من صفوف المنتجات هنا -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة أي سكربتات خاصة بالصفحة هنا
+        $(document).ready(function () {
+            // مثال: تهيئة أي مكونات Bootstrap JavaScript إذا لزم الأمر
+        });
+    </script>
+}

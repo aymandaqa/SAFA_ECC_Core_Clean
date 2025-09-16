@@ -1,0 +1,91 @@
+
+@page
+@model SAFA_ECC_Core_Clean.ViewModels.PDCChequesViewModel
+
+@{ 
+    ViewData["Title"] = "الشيكات الآجلة";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div dir="rtl" lang="ar">
+    <h1>@ViewData["Title"]</h1>
+
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Placeholder for Forms -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="card-title">إدخال بيانات الشيك</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <!-- Form elements will go here -->
+                        <div class="mb-3">
+                            <label for="chequeNumber" class="form-label">رقم الشيك</label>
+                            <input type="text" class="form-control" id="chequeNumber" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="chequeDate" class="form-label">تاريخ الشيك</label>
+                            <input type="date" class="form-control" id="chequeDate" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">المبلغ</label>
+                            <input type="number" class="form-control" id="amount" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="beneficiary" class="form-label">المستفيد</label>
+                            <input type="text" class="form-control" id="beneficiary" />
+                        </div>
+                        <button type="submit" class="btn btn-primary">حفظ</button>
+                        <button type="button" class="btn btn-secondary">إلغاء</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Placeholder for Tables -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">قائمة الشيكات</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>رقم الشيك</th>
+                                <th>تاريخ الشيك</th>
+                                <th>المبلغ</th>
+                                <th>المستفيد</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Table rows will be dynamically generated here -->
+                            <tr>
+                                <td>12345</td>
+                                <td>2024-01-15</td>
+                                <td>1000.00</td>
+                                <td>أحمد محمد</td>
+                                <td>
+                                    <button class="btn btn-sm btn-info">عرض</button>
+                                    <button class="btn btn-sm btn-warning">تعديل</button>
+                                    <button class="btn btn-sm btn-danger">حذف</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>67890</td>
+                                <td>2024-02-20</td>
+                                <td>2500.00</td>
+                                <td>فاطمة علي</td>
+                                <td>
+                                    <button class="btn btn-sm btn-info">عرض</button>
+                                    <button class="btn btn-sm btn-warning">تعديل</button>
+                                    <button class="btn btn-sm btn-danger">حذف</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

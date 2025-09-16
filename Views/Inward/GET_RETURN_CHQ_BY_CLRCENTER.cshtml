@@ -1,0 +1,136 @@
+
+@model SAFA_ECC_Core_Clean.ViewModels.GET_RETURN_CHQ_BY_CLRCENTER_ViewModel
+
+@{
+    ViewData["Title"] = "شيكات الإرجاع الواردة حسب مركز المقاصة";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        direction: rtl;
+        text-align: right;
+    }
+
+    .form-label {
+        float: right;
+    }
+</style>
+
+<div class="container-fluid">
+    <h1 class="mt-4">@ViewData["Title"]</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="#">الرئيسية</a></li>
+        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            البحث عن شيكات الإرجاع
+        </div>
+        <div class="card-body">
+            <form asp-action="GET_RETURN_CHQ_BY_CLRCENTER" asp-controller="Inward" method="get">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="ClearingCenterId" class="form-label">مركز المقاصة:</label>
+                        <select asp-for="ClearingCenterId" class="form-select">
+                            <option value="">اختر مركز المقاصة</option>
+                            @if (Model != null && Model.ClearingCenters != null)
+                            {
+                                foreach (var center in Model.ClearingCenters)
+                                {
+                                    <option value="@center.Id">@center.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="FromDate" class="form-label">من تاريخ:</label>
+                        <input asp-for="FromDate" type="date" class="form-control" />
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="ToDate" class="form-label">إلى تاريخ:</label>
+                        <input asp-for="ToDate" type="date" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="StatusId" class="form-label">الحالة:</label>
+                        <select asp-for="StatusId" class="form-select">
+                            <option value="">اختر الحالة</option>
+                            @if (Model != null && Model.Statuses != null)
+                            {
+                                foreach (var status in Model.Statuses)
+                                {
+                                    <option value="@status.Id">@status.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">بحث</button>
+                    <button type="reset" class="btn btn-secondary ms-2">مسح</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            نتائج البحث
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>رقم الشيك</th>
+                            <th>المبلغ</th>
+                            <th>تاريخ الإرجاع</th>
+                            <th>مركز المقاصة</th>
+                            <th>الحالة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.ReturnChecks != null)
+                        {
+                            foreach (var check in Model.ReturnChecks)
+                            {
+                                <tr>
+                                    <td>@check.CheckNumber</td>
+                                    <td>@check.Amount</td>
+                                    <td>@check.ReturnDate.ToShortDateString()</td>
+                                    <td>@check.ClearingCenterName</td>
+                                    <td>@check.StatusName</td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm">عرض</button>
+                                        <button class="btn btn-success btn-sm">معالجة</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6">لا توجد بيانات لعرضها.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Example: Initialize DataTable
+            // $(\'#dataTable\").DataTable();
+        });
+    </script>
+}

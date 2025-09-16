@@ -1,0 +1,49 @@
+
+@model SAFA_ECC_Core_Clean.ViewModels.SharedViewModels.ConfirmationViewModel
+
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true" dir="rtl">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="confirmationModalLabel">@Model.Title</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+            </div>
+            <div class="modal-body text-end">
+                <p>@Model.Message</p>
+            </div>
+            <div class="modal-footer justify-content-start">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Model.CancelButtonText</button>
+                <button type="button" class="btn btn-primary" id="confirmActionButton">@Model.ConfirmButtonText</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $(\'#confirmationModal\').on(\'show.bs.modal\', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var title = button.data(\'title\');
+            var message = button.data(\'message\');
+            var confirmButtonText = button.data(\'confirm-button-text\');
+            var cancelButtonText = button.data(\'cancel-button-text\');
+            var actionUrl = button.data(\'action-url\');
+
+            var modal = $(this);
+            modal.find(\'.modal-title\').text(title);
+            modal.find(\'.modal-body p\').text(message);
+            modal.find(\'#confirmActionButton\').text(confirmButtonText);
+            modal.find(\'.btn-secondary\').text(cancelButtonText);
+
+            // Set the action for the confirm button
+            modal.find(\'#confirmActionButton\').off(\'click\').on(\'click\', function () {
+                // Perform the action, e.g., redirect or submit a form
+                if (actionUrl) {
+                    window.location.href = actionUrl;
+                }
+                // You might want to add more complex logic here, like AJAX submission
+                modal.modal(\'hide\');
+            });
+        });
+    });
+</script>

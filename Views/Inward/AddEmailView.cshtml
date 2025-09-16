@@ -1,0 +1,197 @@
+@model SAFA_ECC_Core_Clean.ViewModels.EmailViewModel
+
+@{
+    ViewData["Title"] = "إضافة بريد إلكتروني";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h3 class="card-title">
+                        <i class="fas fa-envelope-open"></i>
+                        إضافة بريد إلكتروني جديد
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="AddEmail" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="ToEmail" class="form-label"></label>
+                                    <input asp-for="ToEmail" class="form-control" placeholder="example@domain.com" />
+                                    <span asp-validation-for="ToEmail" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Subject" class="form-label"></label>
+                                    <input asp-for="Subject" class="form-control" placeholder="موضوع البريد الإلكتروني" />
+                                    <span asp-validation-for="Subject" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Body" class="form-label"></label>
+                            <textarea asp-for="Body" class="form-control" rows="10" id="emailBody"></textarea>
+                            <span asp-validation-for="Body" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input asp-for="HighPriority" class="form-check-input" />
+                                <label asp-for="HighPriority" class="form-check-label"></label>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-paper-plane"></i> إرسال البريد الإلكتروني
+                                </button>
+                                <a asp-action="EmailList" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> العودة للقائمة
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Email Templates -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title">
+                    <i class="fas fa-templates"></i>
+                    قوالب البريد الإلكتروني
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card border-primary">
+                            <div class="card-header bg-primary text-white">
+                                <h6>إشعار الشيك المرتجع</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">قالب لإشعار العميل بإرجاع الشيك</p>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="useTemplate('returned')">
+                                    استخدام القالب
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-success">
+                            <div class="card-header bg-success text-white">
+                                <h6>إشعار قبول الشيك</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">قالب لإشعار العميل بقبول الشيك</p>
+                                <button type="button" class="btn btn-success btn-sm" onclick="useTemplate('accepted')">
+                                    استخدام القالب
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-warning">
+                            <div class="card-header bg-warning text-dark">
+                                <h6>تنبيه عام</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">قالب للتنبيهات العامة</p>
+                                <button type="button" class="btn btn-warning btn-sm" onclick="useTemplate('general')">
+                                    استخدام القالب
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.ckeditor.com/ckeditor5/35.0.1/classic/ckeditor.js"></script>
+    <script>
+        let editor;
+        
+        ClassicEditor
+            .create(document.querySelector('#emailBody'), {
+                language: 'ar',
+                toolbar: [
+                    'heading', '|',
+                    'bold', 'italic', 'underline', '|',
+                    'bulletedList', 'numberedList', '|',
+                    'outdent', 'indent', '|',
+                    'blockQuote', 'insertTable', '|',
+                    'undo', 'redo'
+                ]
+            })
+            .then(newEditor => {
+                editor = newEditor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
+        function useTemplate(type) {
+            let subject = '';
+            let body = '';
+            
+            switch(type) {
+                case 'returned':
+                    subject = 'إشعار إرجاع شيك';
+                    body = `
+                        <p>عزيزي العميل،</p>
+                        <p>نود إعلامكم بأنه تم إرجاع الشيك رقم [رقم الشيك] بتاريخ [التاريخ] لسبب [سبب الإرجاع].</p>
+                        <p>يرجى مراجعة فرعكم لاتخاذ الإجراءات اللازمة.</p>
+                        <p>مع تحيات،<br>إدارة المقاصة الإلكترونية</p>
+                    `;
+                    break;
+                case 'accepted':
+                    subject = 'إشعار قبول شيك';
+                    body = `
+                        <p>عزيزي العميل،</p>
+                        <p>نود إعلامكم بأنه تم قبول الشيك رقم [رقم الشيك] بمبلغ [المبلغ] بتاريخ [التاريخ].</p>
+                        <p>تم إضافة المبلغ إلى حسابكم بنجاح.</p>
+                        <p>مع تحيات،<br>إدارة المقاصة الإلكترونية</p>
+                    `;
+                    break;
+                case 'general':
+                    subject = 'تنبيه عام';
+                    body = `
+                        <p>عزيزي العميل،</p>
+                        <p>[محتوى التنبيه]</p>
+                        <p>مع تحيات،<br>إدارة المقاصة الإلكترونية</p>
+                    `;
+                    break;
+            }
+            
+            document.getElementById('Subject').value = subject;
+            if (editor) {
+                editor.setData(body);
+            }
+        }
+    </script>
+}
+
+@section Styles {
+    <style>
+        .ck-editor__editable {
+            min-height: 200px;
+        }
+    </style>
+}
+

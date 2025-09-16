@@ -1,0 +1,91 @@
+@page
+@model SAFA_ECC_Core_Clean.ViewModels.T24_JOBViewModel
+
+@{ ViewData["Title"] = "T24 JOB"; }
+
+<div class="container-fluid" dir="rtl" lang="ar">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/css/site.css" rel="stylesheet" /> @* For custom RTL adjustments if needed *@
+
+    <h1 class="mb-4">إدارة وظائف T24</h1>
+
+    <div class="card mb-4">
+        <div class="card-header">تفاصيل الوظيفة</div>
+        <div class="card-body">
+            <form>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="JobId" class="form-label">معرف الوظيفة</label>
+                        <input type="text" class="form-control" id="JobId" asp-for="JobId">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="JobName" class="form-label">اسم الوظيفة</label>
+                        <input type="text" class="form-control" id="JobName" asp-for="JobName">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="Status" class="form-label">الحالة</label>
+                        <select class="form-select" id="Status" asp-for="Status">
+                            <option value="Active">نشط</option>
+                            <option value="Inactive">غير نشط</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="LastRun" class="form-label">آخر تشغيل</label>
+                        <input type="datetime-local" class="form-control" id="LastRun" asp-for="LastRun">
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary me-2">حفظ</button>
+                    <button type="button" class="btn btn-secondary">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">قائمة الوظائف</div>
+        <div class="card-body">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>معرف الوظيفة</th>
+                        <th>اسم الوظيفة</th>
+                        <th>الحالة</th>
+                        <th>آخر تشغيل</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @* Loop through Model.Jobs collection *@
+                    @if (Model.Jobs != null && Model.Jobs.Any())
+                    {
+                        @foreach (var job in Model.Jobs)
+                        {
+                            <tr>
+                                <td>@job.JobId</td>
+                                <td>@job.JobName</td>
+                                <td>@job.Status</td>
+                                <td>@job.LastRun</td>
+                                <td>
+                                    <button class="btn btn-info btn-sm">عرض</button>
+                                    <button class="btn btn-warning btn-sm">تعديل</button>
+                                    <button class="btn btn-danger btn-sm">حذف</button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center">لا توجد وظائف لعرضها.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</div>

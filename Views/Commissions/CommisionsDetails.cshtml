@@ -1,0 +1,91 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model CommissionDetailsViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل العمولة";
+}
+
+<div dir="rtl" lang="ar">
+    <h1 class="text-right">@ViewData["Title"]</h1>
+
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-white text-right">
+            معلومات العمولة
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3 text-right">
+                    @Html.DisplayNameFor(model => model.CommissionId)
+                </dt>
+                <dd class="col-sm-9 text-right">
+                    @Html.DisplayFor(model => model.CommissionId)
+                </dd>
+                <dt class="col-sm-3 text-right">
+                    @Html.DisplayNameFor(model => model.CommissionDate)
+                </dt>
+                <dd class="col-sm-9 text-right">
+                    @Html.DisplayFor(model => model.CommissionDate)
+                </dd>
+                <dt class="col-sm-3 text-right">
+                    @Html.DisplayNameFor(model => model.Amount)
+                </dt>
+                <dd class="col-sm-9 text-right">
+                    @Html.DisplayFor(model => model.Amount)
+                </dd>
+                <dt class="col-sm-3 text-right">
+                    @Html.DisplayNameFor(model => model.Status)
+                </dt>
+                <dd class="col-sm-9 text-right">
+                    @Html.DisplayFor(model => model.Status)
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-white text-right">
+            تفاصيل البنود
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped text-right">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.Items.FirstOrDefault().ItemName)</th>
+                        <th>@Html.DisplayNameFor(model => model.Items.FirstOrDefault().Quantity)</th>
+                        <th>@Html.DisplayNameFor(model => model.Items.FirstOrDefault().UnitPrice)</th>
+                        <th>@Html.DisplayNameFor(model => model.Items.FirstOrDefault().TotalPrice)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items != null && Model.Items.Any())
+                    {
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.ItemName)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Quantity)</td>
+                                <td>@Html.DisplayFor(modelItem => item.UnitPrice)</td>
+                                <td>@Html.DisplayFor(modelItem => item.TotalPrice)</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center">لا توجد بنود لعرضها.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-4 text-right">
+        <a asp-action="Edit" asp-route-id="@Model.CommissionId" class="btn btn-warning">تعديل</a>
+        <a asp-action="Index" class="btn btn-secondary">العودة إلى القائمة</a>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

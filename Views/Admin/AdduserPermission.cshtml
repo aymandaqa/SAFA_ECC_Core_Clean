@@ -1,0 +1,42 @@
+@model SAFA_ECC_Core_Clean.ViewModels.AddUserPermissionViewModel
+
+@{
+    ViewData["Title"] = "إضافة صلاحية مستخدم";
+}
+
+<h1 class="text-center">@ViewData["Title"]</h1>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header text-end">
+                <h5 class="card-title">إضافة صلاحية جديدة</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="AdduserPermission" method="post" dir="rtl">
+                    <div asp-validation-summary="ModelOnly" class="text-danger text-end"></div>
+
+                    <div class="mb-3 text-end">
+                        <label asp-for="UserId" class="form-label"></label>
+                        <select asp-for="UserId" class="form-select" asp-items="@(new SelectList(Model.Users, "Id", "UserName"))"></select>
+                        <span asp-validation-for="UserId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3 text-end">
+                        <label asp-for="PermissionId" class="form-label"></label>
+                        <select asp-for="PermissionId" asp-items="@(new SelectList(Model.Permissions, "Id", "PermissionName"))" class="form-select"></select>
+                        <span asp-validation-for="PermissionId" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">إضافة الصلاحية</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

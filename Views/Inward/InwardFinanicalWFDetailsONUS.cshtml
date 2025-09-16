@@ -1,0 +1,118 @@
+@page
+@model SAFA_ECC_Core_Clean.ViewModels.InwardFinanicalWFDetailsONUSViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل سير العمل المالي الوارد";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <h1>@ViewData["Title"]</h1>
+
+    <!-- Content will be added here -->
+
+</div>
+
+
+
+<div class="row" dir="rtl">
+    <div class="col-12 text-end">
+        <p>هذه صفحة تفاصيل سير العمل المالي الوارد.</p>
+    </div>
+</div>
+
+
+
+<div class="row mt-3" dir="rtl">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">تفاصيل عامة</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">رقم المعاملة:</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.TransactionNumber)</dd>
+
+                    <dt class="col-sm-4">تاريخ الإنشاء:</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.CreationDate)</dd>
+
+                    <dt class="col-sm-4">الحالة:</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Status)</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">تفاصيل مالية</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">المبلغ:</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Amount)</dd>
+
+                    <dt class="col-sm-4">العملة:</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Currency)</dd>
+
+                    <dt class="col-sm-4">البنك:</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.BankName)</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="row mt-3" dir="rtl">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">سجل سير العمل</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>الإجراء</th>
+                            <th>الملاحظات</th>
+                            <th>المستخدم</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.WorkflowHistory != null && Model.WorkflowHistory.Any())
+                        {
+                            @foreach (var item in Model.WorkflowHistory)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(modelItem => item.Date)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Action)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Notes)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.User)</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center">لا يوجد سجل لسير العمل.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3" dir="rtl">
+    <div class="col-12 text-center">
+        <button type="button" class="btn btn-success m-2">اعتماد</button>
+        <button type="button" class="btn btn-danger m-2">رفض</button>
+        <a asp-action="Index" class="btn btn-secondary m-2">عودة للقائمة</a>
+    </div>
+</div>
+

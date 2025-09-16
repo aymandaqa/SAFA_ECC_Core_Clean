@@ -1,0 +1,53 @@
+
+@model SAFA_ECC_Core_Clean.ViewModels.DeleteUserViewModel
+
+@{ 
+    ViewData["Title"] = "حذف مستخدم";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // افتراض أن هذا هو تخطيط لوحة الإدارة
+}
+
+<div class="container mt-5" dir="rtl">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white text-end">
+                    <h3 class="mb-0">@ViewData["Title"]</h3>
+                </div>
+                <div class="card-body text-end">
+                    <h4 class="card-title text-danger">هل أنت متأكد أنك تريد حذف هذا المستخدم؟</h4>
+                    <p class="card-text">سيؤدي حذف المستخدم إلى إزالة جميع البيانات المرتبطة به بشكل دائم.</p>
+
+                    <dl class="row">
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.UserId)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.UserId)
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.UserName)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.UserName)
+                        </dd>
+                        <dt class="col-sm-4">
+                            @Html.DisplayNameFor(model => model.Email)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.Email)
+                        </dd>
+                    </dl>
+
+                    <form asp-action="DeleteUser" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="UserId" />
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="submit" class="btn btn-danger me-2">حذف</button>
+                            <a asp-action="Index" class="btn btn-secondary">إلغاء</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

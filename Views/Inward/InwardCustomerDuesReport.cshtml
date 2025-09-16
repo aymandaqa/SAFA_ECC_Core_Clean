@@ -1,0 +1,524 @@
+@model SAFA_ECC_Core_Clean.ViewModels.InwardCustomerDuesReportViewModel
+@{
+    ViewData["Title"] = "تقرير مستحقات العملاء - الشيكات الواردة";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">تقرير مستحقات العملاء - الشيكات الواردة</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">الرئيسية</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Inward")">الشيكات الواردة</a></li>
+                        <li class="breadcrumb-item active">تقرير مستحقات العملاء</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Form -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">معايير البحث والفلترة</h4>
+                </div>
+                <div class="card-body">
+                    <form id="searchForm" method="post" asp-action="InwardCustomerDuesReport">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">من تاريخ</label>
+                                    <input type="date" class="form-control" asp-for="FromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">إلى تاريخ</label>
+                                    <input type="date" class="form-control" asp-for="ToDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">رقم الحساب</label>
+                                    <input type="text" class="form-control" asp-for="AccountNumber" placeholder="رقم الحساب">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">اسم العميل</label>
+                                    <input type="text" class="form-control" asp-for="CustomerName" placeholder="اسم العميل">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">البنك</label>
+                                    <select class="form-select" asp-for="BankId">
+                                        <option value="">جميع البنوك</option>
+                                        @foreach (var bank in Model.Banks)
+                                        {
+                                            <option value="@bank.Bank_ID" selected="@(bank.Bank_ID == Model.BankId)">@bank.Bank_Name_AR</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">الحالة</label>
+                                    <select class="form-select" asp-for="Status">
+                                        <option value="">جميع الحالات</option>
+                                        <option value="Pending" selected="@(Model.Status == "Pending")">معلق</option>
+                                        <option value="Authorized" selected="@(Model.Status == "Authorized")">معتمد</option>
+                                        <option value="Returned" selected="@(Model.Status == "Returned")">مرجع</option>
+                                        <option value="Paid" selected="@(Model.Status == "Paid")">مدفوع</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">من مبلغ</label>
+                                    <input type="number" class="form-control" asp-for="MinAmount" placeholder="0.00" step="0.01">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">إلى مبلغ</label>
+                                    <input type="number" class="form-control" asp-for="MaxAmount" placeholder="0.00" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bx bx-search me-1"></i> بحث
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" onclick="clearForm()">
+                                        <i class="bx bx-refresh me-1"></i> مسح
+                                    </button>
+                                    <button type="button" class="btn btn-success" onclick="exportToExcel()">
+                                        <i class="bx bx-download me-1"></i> تصدير Excel
+                                    </button>
+                                    <button type="button" class="btn btn-info" onclick="exportToPDF()">
+                                        <i class="bx bx-file-pdf me-1"></i> تصدير PDF
+                                    </button>
+                                    <button type="button" class="btn btn-warning" onclick="printReport()">
+                                        <i class="bx bx-printer me-1"></i> طباعة
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Statistics -->
+    @if (Model.CustomerDues?.Any() == true)
+    {
+        <div class="row">
+            <div class="col-xl-3 col-md-6">
+                <div class="card mini-stats-wid">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <p class="text-muted fw-medium">إجمالي العملاء</p>
+                                <h4 class="mb-0">@Model.CustomerDues.GroupBy(x => x.Account_No).Count().ToString("N0")</h4>
+                            </div>
+                            <div class="flex-shrink-0 align-self-center">
+                                <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                    <span class="avatar-title">
+                                        <i class="bx bx-user font-size-24"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card mini-stats-wid">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <p class="text-muted fw-medium">إجمالي الشيكات</p>
+                                <h4 class="mb-0">@Model.CustomerDues.Count().ToString("N0")</h4>
+                            </div>
+                            <div class="flex-shrink-0 align-self-center">
+                                <div class="mini-stat-icon avatar-sm rounded-circle bg-success">
+                                    <span class="avatar-title">
+                                        <i class="bx bx-receipt font-size-24"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card mini-stats-wid">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <p class="text-muted fw-medium">إجمالي المبلغ</p>
+                                <h4 class="mb-0">@Model.CustomerDues.Sum(x => x.Amount ?? 0).ToString("N2")</h4>
+                            </div>
+                            <div class="flex-shrink-0 align-self-center">
+                                <div class="mini-stat-icon avatar-sm rounded-circle bg-info">
+                                    <span class="avatar-title">
+                                        <i class="bx bx-money font-size-24"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card mini-stats-wid">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <p class="text-muted fw-medium">متوسط المبلغ</p>
+                                <h4 class="mb-0">@(Model.CustomerDues.Any() ? (Model.CustomerDues.Sum(x => x.Amount ?? 0) / Model.CustomerDues.Count()).ToString("N2") : "0.00")</h4>
+                            </div>
+                            <div class="flex-shrink-0 align-self-center">
+                                <div class="mini-stat-icon avatar-sm rounded-circle bg-warning">
+                                    <span class="avatar-title">
+                                        <i class="bx bx-calculator font-size-24"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Results Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="card-title">نتائج البحث</h4>
+                        @if (Model.CustomerDues?.Any() == true)
+                        {
+                            <span class="badge bg-primary">@Model.CustomerDues.Count() نتيجة</span>
+                        }
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.CustomerDues?.Any() == true)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-hover" id="customerDuesTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>رقم الحساب</th>
+                                        <th>اسم العميل</th>
+                                        <th>رقم الشيك</th>
+                                        <th>تاريخ الشيك</th>
+                                        <th>المبلغ</th>
+                                        <th>البنك</th>
+                                        <th>الحالة</th>
+                                        <th>تاريخ الاستحقاق</th>
+                                        <th>أيام التأخير</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var due in Model.CustomerDues)
+                                    {
+                                        var daysOverdue = due.Due_Date.HasValue ? (DateTime.Now - due.Due_Date.Value).Days : 0;
+                                        <tr class="@(daysOverdue > 30 ? "table-danger" : daysOverdue > 7 ? "table-warning" : "")">
+                                            <td>@due.Account_No</td>
+                                            <td>@due.Customer_Name</td>
+                                            <td>@due.Cheque_No</td>
+                                            <td>@due.Cheque_Date?.ToString("dd/MM/yyyy")</td>
+                                            <td class="text-end">@due.Amount?.ToString("N2")</td>
+                                            <td>@due.Bank_Name</td>
+                                            <td>
+                                                @switch (due.Status)
+                                                {
+                                                    case "Pending":
+                                                        <span class="badge bg-warning">معلق</span>
+                                                        break;
+                                                    case "Authorized":
+                                                        <span class="badge bg-success">معتمد</span>
+                                                        break;
+                                                    case "Returned":
+                                                        <span class="badge bg-danger">مرجع</span>
+                                                        break;
+                                                    case "Paid":
+                                                        <span class="badge bg-info">مدفوع</span>
+                                                        break;
+                                                    default:
+                                                        <span class="badge bg-secondary">@due.Status</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>@due.Due_Date?.ToString("dd/MM/yyyy")</td>
+                                            <td class="text-center">
+                                                @if (daysOverdue > 0)
+                                                {
+                                                    <span class="badge bg-danger">@daysOverdue يوم</span>
+                                                }
+                                                else if (daysOverdue == 0)
+                                                {
+                                                    <span class="badge bg-warning">اليوم</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">@Math.Abs(daysOverdue) يوم متبقي</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <button type="button" class="btn btn-outline-info" onclick="viewChequeDetails(@due.Serial)" title="عرض التفاصيل">
+                                                        <i class="bx bx-show"></i>
+                                                    </button>
+                                                    @if (due.Status == "Pending")
+                                                    {
+                                                        <button type="button" class="btn btn-outline-success" onclick="authorizeCheque(@due.Serial)" title="اعتماد">
+                                                            <i class="bx bx-check"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-outline-danger" onclick="returnCheque(@due.Serial)" title="إرجاع">
+                                                            <i class="bx bx-x"></i>
+                                                        </button>
+                                                    }
+                                                    <button type="button" class="btn btn-outline-primary" onclick="sendReminder(@due.Serial)" title="إرسال تذكير">
+                                                        <i class="bx bx-bell"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="bx bx-search font-size-48 text-muted"></i>
+                            <h5 class="mt-3 text-muted">لا توجد نتائج</h5>
+                            <p class="text-muted">يرجى تعديل معايير البحث والمحاولة مرة أخرى</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+$(document).ready(function() {
+    // Initialize DataTable
+    $('#customerDuesTable').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Arabic.json"
+        },
+        "pageLength": 25,
+        "order": [[8, "desc"]], // Sort by days overdue descending
+        "columnDefs": [
+            { "orderable": false, "targets": [9] }, // Disable sorting for actions column
+            { "type": "num", "targets": [4, 8] } // Numeric sorting for amount and days
+        ],
+        "footerCallback": function(row, data, start, end, display) {
+            var api = this.api();
+            
+            // Calculate totals
+            var totalAmount = api
+                .column(4, { page: 'current' })
+                .data()
+                .reduce(function(a, b) {
+                    return parseFloat(a) + parseFloat(b.replace(/[^\d.-]/g, ''));
+                }, 0);
+            
+            // Update footer
+            $(api.column(4).footer()).html(
+                'الإجمالي: ' + totalAmount.toLocaleString('ar-EG', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                })
+            );
+        }
+    });
+
+    // Set default date range (last 30 days)
+    if (!$('input[name="FromDate"]').val()) {
+        var thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        $('input[name="FromDate"]').val(thirtyDaysAgo.toISOString().split('T')[0]);
+    }
+    
+    if (!$('input[name="ToDate"]').val()) {
+        $('input[name="ToDate"]').val(new Date().toISOString().split('T')[0]);
+    }
+});
+
+function clearForm() {
+    $('#searchForm')[0].reset();
+    $('input[name="FromDate"]').val('');
+    $('input[name="ToDate"]').val('');
+}
+
+function exportToExcel() {
+    var form = $('#searchForm');
+    var action = form.attr('action');
+    form.attr('action', '@Url.Action("ExportCustomerDuesToExcel", "Inward")');
+    form.submit();
+    form.attr('action', action);
+}
+
+function exportToPDF() {
+    var form = $('#searchForm');
+    var action = form.attr('action');
+    form.attr('action', '@Url.Action("ExportCustomerDuesToPDF", "Inward")');
+    form.submit();
+    form.attr('action', action);
+}
+
+function printReport() {
+    window.print();
+}
+
+function viewChequeDetails(serial) {
+    window.open('@Url.Action("Details", "Inward")/' + serial, '_blank');
+}
+
+function authorizeCheque(serial) {
+    Swal.fire({
+        title: 'تأكيد الاعتماد',
+        text: 'هل أنت متأكد من اعتماد هذا الشيك؟',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'نعم، اعتماد',
+        cancelButtonText: 'إلغاء'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post('@Url.Action("Authorize", "Inward")', {
+                id: serial,
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+            }).done(function(response) {
+                if (response.success) {
+                    Swal.fire('تم!', response.message, 'success');
+                    location.reload();
+                } else {
+                    Swal.fire('خطأ', response.message, 'error');
+                }
+            }).fail(function() {
+                Swal.fire('خطأ', 'حدث خطأ أثناء اعتماد الشيك', 'error');
+            });
+        }
+    });
+}
+
+function returnCheque(serial) {
+    Swal.fire({
+        title: 'إرجاع الشيك',
+        input: 'select',
+        inputOptions: {
+            '01': 'عدم كفاية الرصيد',
+            '02': 'حساب مغلق',
+            '03': 'توقيع غير مطابق',
+            '04': 'شيك مؤجل',
+            '05': 'أمر بعدم الدفع',
+            '99': 'أسباب أخرى'
+        },
+        inputPlaceholder: 'اختر سبب الإرجاع',
+        showCancelButton: true,
+        confirmButtonText: 'إرجاع',
+        cancelButtonText: 'إلغاء',
+        inputValidator: (value) => {
+            if (!value) {
+                return 'يرجى اختيار سبب الإرجاع'
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post('@Url.Action("Return", "Inward")', {
+                id: serial,
+                returnCode: result.value,
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+            }).done(function(response) {
+                if (response.success) {
+                    Swal.fire('تم!', response.message, 'success');
+                    location.reload();
+                } else {
+                    Swal.fire('خطأ', response.message, 'error');
+                }
+            }).fail(function() {
+                Swal.fire('خطأ', 'حدث خطأ أثناء إرجاع الشيك', 'error');
+            });
+        }
+    });
+}
+
+function sendReminder(serial) {
+    Swal.fire({
+        title: 'إرسال تذكير',
+        text: 'هل تريد إرسال تذكير للعميل بخصوص هذا الشيك؟',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#007bff',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'نعم، إرسال',
+        cancelButtonText: 'إلغاء'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post('@Url.Action("SendReminder", "Inward")', {
+                id: serial,
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+            }).done(function(response) {
+                if (response.success) {
+                    Swal.fire('تم!', response.message, 'success');
+                } else {
+                    Swal.fire('خطأ', response.message, 'error');
+                }
+            }).fail(function() {
+                Swal.fire('خطأ', 'حدث خطأ أثناء إرسال التذكير', 'error');
+            });
+        }
+    });
+}
+</script>
+
+<style>
+@media print {
+    .btn, .breadcrumb, .card-header .d-flex > *:not(.card-title) {
+        display: none !important;
+    }
+    
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    .table {
+        font-size: 12px;
+    }
+}
+
+.table-danger {
+    background-color: rgba(220, 53, 69, 0.1) !important;
+}
+
+.table-warning {
+    background-color: rgba(255, 193, 7, 0.1) !important;
+}
+</style>
+}
+

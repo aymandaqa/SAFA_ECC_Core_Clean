@@ -1,0 +1,177 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model PrintAllOutwardCHQViewModel
+
+@{ 
+    ViewData["Title"] = "طباعة جميع الشيكات الصادرة";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // افتراضياً، استخدام Layout الرئيسي
+}
+
+<style>
+    /* Custom RTL adjustments if needed */
+    body {
+        direction: rtl;
+        text-align: right;
+    }
+    .form-label {
+        float: right;
+    }
+    .input-group > .form-control,
+    .input-group > .form-select {
+        border-top-left-radius: 0.375rem;
+        border-bottom-left-radius: 0.375rem;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    .input-group > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.invalid-tooltip) {
+        margin-right: -1px;
+        margin-left: 0;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-top-right-radius: 0.375rem;
+        border-bottom-right-radius: 0.375rem;
+    }
+</style>
+
+<div class="container-fluid">
+    <h1 class="mt-4 text-right">@ViewData["Title"]</h1>
+
+    <!-- Search Form -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-search me-1"></i>
+            بحث عن الشيكات الصادرة
+        </div>
+        <div class="card-body">
+            <form id="searchForm" class="row g-3">
+                <div class="col-md-4">
+                    <label for="startDate" class="form-label">تاريخ البدء:</label>
+                    <input type="date" class="form-control" id="startDate" name="startDate" value="@Model.SearchCriteria.StartDate.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-4">
+                    <label for="endDate" class="form-label">تاريخ الانتهاء:</label>
+                    <input type="date" class="form-control" id="endDate" name="endDate" value="@Model.SearchCriteria.EndDate.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-4">
+                    <label for="chequeNumber" class="form-label">رقم الشيك:</label>
+                    <input type="text" class="form-control" id="chequeNumber" name="chequeNumber" value="@Model.SearchCriteria.ChequeNumber">
+                </div>
+                <div class="col-md-4">
+                    <label for="payeeName" class="form-label">اسم المستفيد:</label>
+                    <input type="text" class="form-control" id="payeeName" name="payeeName" value="@Model.SearchCriteria.PayeeName">
+                </div>
+                <div class="col-12 mt-4">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-search me-2"></i>بحث</button>
+                    <button type="button" class="btn btn-secondary ms-2" onclick="resetForm()"><i class="fas fa-redo me-2"></i>إعادة تعيين</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            نتائج البحث
+        </div>
+        <div class="card-body">
+            @if (Model.Cheques != null && Model.Cheques.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="chequesTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>رقم الشيك</th>
+                                <th>تاريخ الشيك</th>
+                                <th>اسم المستفيد</th>
+                                <th>المبلغ</th>
+                                <th>الحالة</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var cheque in Model.Cheques)
+                            {
+                                <tr>
+                                    <td>@cheque.ChequeNumber</td>
+                                    <td>@(cheque.ChequeDate?.ToShortDateString())</td>
+                                    <td>@cheque.PayeeName</td>
+                                    <td>@cheque.Amount.ToString("N2")</td>
+                                    <td>@cheque.Status</td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm" onclick="printSingleCheque(\'@cheque.Id\')"><i class="fas fa-print"></i> طباعة</button>
+                                        <!-- Add more actions if needed -->
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center" role="alert">
+                    لا توجد شيكات مطابقة لمعايير البحث.
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mb-4 text-left">
+        <button type="button" class="btn btn-success btn-lg" onclick="printAllCheques()"><i class="fas fa-print me-2"></i>طباعة جميع الشيكات المعروضة</button>
+        <!-- Optional: Export Button -->
+        @* <button type="button" class="btn btn-secondary btn-lg ms-2" onclick="exportCheques()"><i class="fas fa-file-export me-2"></i>تصدير</button> *@
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function resetForm() {
+            document.getElementById(\'searchForm\').reset();
+            // Optionally trigger a new search after reset
+            // document.getElementById(\'searchForm\').submit();
+        }
+
+        function printSingleCheque(chequeId) {
+            // Implement logic to print a single cheque, e.g., open a new window or make an AJAX call
+            alert(\'طباعة الشيك رقم: \' + chequeId);
+            console.log(\'Printing single cheque with ID:\', chequeId);
+        }
+
+        function printAllCheques() {
+            // Implement logic to print all cheques currently displayed in the table
+            alert(\'طباعة جميع الشيكات المعروضة.\');
+            console.log(\'Printing all displayed cheques.\');
+            // Example: You might want to collect all cheque IDs from the table and send them to a print endpoint
+            // var chequeIds = [];
+            // $(\'#chequesTable tbody tr\').each(function() {
+            //     chequeIds.push($(this).find(\'td:first\').text()); // Assuming ChequeNumber is the first td
+            // });
+            // window.open(\'/ChequeViewer/PrintSelectedCheques?ids=\' + chequeIds.join(\'\'), \'_blank\');
+        }
+
+        // Optional: AJAX search implementation
+        // $(\'#searchForm\').on(\'submit\', function(e) {
+        //     e.preventDefault();
+        //     var formData = $(this).serialize();
+        //     $.ajax({
+        //         url: \'@Url.Action("SearchOutwardCheques", "ChequeViewer")\',
+        //         type: \'GET\',
+        //         data: formData,
+        //         success: function(data) {
+        //             // Update the table body with new data
+        //             $(\'#chequesTable tbody\').html(data);
+        //         },
+        //         error: function(error) {
+        //             console.error(\'Error during search:\', error);
+        //             alert(\'حدث خطأ أثناء البحث.\');
+        //         }
+        //     });
+        // });
+
+        // Initialize DataTables (if using)
+        $(document).ready(function() {
+            // $(\'#chequesTable\').DataTable(); // Uncomment if you have DataTables library included
+        });
+    </script>
+}

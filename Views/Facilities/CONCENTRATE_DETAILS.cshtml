@@ -1,0 +1,149 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model SAFA_ECC_Core_Clean.ViewModels.ConcentrateDetailsViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل التركيز";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h1 class="text-end mb-4">@ViewData["Title"]</h1>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white text-end">
+            <h5 class="mb-0">بيانات التركيز</h5>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="concentrateName" class="form-label float-end">اسم التركيز:</label>
+                        <input type="text" class="form-control text-end" id="concentrateName" value="@Model.ConcentrateName" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="concentrateCode" class="form-label float-end">كود التركيز:</label>
+                        <input type="text" class="form-control text-end" id="concentrateCode" value="@Model.ConcentrateCode" readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="productionDate" class="form-label float-end">تاريخ الإنتاج:</label>
+                        <input type="date" class="form-control text-end" id="productionDate" value="@Model.ProductionDate?.ToString("yyyy-MM-dd")" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="expiryDate" class="form-label float-end">تاريخ انتهاء الصلاحية:</label>
+                        <input type="date" class="form-control text-end" id="expiryDate" value="@Model.ExpiryDate?.ToString("yyyy-MM-dd")" readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="description" class="form-label float-end">الوصف:</label>
+                        <textarea class="form-control text-end" id="description" rows="3" readonly>@Model.Description</textarea>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-secondary me-2">تعديل</button>
+                    <button type="button" class="btn btn-danger">حذف</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white text-end">
+            <h5 class="mb-0">مكونات التركيز</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered text-end">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">اسم المكون</th>
+                            <th scope="col">الكمية</th>
+                            <th scope="col">الوحدة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Components != null && Model.Components.Any())
+                        {
+                            @foreach (var component in Model.Components)
+                            {
+                                <tr>
+                                    <td>@component.Id</td>
+                                    <td>@component.ComponentName</td>
+                                    <td>@component.Quantity</td>
+                                    <td>@component.Unit</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4">لا توجد مكونات لعرضها.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-success">إضافة مكون جديد</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-primary text-white text-end">
+            <h5 class="mb-0">سجل التغييرات</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered text-end">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">التاريخ</th>
+                            <th scope="col">المستخدم</th>
+                            <th scope="col">العملية</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.ChangeLog != null && Model.ChangeLog.Any())
+                        {
+                            @foreach (var log in Model.ChangeLog)
+                            {
+                                <tr>
+                                    <td>@log.Id</td>
+                                    <td>@log.Date.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@log.User</td>
+                                    <td>@log.Operation</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4">لا يوجد سجل تغييرات لعرضه.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-start mt-4">
+        <a href="@Url.Action("Index", "Facilities")" class="btn btn-primary">العودة إلى قائمة المنشآت</a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة أي سكريبتات خاصة بالصفحة هنا
+        $(document).ready(function () {
+            // تهيئة أي مكونات Bootstrap JavaScript مثل التلميحات أو النوافذ المنبثقة
+            $(\'[data-bs-toggle="tooltip"]\').tooltip();
+            $(\'[data-bs-toggle="popover"]\').popover();
+        });
+    </script>
+}

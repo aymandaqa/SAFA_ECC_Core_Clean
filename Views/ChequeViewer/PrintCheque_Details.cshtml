@@ -1,0 +1,120 @@
+
+@model PrintChequeDetailsViewModel // Placeholder for the actual ViewModel
+
+@{
+    ViewData["Title"] = "تفاصيل الشيك للطباعة";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Assuming a shared layout
+}
+
+<style>
+    body {
+        direction: rtl; /* Right-to-left direction for Arabic */
+        text-align: right;
+    }
+    .container-fluid {
+        padding-right: var(--bs-gutter-x, 0.75rem);
+        padding-left: var(--bs-gutter-x, 0.75rem);
+    }
+    .form-label {
+        float: right;
+    }
+    .text-start {
+        text-align: right !important;
+    }
+    .text-end {
+        text-align: left !important;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <h1 class="mb-4">@ViewData["Title"]</h1>
+
+    <!-- Placeholder for Search Form -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">نموذج البحث</h5>
+        </div>
+        <div class="card-body">
+
+            <form class="row g-3">
+                <div class="col-md-4">
+                    <label for="chequeNumber" class="form-label">رقم الشيك</label>
+                    <input type="text" class="form-control" id="chequeNumber" placeholder="أدخل رقم الشيك">
+                </div>
+                <div class="col-md-4">
+                    <label for="accountNumber" class="form-label">رقم الحساب</label>
+                    <input type="text" class="form-control" id="accountNumber" placeholder="أدخل رقم الحساب">
+                </div>
+                <div class="col-md-4">
+                    <label for="bankName" class="form-label">اسم البنك</label>
+                    <input type="text" class="form-control" id="bankName" placeholder="أدخل اسم البنك">
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">بحث</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Placeholder for Cheque Details and Data Table -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">تفاصيل الشيك</h5>
+        </div>
+        <div class="card-body">
+
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>رقم الشيك:</strong> @Model.ChequeNumber</p>
+                    <p><strong>تاريخ الشيك:</strong> @Model.ChequeDate.ToShortDateString()</p>
+                    <p><strong>المبلغ:</strong> @Model.Amount.ToString("N2")</p>
+                    <p><strong>المستفيد:</strong> @Model.PayeeName</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>اسم البنك:</strong> @Model.BankName</p>
+                    <p><strong>رقم الحساب:</strong> @Model.AccountNumber</p>
+                    <p><strong>حالة الشيك:</strong> @Model.Status</p>
+                </div>
+            </div>
+
+            <h6 class="mt-4">تفاصيل البنود</h6>
+            <table class="table table-bordered table-striped mt-3">
+                <thead>
+                    <tr>
+                        <th>الوصف</th>
+                        <th>المبلغ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items != null && Model.Items.Any())
+                    {
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>@item.Description</td>
+                                <td>@item.Amount.ToString("N2")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="2">لا توجد بنود لعرضها.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Placeholder for Print Button -->
+    <div class="text-center mb-4">
+        <button type="button" class="btn btn-primary btn-lg" onclick="window.print()">طباعة الشيك</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // JavaScript for search functionality, etc.
+    </script>
+}

@@ -1,0 +1,110 @@
+@model SAFA_ECC_Core_Clean.ViewModels.HoldChequeViewModel
+
+@{ 
+    ViewData["Title"] = "احتجاز الشيكات الصادرة";
+}
+
+<div class="container-fluid" dir="rtl">
+    <h2 class="text-center mb-4">احتجاز الشيكات الصادرة</h2>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">تفاصيل الشيك</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="HoldCheque" method="post">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="ChequeNumber" class="form-label">رقم الشيك:</label>
+                        <input asp-for="ChequeNumber" class="form-control" />
+                        <span asp-validation-for="ChequeNumber" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="BankName" class="form-label">اسم البنك:</label>
+                        <input asp-for="BankName" class="form-control" />
+                        <span asp-validation-for="BankName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="AccountHolderName" class="form-label">اسم صاحب الحساب:</label>
+                        <input asp-for="AccountHolderName" class="form-control" />
+                        <span asp-validation-for="AccountHolderName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Amount" class="form-label">المبلغ:</label>
+                        <input asp-for="Amount" class="form-control" type="number" step="0.01" />
+                        <span asp-validation-for="Amount" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="HoldReason" class="form-label">سبب الاحتجاز:</label>
+                        <textarea asp-for="HoldReason" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="HoldReason" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="HoldDate" class="form-label">تاريخ الاحتجاز:</label>
+                        <input asp-for="HoldDate" class="form-control" type="date" />
+                        <span asp-validation-for="HoldDate" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-success me-2">احتجاز الشيك</button>
+                    <button type="reset" class="btn btn-secondary">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">الشيكات المحتجزة حالياً</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.HeldCheques != null && Model.HeldCheques.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>رقم الشيك</th>
+                                <th>البنك</th>
+                                <th>صاحب الحساب</th>
+                                <th>المبلغ</th>
+                                <th>تاريخ الاحتجاز</th>
+                                <th>سبب الاحتجاز</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var cheque in Model.HeldCheques)
+                            {
+                                <tr>
+                                    <td>@cheque.ChequeNumber</td>
+                                    <td>@cheque.BankName</td>
+                                    <td>@cheque.AccountHolderName</td>
+                                    <td>@cheque.Amount.ToString("N2")</td>
+                                    <td>@cheque.HoldDate.ToShortDateString()</td>
+                                    <td>@cheque.HoldReason</td>
+                                    <td>
+                                        <a asp-action="ReleaseCheque" asp-route-id="@cheque.Id" class="btn btn-sm btn-warning">تحرير</a>
+                                        <a asp-action="EditHeldCheque" asp-route-id="@cheque.Id" class="btn btn-sm btn-primary">تعديل</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-center">لا توجد شيكات محتجزة حالياً.</p>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

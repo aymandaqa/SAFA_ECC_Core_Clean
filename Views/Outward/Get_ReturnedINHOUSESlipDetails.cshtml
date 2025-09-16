@@ -1,0 +1,93 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model GetReturnedINHOUSESlipDetailsViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل إذن الإرجاع الداخلي";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <h1 class="text-center">@ViewData["Title"]</h1>
+
+    <!-- Placeholder for forms, tables, and buttons -->
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Content will be added here in subsequent phases -->
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="card mt-4">
+    <div class="card-header bg-primary text-white text-end">
+        <h5 class="mb-0">بحث عن إذن إرجاع داخلي</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="Get_ReturnedINHOUSESlipDetails" method="get" class="row g-3 justify-content-end">
+            <div class="col-md-4">
+                <label for="slipNumber" class="form-label">رقم الإذن:</label>
+                <input type="text" class="form-control text-end" id="slipNumber" name="slipNumber" value="@ViewBag.SlipNumber" />
+            </div>
+            <div class="col-md-4">
+                <label for="startDate" class="form-label">من تاريخ:</label>
+                <input type="date" class="form-control text-end" id="startDate" name="startDate" value="@ViewBag.StartDate" />
+            </div>
+            <div class="col-md-4">
+                <label for="endDate" class="form-label">إلى تاريخ:</label>
+                <input type="date" class="form-control text-end" id="endDate" name="endDate" value="@ViewBag.EndDate" />
+            </div>
+            <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> بحث</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-success text-white text-end">
+        <h5 class="mb-0">نتائج البحث</h5>
+    </div>
+    <div class="card-body">
+        @if (Model != null && Model.Details.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped text-end">
+                    <thead>
+                        <tr>
+                            <th>رقم الصنف</th>
+                            <th>اسم الصنف</th>
+                            <th>الكمية المرتجعة</th>
+                            <th>الوحدة</th>
+                            <th>الملاحظات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Details)
+                        {
+                            <tr>
+                                <td>@item.ItemNumber</td>
+                                <td>@item.ItemName</td>
+                                <td>@item.ReturnedQuantity</td>
+                                <td>@item.Unit</td>
+                                <td>@item.Notes</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-end" role="alert">
+                لا توجد بيانات لعرضها.
+            </div>
+        }
+    </div>
+    <div class="card-footer text-end">
+        <a asp-action="Create" class="btn btn-success"><i class="bi bi-plus-circle"></i> إنشاء إذن جديد</a>
+        <button type="button" class="btn btn-secondary" onclick="window.history.back();"><i class="bi bi-arrow-right"></i> رجوع</button>
+    </div>
+</div>
+

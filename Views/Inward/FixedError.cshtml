@@ -1,0 +1,98 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model FixedErrorViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل الخطأ الثابت";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // افتراض استخدام تخطيط مشترك
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h1 class="text-right mb-4">@ViewData["Title"]</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary text-right">معلومات الخطأ</h6>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="ErrorId" class="form-label float-end">معرف الخطأ:</label>
+                        <input asp-for="ErrorId" class="form-control text-right" readonly />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="ErrorDate" class="form-label float-end">تاريخ الخطأ:</label>
+                        <input asp-for="ErrorDate" class="form-control text-right" type="date" readonly />
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label asp-for="ErrorDescription" class="form-label float-end">وصف الخطأ:</label>
+                        <textarea asp-for="ErrorDescription" class="form-control text-right" rows="3" readonly></textarea>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="ReportedByUser" class="form-label float-end">المستخدم الذي أبلغ عن الخطأ:</label>
+                        <input asp-for="ReportedByUser" class="form-control text-right" readonly />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="ErrorStatus" class="form-label float-end">حالة الخطأ:</label>
+                        <input asp-for="ErrorStatus" class="form-control text-right" readonly />
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="FixedDate" class="form-label float-end">تاريخ الإصلاح:</label>
+                        <input asp-for="FixedDate" class="form-control text-right" type="date" readonly />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="FixedNotes" class="form-label float-end">ملاحظات الإصلاح:</label>
+                        <textarea asp-for="FixedNotes" class="form-control text-right" rows="3" readonly></textarea>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <a href="#" class="btn btn-primary me-2">تعديل</a>
+                    <a href="#" class="btn btn-secondary">العودة</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4 mt-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary text-right">سجل الخطأ</h6>
+        </div>
+        <div class="card-body">
+            @if (Model.ErrorLog != null && Model.ErrorLog.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered text-right" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>التاريخ والوقت</th>
+                                <th>الرسالة</th>
+                                <th>المستخدم</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var entry in Model.ErrorLog)
+                            {
+                                <tr>
+                                    <td>@entry.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                    <td>@entry.Message</td>
+                                    <td>@entry.User</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-center">لا يوجد سجل لهذا الخطأ.</p>
+            }
+        </div>
+    </div>
+</div>
+

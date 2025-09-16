@@ -1,0 +1,61 @@
+@model SAFA_ECC_Core_Clean.ViewModels.SystemSettingsViewModel
+
+@{
+    ViewData["Title"] = "إعدادات النظام";
+}
+
+<h1 class="text-center mb-4">إعدادات النظام</h1>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form asp-action="SystemSettings" method="post" class="needs-validation" novalidate dir="rtl">
+                    <div asp-validation-summary="ModelOnly" class="text-danger text-end"></div>
+
+                    <div class="mb-3 text-end">
+                        <label asp-for="SiteName" class="form-label"></label>
+                        <input asp-for="SiteName" class="form-control" />
+                        <span asp-validation-for="SiteName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3 text-end">
+                        <label asp-for="AdminEmail" class="form-label"></label>
+                        <input asp-for="AdminEmail" class="form-control" />
+                        <span asp-validation-for="AdminEmail" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3 text-end">
+                        <label asp-for="PhoneNumber" class="form-label"></label>
+                        <input asp-for="PhoneNumber" class="form-control" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3 text-end">
+                        <label asp-for="CompanyAddress" class="form-label"></label>
+                        <textarea asp-for="CompanyAddress" class="form-control"></textarea>
+                        <span asp-validation-for="CompanyAddress" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3 form-check form-switch text-end">
+                        <input class="form-check-input" type="checkbox" asp-for="AllowRegistration" role="switch" id="allowRegistrationSwitch">
+                        <label class="form-check-label" for="allowRegistrationSwitch" asp-for="AllowRegistration"></label>
+                    </div>
+
+                    <div class="mb-3 form-check form-switch text-end">
+                        <input class="form-check-input" type="checkbox" asp-for="MaintenanceMode" role="switch" id="maintenanceModeSwitch">
+                        <label class="form-check-label" for="maintenanceModeSwitch" asp-for="MaintenanceMode"></label>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,126 @@
+@model SAFA_ECC_Core_Clean.ViewModels.SystemMonitoringViewModel
+
+@{ 
+    ViewData["Title"] = "مراقبة النظام";
+}
+
+<h1 class="text-right">مراقبة النظام</h1>
+
+<div class="container-fluid" dir="rtl">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white text-right">
+                    <h4 class="mb-0">معلومات النظام</h4>
+                </div>
+                <div class="card-body">
+                    <dl class="row text-right">
+                        <dt class="col-sm-4">اسم الخادم:</dt>
+                        <dd class="col-sm-8">@Model.ServerName</dd>
+
+                        <dt class="col-sm-4">وقت التشغيل:</dt>
+                        <dd class="col-sm-8">@Model.Uptime</dd>
+
+                        <dt class="col-sm-4">استخدام وحدة المعالجة المركزية:</dt>
+                        <dd class="col-sm-8">@Model.CpuUsage %</dd>
+
+                        <dt class="col-sm-4">الذاكرة المستخدمة:</dt>
+                        <dd class="col-sm-8">@Model.MemoryUsage MB</dd>
+
+                        <dt class="col-sm-4">الذاكرة المتاحة:</dt>
+                        <dd class="col-sm-8">@Model.AvailableMemory MB</dd>
+
+                        <dt class="col-sm-4">إجمالي الذاكرة:</dt>
+                        <dd class="col-sm-8">@Model.TotalMemory MB</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white text-right">
+                    <h4 class="mb-0">حالة الخدمات</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-striped text-right">
+                        <thead>
+                            <tr>
+                                <th class="text-right">اسم الخدمة</th>
+                                <th class="text-right">الحالة</th>
+                                <th class="text-right">وقت آخر تحديث</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.ServiceStatuses != null && Model.ServiceStatuses.Any())
+                            {
+                                foreach (var service in Model.ServiceStatuses)
+                                {
+                                    <tr>
+                                        <td>@service.ServiceName</td>
+                                        <td>
+                                            @if (service.IsRunning)
+                                            {
+                                                <span class="badge bg-success">قيد التشغيل</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">متوقفة</span>
+                                            }
+                                        </td>
+                                        <td>@service.LastUpdated?.ToString("g")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="3" class="text-center">لا توجد خدمات لعرضها.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white text-right">
+                    <h4 class="mb-0">سجل الأخطاء الأخير</h4>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentErrors != null && Model.RecentErrors.Any())
+                    {
+                        <ul class="list-group list-group-flush text-right">
+                            @foreach (var error in Model.RecentErrors)
+                            {
+                                <li class="list-group-item">
+                                    <strong>@error.Timestamp.ToString("g"):</strong> @error.Message
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-center">لا توجد أخطاء حديثة.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة أي سكربتات خاصة بمراقبة النظام هنا، مثل تحديث البيانات بشكل دوري
+        // مثال: تحديث كل 5 ثوانٍ
+        // setInterval(function() {
+        //     location.reload();
+        // }, 5000);
+    </script>
+}

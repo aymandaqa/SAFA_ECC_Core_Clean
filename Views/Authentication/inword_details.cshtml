@@ -1,0 +1,94 @@
+@model SAFA_ECC_Core_Clean.ViewModels.InwordDetailsViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل المعاملة الواردة";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // افتراض أن هناك ملف _Layout.cshtml موجود
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h1 class="text-end mb-4">@ViewData["Title"]</h1>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white text-end">
+            <h5 class="mb-0">تفاصيل التفويض</h5>
+        </div>
+        <div class="card-body text-end">
+
+            <dl class="row">
+                <dt class="col-sm-3">رقم التفويض:</dt>
+                <dd class="col-sm-9">@Model.AuthorizationId</dd>
+
+                <dt class="col-sm-3">تاريخ التفويض:</dt>
+                <dd class="col-sm-9">@Model.AuthorizationDate.ToShortDateString()</dd>
+
+                <dt class="col-sm-3">الجهة المصدرة:</dt>
+                <dd class="col-sm-9">@Model.Issuer</dd>
+
+                <dt class="col-sm-3">الحالة:</dt>
+                <dd class="col-sm-9">@Model.Status</dd>
+
+                <dt class="col-sm-3">الملاحظات:</dt>
+                <dd class="col-sm-9">@Model.Notes</dd>
+            </dl>
+            <div class="text-start">
+                <a asp-action="EditAuthorization" asp-route-id="@Model.AuthorizationId" class="btn btn-warning btn-sm">تعديل التفويض</a>
+                <a asp-action="DeleteAuthorization" asp-route-id="@Model.AuthorizationId" class="btn btn-danger btn-sm">حذف التفويض</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-info text-white text-end">
+            <h5 class="mb-0">تفاصيل المعاملات</h5>
+        </div>
+        <div class="card-body text-end">
+
+            <table class="table table-bordered table-striped text-end">
+                <thead>
+                    <tr>
+                        <th>رقم المعاملة</th>
+                        <th>النوع</th>
+                        <th>المبلغ</th>
+                        <th>التاريخ</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Transactions != null && Model.Transactions.Any())
+                    {
+                        foreach (var item in Model.Transactions)
+                        {
+                            <tr>
+                                <td>@item.TransactionId</td>
+                                <td>@item.Type</td>
+                                <td>@item.Amount.ToString("C")</td>
+                                <td>@item.TransactionDate.ToShortDateString()</td>
+                                <td>
+                                    <a asp-action="EditTransaction" asp-route-id="@item.TransactionId" class="btn btn-info btn-sm">تعديل</a>
+                                    <a asp-action="DeleteTransaction" asp-route-id="@item.TransactionId" class="btn btn-danger btn-sm">حذف</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5">لا توجد معاملات لعرضها.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="text-start mt-3">
+                <a asp-action="CreateTransaction" asp-route-authorizationId="@Model.AuthorizationId" class="btn btn-success">إضافة معاملة جديدة</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-end mt-4">
+        <a asp-action="Index" class="btn btn-secondary">العودة إلى القائمة</a>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- يمكن إضافة سكربتات خاصة بالصفحة هنا -->
+}

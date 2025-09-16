@@ -1,0 +1,574 @@
+@model SAFA_ECC_Core_Clean.ViewModels.MagicScreenViewModel
+@{
+    ViewData["Title"] = "Magic Screen - الشاشة السحرية";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">Magic Screen - الشاشة السحرية</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">الرئيسية</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Inward")">الشيكات الواردة</a></li>
+                        <li class="breadcrumb-item active">Magic Screen</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">إجمالي الشيكات</p>
+                            <h4 class="mb-0">@Model.TotalCheques.ToString("N0")</h4>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                <span class="avatar-title">
+                                    <i class="bx bx-receipt font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">في الانتظار</p>
+                            <h4 class="mb-0">@Model.PendingCheques.ToString("N0")</h4>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-warning">
+                                <span class="avatar-title">
+                                    <i class="bx bx-time-five font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">معتمدة</p>
+                            <h4 class="mb-0">@Model.ApprovedCheques.ToString("N0")</h4>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-success">
+                                <span class="avatar-title">
+                                    <i class="bx bx-check-circle font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card mini-stats-wid">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <p class="text-muted fw-medium">مرجعة</p>
+                            <h4 class="mb-0">@Model.ReturnedCheques.ToString("N0")</h4>
+                        </div>
+                        <div class="flex-shrink-0 align-self-center">
+                            <div class="mini-stat-icon avatar-sm rounded-circle bg-danger">
+                                <span class="avatar-title">
+                                    <i class="bx bx-x-circle font-size-24"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Magic Screen Controls -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">أدوات التحكم السريع</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">رقم الشيك</label>
+                                <input type="text" class="form-control" id="chequeNumber" placeholder="أدخل رقم الشيك">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">البنك</label>
+                                <select class="form-select" id="bankSelect">
+                                    <option value="">جميع البنوك</option>
+                                    @foreach (var bank in Model.Banks)
+                                    {
+                                        <option value="@bank.Bank_ID">@bank.Bank_Name_AR</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">الحالة</label>
+                                <select class="form-select" id="statusSelect">
+                                    <option value="">جميع الحالات</option>
+                                    <option value="Pending">في الانتظار</option>
+                                    <option value="Approved">معتمد</option>
+                                    <option value="Returned">مرجع</option>
+                                    <option value="Cancelled">ملغي</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">&nbsp;</label>
+                                <div class="d-grid">
+                                    <button type="button" class="btn btn-primary" onclick="searchCheques()">
+                                        <i class="bx bx-search-alt me-1"></i> بحث
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-success" onclick="bulkApprove()">
+                                    <i class="bx bx-check me-1"></i> اعتماد مجمع
+                                </button>
+                                <button type="button" class="btn btn-danger" onclick="bulkReturn()">
+                                    <i class="bx bx-x me-1"></i> إرجاع مجمع
+                                </button>
+                                <button type="button" class="btn btn-warning" onclick="bulkHold()">
+                                    <i class="bx bx-pause me-1"></i> تعليق مجمع
+                                </button>
+                                <button type="button" class="btn btn-info" onclick="exportSelected()">
+                                    <i class="bx bx-export me-1"></i> تصدير المحدد
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cheques Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="card-title">قائمة الشيكات</h4>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="refreshTable()">
+                                <i class="bx bx-refresh"></i> تحديث
+                            </button>
+                            <button type="button" class="btn btn-outline-success btn-sm" onclick="autoProcess()">
+                                <i class="bx bx-cog"></i> معالجة تلقائية
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover" id="chequesTable">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th width="40">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="selectAll">
+                                        </div>
+                                    </th>
+                                    <th>رقم الشيك</th>
+                                    <th>اسم الساحب</th>
+                                    <th>المبلغ</th>
+                                    <th>البنك</th>
+                                    <th>التاريخ</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var cheque in Model.Cheques)
+                                {
+                                    <tr data-id="@cheque.Serial">
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input cheque-checkbox" type="checkbox" value="@cheque.Serial">
+                                            </div>
+                                        </td>
+                                        <td>@cheque.DrwChqNo</td>
+                                        <td>@cheque.DrwName</td>
+                                        <td class="text-end">@cheque.Amount?.ToString("N2")</td>
+                                        <td>@cheque.Bank?.Bank_Name_AR</td>
+                                        <td>@cheque.Trans_Date?.ToString("dd/MM/yyyy")</td>
+                                        <td>
+                                            @switch (cheque.Status)
+                                            {
+                                                case "Pending":
+                                                    <span class="badge bg-warning">في الانتظار</span>
+                                                    break;
+                                                case "Approved":
+                                                    <span class="badge bg-success">معتمد</span>
+                                                    break;
+                                                case "Returned":
+                                                    <span class="badge bg-danger">مرجع</span>
+                                                    break;
+                                                case "Cancelled":
+                                                    <span class="badge bg-secondary">ملغي</span>
+                                                    break;
+                                                default:
+                                                    <span class="badge bg-light text-dark">@cheque.Status</span>
+                                                    break;
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <button type="button" class="btn btn-outline-info" onclick="viewCheque(@cheque.Serial)" title="عرض">
+                                                    <i class="bx bx-show"></i>
+                                                </button>
+                                                @if (cheque.Status == "Pending")
+                                                {
+                                                    <button type="button" class="btn btn-outline-success" onclick="approveCheque(@cheque.Serial)" title="اعتماد">
+                                                        <i class="bx bx-check"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-danger" onclick="returnCheque(@cheque.Serial)" title="إرجاع">
+                                                        <i class="bx bx-x"></i>
+                                                    </button>
+                                                }
+                                                <button type="button" class="btn btn-outline-primary" onclick="printCheque(@cheque.Serial)" title="طباعة">
+                                                    <i class="bx bx-printer"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="row mt-3">
+                        <div class="col-sm-12 col-md-5">
+                            <div class="dataTables_info">
+                                عرض @Model.Cheques.Count() من أصل @Model.TotalCheques شيك
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-7">
+                            <div class="dataTables_paginate paging_simple_numbers">
+                                <!-- Pagination will be handled by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<!-- Cheque Details Modal -->
+<div class="modal fade" id="chequeDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">تفاصيل الشيك</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="chequeDetailsContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Return Reason Modal -->
+<div class="modal fade" id="returnReasonModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">سبب الإرجاع</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="returnReasonForm">
+                    <div class="mb-3">
+                        <label class="form-label">كود الإرجاع</label>
+                        <select class="form-select" id="returnCode" required>
+                            <option value="">اختر كود الإرجاع</option>
+                            @foreach (var code in Model.ReturnCodes)
+                            {
+                                <option value="@code.Return_Code">@code.Return_Code - @code.Return_Desc_AR</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">ملاحظات</label>
+                        <textarea class="form-control" id="returnRemarks" rows="3"></textarea>
+                    </div>
+                    <input type="hidden" id="returnChequeId">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-danger" onclick="confirmReturn()">تأكيد الإرجاع</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+$(document).ready(function() {
+    // Initialize DataTable
+    $('#chequesTable').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Arabic.json"
+        },
+        "pageLength": 25,
+        "order": [[5, "desc"]], // Sort by date descending
+        "columnDefs": [
+            { "orderable": false, "targets": [0, 7] } // Disable sorting for checkbox and actions columns
+        ]
+    });
+
+    // Select all checkbox functionality
+    $('#selectAll').change(function() {
+        $('.cheque-checkbox').prop('checked', this.checked);
+    });
+
+    // Auto-refresh every 30 seconds
+    setInterval(function() {
+        if ($('#autoRefresh').is(':checked')) {
+            refreshTable();
+        }
+    }, 30000);
+});
+
+function searchCheques() {
+    const chequeNumber = $('#chequeNumber').val();
+    const bankId = $('#bankSelect').val();
+    const status = $('#statusSelect').val();
+
+    // Implement search functionality
+    window.location.href = '@Url.Action("MagicScreen", "Inward")' + 
+        '?chequeNumber=' + encodeURIComponent(chequeNumber) +
+        '&bankId=' + encodeURIComponent(bankId) +
+        '&status=' + encodeURIComponent(status);
+}
+
+function viewCheque(chequeId) {
+    $.get('@Url.Action("GetChequeDetails", "Inward")/' + chequeId, function(data) {
+        $('#chequeDetailsContent').html(data);
+        $('#chequeDetailsModal').modal('show');
+    }).fail(function() {
+        Swal.fire('خطأ', 'حدث خطأ أثناء تحميل تفاصيل الشيك', 'error');
+    });
+}
+
+function approveCheque(chequeId) {
+    Swal.fire({
+        title: 'تأكيد الاعتماد',
+        text: 'هل أنت متأكد من اعتماد هذا الشيك؟',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'نعم، اعتماد',
+        cancelButtonText: 'إلغاء'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post('@Url.Action("ApproveCheque", "Inward")', {
+                id: chequeId,
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+            }).done(function(response) {
+                if (response.success) {
+                    Swal.fire('تم!', response.message, 'success');
+                    refreshTable();
+                } else {
+                    Swal.fire('خطأ', response.message, 'error');
+                }
+            }).fail(function() {
+                Swal.fire('خطأ', 'حدث خطأ أثناء اعتماد الشيك', 'error');
+            });
+        }
+    });
+}
+
+function returnCheque(chequeId) {
+    $('#returnChequeId').val(chequeId);
+    $('#returnReasonModal').modal('show');
+}
+
+function confirmReturn() {
+    const chequeId = $('#returnChequeId').val();
+    const returnCode = $('#returnCode').val();
+    const remarks = $('#returnRemarks').val();
+
+    if (!returnCode) {
+        Swal.fire('تنبيه', 'يرجى اختيار كود الإرجاع', 'warning');
+        return;
+    }
+
+    $.post('@Url.Action("ReturnCheque", "Inward")', {
+        id: chequeId,
+        returnCode: returnCode,
+        remarks: remarks,
+        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+    }).done(function(response) {
+        if (response.success) {
+            $('#returnReasonModal').modal('hide');
+            Swal.fire('تم!', response.message, 'success');
+            refreshTable();
+        } else {
+            Swal.fire('خطأ', response.message, 'error');
+        }
+    }).fail(function() {
+        Swal.fire('خطأ', 'حدث خطأ أثناء إرجاع الشيك', 'error');
+    });
+}
+
+function bulkApprove() {
+    const selectedCheques = $('.cheque-checkbox:checked').map(function() {
+        return this.value;
+    }).get();
+
+    if (selectedCheques.length === 0) {
+        Swal.fire('تنبيه', 'يرجى تحديد شيك واحد على الأقل', 'warning');
+        return;
+    }
+
+    Swal.fire({
+        title: 'تأكيد الاعتماد المجمع',
+        text: `هل أنت متأكد من اعتماد ${selectedCheques.length} شيك؟`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'نعم، اعتماد الكل',
+        cancelButtonText: 'إلغاء'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post('@Url.Action("BulkApprove", "Inward")', {
+                chequeIds: selectedCheques,
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+            }).done(function(response) {
+                if (response.success) {
+                    Swal.fire('تم!', response.message, 'success');
+                    refreshTable();
+                } else {
+                    Swal.fire('خطأ', response.message, 'error');
+                }
+            }).fail(function() {
+                Swal.fire('خطأ', 'حدث خطأ أثناء الاعتماد المجمع', 'error');
+            });
+        }
+    });
+}
+
+function bulkReturn() {
+    const selectedCheques = $('.cheque-checkbox:checked').map(function() {
+        return this.value;
+    }).get();
+
+    if (selectedCheques.length === 0) {
+        Swal.fire('تنبيه', 'يرجى تحديد شيك واحد على الأقل', 'warning');
+        return;
+    }
+
+    // Show bulk return modal (would need to be implemented)
+    Swal.fire('قريباً', 'وظيفة الإرجاع المجمع قيد التطوير', 'info');
+}
+
+function bulkHold() {
+    const selectedCheques = $('.cheque-checkbox:checked').map(function() {
+        return this.value;
+    }).get();
+
+    if (selectedCheques.length === 0) {
+        Swal.fire('تنبيه', 'يرجى تحديد شيك واحد على الأقل', 'warning');
+        return;
+    }
+
+    // Implement bulk hold functionality
+    Swal.fire('قريباً', 'وظيفة التعليق المجمع قيد التطوير', 'info');
+}
+
+function exportSelected() {
+    const selectedCheques = $('.cheque-checkbox:checked').map(function() {
+        return this.value;
+    }).get();
+
+    if (selectedCheques.length === 0) {
+        Swal.fire('تنبيه', 'يرجى تحديد شيك واحد على الأقل', 'warning');
+        return;
+    }
+
+    window.location.href = '@Url.Action("ExportCheques", "Inward")' + 
+        '?chequeIds=' + selectedCheques.join(',');
+}
+
+function printCheque(chequeId) {
+    window.open('@Url.Action("PrintCheque", "Inward")/' + chequeId, '_blank');
+}
+
+function refreshTable() {
+    location.reload();
+}
+
+function autoProcess() {
+    Swal.fire({
+        title: 'المعالجة التلقائية',
+        text: 'هل تريد تشغيل المعالجة التلقائية للشيكات؟',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#007bff',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'نعم، تشغيل',
+        cancelButtonText: 'إلغاء'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post('@Url.Action("AutoProcess", "Inward")', {
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+            }).done(function(response) {
+                if (response.success) {
+                    Swal.fire('تم!', response.message, 'success');
+                    refreshTable();
+                } else {
+                    Swal.fire('خطأ', response.message, 'error');
+                }
+            }).fail(function() {
+                Swal.fire('خطأ', 'حدث خطأ أثناء المعالجة التلقائية', 'error');
+            });
+        }
+    });
+}
+</script>
+}
+

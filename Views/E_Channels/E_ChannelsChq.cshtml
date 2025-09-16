@@ -1,0 +1,136 @@
+
+@model SAFA_ECC_Core_Clean.ViewModels.E_ChannelsChqViewModel
+
+@{ 
+    ViewData["Title"] = "شيكات القنوات الإلكترونية";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid" dir="rtl">
+    <h1 class="text-center mb-4">@ViewData["Title"]</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">بحث عن شيك</h6>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="checkNumber" class="form-label">رقم الشيك:</label>
+                        <input type="text" class="form-control" id="checkNumber" placeholder="أدخل رقم الشيك">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="accountNumber" class="form-label">رقم الحساب:</label>
+                        <input type="text" class="form-control" id="accountNumber" placeholder="أدخل رقم الحساب">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="startDate" class="form-label">تاريخ البدء:</label>
+                        <input type="date" class="form-control" id="startDate">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="endDate" class="form-label">تاريخ الانتهاء:</label>
+                        <input type="date" class="form-control" id="endDate">
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary me-2">بحث</button>
+                    <button type="reset" class="btn btn-secondary">مسح</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4 mt-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">نتائج البحث</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>رقم الشيك</th>
+                            <th>رقم الحساب</th>
+                            <th>المبلغ</th>
+                            <th>تاريخ الشيك</th>
+                            <th>الحالة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @* هنا سيتم عرض بيانات الشيكات من ViewModel *@
+                        <tr>
+                            <td>123456</td>
+                            <td>987654321</td>
+                            <td>1000.00</td>
+                            <td>2025-09-15</td>
+                            <td>معلق</td>
+                            <td>
+                                <button class="btn btn-info btn-sm">عرض</button>
+                                <button class="btn btn-warning btn-sm">تعديل</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>654321</td>
+                            <td>123456789</td>
+                            <td>500.50</td>
+                            <td>2025-09-14</td>
+                            <td>صرف</td>
+                            <td>
+                                <button class="btn btn-info btn-sm">عرض</button>
+                                <button class="btn btn-warning btn-sm">تعديل</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4 mt-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">إضافة شيك جديد</h6>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="newCheckNumber" class="form-label">رقم الشيك:</label>
+                        <input type="text" class="form-control" id="newCheckNumber" placeholder="أدخل رقم الشيك الجديد">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="newAccountNumber" class="form-label">رقم الحساب:</label>
+                        <input type="text" class="form-control" id="newAccountNumber" placeholder="أدخل رقم الحساب الجديد">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="newAmount" class="form-label">المبلغ:</label>
+                        <input type="number" class="form-control" id="newAmount" placeholder="أدخل المبلغ">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="newCheckDate" class="form-label">تاريخ الشيك:</label>
+                        <input type="date" class="form-control" id="newCheckDate">
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-success">إضافة شيك</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة أي سكريبتات خاصة بالصفحة هنا
+        // على سبيل المثال، تهيئة مكتبات JavaScript أو معالجة الأحداث
+        $(document).ready(function () {
+            // تهيئة DataTables إذا كانت مستخدمة
+            // $(\'#dataTable\').DataTable();
+        });
+    </script>
+}

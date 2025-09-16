@@ -1,0 +1,92 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model IEnumerable<SAFA_ECC_Core_Clean.ViewModels.GroupViewModel>
+
+@{ 
+    ViewData["Title"] = "قائمة المجموعات";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // افتراض استخدام تخطيط Admin
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-right">@ViewData["Title"]</h1>
+            <hr />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <!-- Placeholder for functional elements, validation, and data display -->
+            <p class="text-right">هنا سيتم عرض قائمة المجموعات وإدارة بياناتها.</p>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="row mb-3">
+    <div class="col-12 text-left">
+        <a asp-action="Create" class="btn btn-primary">إضافة مجموعة جديدة</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">قائمة المجموعات</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped text-right">
+                    <thead>
+                        <tr>
+                            <th>@Html.DisplayNameFor(model => model.First().GroupId)</th>
+                            <th>@Html.DisplayNameFor(model => model.First().GroupName)</th>
+                            <th>@Html.DisplayNameFor(model => model.First().Description)</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(modelItem => item.GroupId)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.GroupName)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                                    <td>
+                                        <a asp-action="Edit" asp-route-id="@item.GroupId" class="btn btn-sm btn-info">تعديل</a> |
+                                        <a asp-action="Details" asp-route-id="@item.GroupId" class="btn btn-sm btn-secondary">تفاصيل</a> |
+                                        <a asp-action="Delete" asp-route-id="@item.GroupId" class="btn btn-sm btn-danger">حذف</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center">لا توجد مجموعات لعرضها.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer clearfix">
+                <!-- Pagination Placeholder -->
+                <ul class="pagination pagination-sm m-0 float-left">
+                    <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,95 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model FaildPostDateVerficationDetailsViewModel
+
+@{
+    ViewData["Title"] = "تفاصيل التحقق من تاريخ ما بعد الفشل";
+}
+
+<div class="container-fluid" dir="rtl">
+    <h1 class="text-center mb-4">@ViewData["Title"]</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">معلومات التحقق</h6>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="TransactionId" class="form-label">معرف المعاملة:</label>
+                        <input asp-for="TransactionId" class="form-control" readonly />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="VerificationDate" class="form-label">تاريخ التحقق:</label>
+                        <input asp-for="VerificationDate" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Status" class="form-label">الحالة:</label>
+                        <input asp-for="Status" class="form-control" readonly />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Reason" class="form-label">السبب:</label>
+                        <textarea asp-for="Reason" class="form-control" rows="3" readonly></textarea>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label asp-for="Notes" class="form-label">ملاحظات:</label>
+                        <textarea asp-for="Notes" class="form-control" rows="5"></textarea>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary me-2">حفظ التغييرات</button>
+                    <a asp-action="Index" class="btn btn-secondary">العودة للقائمة</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4 mt-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">سجل التغييرات</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>المستخدم</th>
+                            <th>العملية</th>
+                            <th>التفاصيل</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @* هنا سيتم عرض بيانات سجل التغييرات من ViewModel *@
+                        @if (Model.ChangeLog != null && Model.ChangeLog.Any())
+                        {
+                            foreach (var log in Model.ChangeLog)
+                            {
+                                <tr>
+                                    <td>@log.Date.ToString()</td>
+                                    <td>@log.User</td>
+                                    <td>@log.Operation</td>
+                                    <td>@log.Details</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center">لا يوجد سجل تغييرات لعرضه.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

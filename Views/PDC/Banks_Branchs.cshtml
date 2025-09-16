@@ -1,0 +1,86 @@
+@model SAFA_ECC_Core_Clean.ViewModels.BankBranchViewModel
+
+@{
+    ViewData["Title"] = "إدارة فروع البنوك";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center mb-4">إدارة فروع البنوك</h1>
+        </div>
+    </div>
+
+    <!-- قسم النموذج لإضافة/تعديل فرع بنك -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white text-end">
+            <h5><i class="bi bi-bank"></i> إضافة / تعديل فرع بنك</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="SaveBankBranch" method="post" dir="rtl">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label asp-for="BranchName" class="form-label">اسم الفرع</label>
+                        <input asp-for="BranchName" class="form-control" />
+                        <span asp-validation-for="BranchName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="BankId" class="form-label">البنك</label>
+                        <select asp-for="BankId" asp-items="ViewBag.Banks" class="form-select"></select>
+                        <span asp-validation-for="BankId" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-success w-100"><i class="bi bi-save"></i> حفظ</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- قسم الجدول لعرض فروع البنوك -->
+    <div class="card">
+        <div class="card-header bg-info text-white text-end">
+            <h5><i class="bi bi-list-ul"></i> قائمة فروع البنوك</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered text-end" dir="rtl">
+                    <thead>
+                        <tr>
+                            <th>اسم الفرع</th>
+                            <th>البنك</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.BankBranches != null && Model.BankBranches.Any())
+                        {
+                            @foreach (var branch in Model.BankBranches)
+                            {
+                                <tr>
+                                    <td>@branch.BranchName</td>
+                                    <td>@branch.BankName</td>
+                                    <td>
+                                        <a asp-action="EditBankBranch" asp-route-id="@branch.Id" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i> تعديل</a>
+                                        <a asp-action="DeleteBankBranch" asp-route-id="@branch.Id" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i> حذف</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3" class="text-center">لا توجد فروع بنوك لعرضها.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

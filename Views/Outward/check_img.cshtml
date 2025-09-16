@@ -1,0 +1,77 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model CheckImageViewModel
+
+@{ 
+    ViewData["Title"] = "التحقق من الصورة";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h1 class="text-right">@ViewData["Title"]</h1>
+
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-white text-right">
+            معلومات الصورة
+        </div>
+        <div class="card-body">
+            <form asp-action="CheckImage" method="post" enctype="multipart/form-data">
+                <div class="mb-3 row">
+                    <label for="ImageFile" class="col-sm-3 col-form-label text-right">تحميل الصورة:</label>
+                    <div class="col-sm-9">
+                        <input type="file" class="form-control" id="ImageFile" name="ImageFile" required>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="ReferenceNumber" class="col-sm-3 col-form-label text-right">الرقم المرجعي:</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="ReferenceNumber" name="ReferenceNumber" required>
+                    </div>
+                </div>
+                <div class="text-left">
+                    <button type="submit" class="btn btn-primary">تحقق</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model != null && Model.IsImageValid.HasValue)
+    {
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white text-right">
+                نتائج التحقق
+            </div>
+            <div class="card-body">
+                <dl class="row text-right">
+                    <dt class="col-sm-4">حالة الصورة:</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.IsImageValid.Value)
+                        {
+                            <span class="badge bg-success">صحيحة</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">غير صحيحة</span>
+                        }
+                    </dd>
+
+                    @if (!string.IsNullOrEmpty(Model.Message))
+                    {
+                        <dt class="col-sm-4">الرسالة:</dt>
+                        <dd class="col-sm-8">@Model.Message</dd>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <dt class="col-sm-4">الصورة المحملة:</dt>
+                        <dd class="col-sm-8">
+                            <img src="@Model.ImageUrl" class="img-fluid" alt="صورة محملة" style="max-height: 200px;" />
+                        </dd>
+                    }
+                </dl>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

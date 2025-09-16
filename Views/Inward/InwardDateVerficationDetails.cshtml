@@ -1,0 +1,99 @@
+@model SAFA_ECC_Core_Clean.ViewModels.InwardDateVerificationViewModel
+
+@{ 
+    ViewData["Title"] = "التحقق من تاريخ الإدخال";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h2 class="text-right mb-4">@ViewData["Title"]</h2>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white text-right">
+            <h5 class="mb-0">معلومات التحقق</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="InwardDateVerification" method="post">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3 text-right">
+                            <label asp-for="InwardNumber" class="control-label">رقم الإدخال</label>
+                            <input asp-for="InwardNumber" class="form-control text-right" />
+                            <span asp-validation-for="InwardNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3 text-right">
+                            <label asp-for="VerificationDate" class="control-label">تاريخ التحقق</label>
+                            <input asp-for="VerificationDate" type="date" class="form-control text-right" />
+                            <span asp-validation-for="VerificationDate" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group text-right">
+                    <button type="submit" class="btn btn-success">تحقق</button>
+                    <a asp-action="Index" class="btn btn-secondary">إلغاء</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white text-right">
+            <h5 class="mb-0">نتائج التحقق</h5>
+        </div>
+        <div class="card-body">
+            @if (Model != null && Model.VerificationResults != null && Model.VerificationResults.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover text-right">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>رقم الإدخال</th>
+                                <th>تاريخ الإدخال</th>
+                                <th>حالة التحقق</th>
+                                <th>ملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.VerificationResults)
+                            {
+                                <tr>
+                                    <td>@item.InwardNumber</td>
+                                    <td>@item.InwardDate.ToShortDateString()</td>
+                                    <td>
+                                        @if (item.IsVerified)
+                                        {
+                                            <span class="badge bg-success">تم التحقق</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">لم يتم التحقق</span>
+                                        }
+                                    </td>
+                                    <td>@item.Notes</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else if (Model != null && Model.HasSearched)
+            {
+                <div class="alert alert-warning text-right" role="alert">
+                    لا توجد نتائج للتحقق.
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-right" role="alert">
+                    الرجاء إدخال رقم الإدخال وتاريخ التحقق للبحث.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

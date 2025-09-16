@@ -1,0 +1,480 @@
+@model SAFA_ECC_Core_Clean.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "لوحة التحكم";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-tachometer-alt me-2 text-primary"></i>
+                    لوحة التحكم الرئيسية
+                </h2>
+                <div>
+                    <span class="text-muted">آخر تحديث: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="row mb-4">
+        <!-- Inward Today -->
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                الشيكات الواردة اليوم
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.InwardToday</div>
+                            <div class="text-xs text-muted">
+                                المبلغ: @Model.InwardAmountToday.ToString("N2") د.أ
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-arrow-down fa-2x text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Outward Today -->
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                الشيكات الصادرة اليوم
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.OutwardToday</div>
+                            <div class="text-xs text-muted">
+                                المبلغ: @Model.OutwardAmountToday.ToString("N2") د.أ
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-arrow-up fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PDC Due Today -->
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                شيكات مؤجلة مستحقة اليوم
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.PDCDueToday</div>
+                            <div class="text-xs text-muted">
+                                المبلغ: @Model.PDCAmountDueToday.ToString("N2") د.أ
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Users -->
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                المستخدمين المتصلين
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.OnlineUsers</div>
+                            <div class="text-xs text-muted">
+                                من أصل @Model.TotalUsers مستخدم
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <!-- Monthly Trends Chart -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">الاتجاهات الشهرية</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                             aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">خيارات الرسم البياني:</div>
+                            <a class="dropdown-item" href="#" onclick="updateChart('monthly')">عرض شهري</a>
+                            <a class="dropdown-item" href="#" onclick="updateChart('daily')">عرض يومي</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="monthlyChart" width="100%" height="40"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Distribution -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">توزيع الحالات</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <canvas id="statusChart" width="100%" height="50"></canvas>
+                    </div>
+                    <div class="mt-4 text-center small">
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-primary"></i> معتمد
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-warning"></i> في الانتظار
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-danger"></i> مرجع
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Statistics -->
+    <div class="row">
+        <!-- Inward Statistics -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-arrow-down me-2"></i>
+                        إحصائيات الشيكات الواردة
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-sm-6"><strong>اليوم:</strong></div>
+                        <div class="col-sm-6 text-end">@Model.InwardToday</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-6"><strong>هذا الشهر:</strong></div>
+                        <div class="col-sm-6 text-end">@Model.InwardThisMonth</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-6"><strong>في الانتظار:</strong></div>
+                        <div class="col-sm-6 text-end">
+                            <span class="badge bg-warning">@Model.InwardPending</span>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-6"><strong>معتمد:</strong></div>
+                        <div class="col-sm-6 text-end">
+                            <span class="badge bg-success">@Model.InwardAuthorized</span>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-6"><strong>مرجع:</strong></div>
+                        <div class="col-sm-6 text-end">
+                            <span class="badge bg-danger">@Model.InwardReturned</span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <strong>مبلغ الشهر:</strong><br>
+                            <span class="h5 text-success">@Model.InwardAmountThisMonth.ToString("N2") د.أ</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a asp-controller="Inward" asp-action="Index" class="btn btn-primary btn-sm w-100">
+                        <i class="fas fa-eye me-1"></i>
+                        عرض التفاصيل
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Outward Statistics -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-arrow-up me-2"></i>
+                        إحصائيات الشيكات الصادرة
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-sm-6"><strong>اليوم:</strong></div>
+                        <div class="col-sm-6 text-end">@Model.OutwardToday</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-6"><strong>هذا الشهر:</strong></div>
+                        <div class="col-sm-6 text-end">@Model.OutwardThisMonth</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-6"><strong>في الانتظار:</strong></div>
+                        <div class="col-sm-6 text-end">
+                            <span class="badge bg-warning">@Model.OutwardPending</span>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-6"><strong>معتمد:</strong></div>
+                        <div class="col-sm-6 text-end">
+                            <span class="badge bg-success">@Model.OutwardAuthorized</span>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-6"><strong>مرحل:</strong></div>
+                        <div class="col-sm-6 text-end">
+                            <span class="badge bg-primary">@Model.OutwardPosted</span>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-6"><strong>مرجع:</strong></div>
+                        <div class="col-sm-6 text-end">
+                            <span class="badge bg-danger">@Model.OutwardReturned</span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <strong>مبلغ الشهر:</strong><br>
+                            <span class="h5 text-warning">@Model.OutwardAmountThisMonth.ToString("N2") د.أ</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a asp-controller="Outward" asp-action="Index" class="btn btn-warning btn-sm w-100">
+                        <i class="fas fa-eye me-1"></i>
+                        عرض التفاصيل
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- PDC Statistics -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-info text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        إحصائيات الشيكات المؤجلة
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-sm-6"><strong>الإجمالي:</strong></div>
+                        <div class="col-sm-6 text-end">@Model.PDCTotal</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-6"><strong>مستحقة اليوم:</strong></div>
+                        <div class="col-sm-6 text-end">
+                            <span class="badge bg-danger">@Model.PDCDueToday</span>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-6"><strong>متأخرة:</strong></div>
+                        <div class="col-sm-6 text-end">
+                            <span class="badge bg-dark">@Model.PDCOverdue</span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <strong>مبلغ مستحق اليوم:</strong><br>
+                            <span class="h5 text-danger">@Model.PDCAmountDueToday.ToString("N2") د.أ</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-6">
+                            <a asp-controller="PDC" asp-action="DueToday" class="btn btn-danger btn-sm w-100">
+                                مستحقة اليوم
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a asp-controller="PDC" asp-action="Index" class="btn btn-info btn-sm w-100">
+                                عرض الكل
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-bolt me-2"></i>
+                        إجراءات سريعة
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a asp-controller="Inward" asp-action="Create" class="btn btn-primary w-100">
+                                <i class="fas fa-plus me-1"></i>
+                                إضافة شيك وارد
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a asp-controller="Outward" asp-action="Create" class="btn btn-warning w-100">
+                                <i class="fas fa-plus me-1"></i>
+                                إضافة شيك صادر
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a asp-controller="PDC" asp-action="Create" class="btn btn-info w-100">
+                                <i class="fas fa-plus me-1"></i>
+                                إضافة شيك مؤجل
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a asp-controller="Reports" asp-action="MonthlyTrends" class="btn btn-success w-100">
+                                <i class="fas fa-chart-line me-1"></i>
+                                التقارير الشهرية
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Monthly Trends Chart
+        const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+        const monthlyChart = new Chart(monthlyCtx, {
+            type: 'line',
+            data: {
+                labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+                datasets: [{
+                    label: 'الشيكات الواردة',
+                    data: [65, 59, 80, 81, 56, 55, 40, 65, 59, 80, 81, 56],
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                    tension: 0.1
+                }, {
+                    label: 'الشيكات الصادرة',
+                    data: [28, 48, 40, 19, 86, 27, 90, 28, 48, 40, 19, 86],
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Status Distribution Chart
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        const statusChart = new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['معتمد', 'في الانتظار', 'مرجع'],
+                datasets: [{
+                    data: [@Model.InwardAuthorized, @Model.InwardPending, @Model.InwardReturned],
+                    backgroundColor: [
+                        '#28a745',
+                        '#ffc107',
+                        '#dc3545'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
+        });
+
+        function updateChart(type) {
+            // Implement chart update logic
+            console.log('Updating chart to:', type);
+        }
+
+        // Auto-refresh dashboard every 5 minutes
+        setInterval(function() {
+            location.reload();
+        }, 300000);
+    </script>
+
+    <style>
+        .border-left-primary {
+            border-left: 0.25rem solid #4e73df !important;
+        }
+        .border-left-warning {
+            border-left: 0.25rem solid #f6c23e !important;
+        }
+        .border-left-danger {
+            border-left: 0.25rem solid #e74a3b !important;
+        }
+        .border-left-success {
+            border-left: 0.25rem solid #1cc88a !important;
+        }
+        .text-xs {
+            font-size: 0.7rem;
+        }
+        .chart-area {
+            position: relative;
+            height: 320px;
+        }
+        .chart-pie {
+            position: relative;
+            height: 245px;
+        }
+    </style>
+}
+

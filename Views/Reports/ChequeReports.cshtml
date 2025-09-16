@@ -1,0 +1,101 @@
+@page
+@model SAFA_ECC_Core_Clean.ViewModels.ChequeReportsViewModel
+
+@{ 
+    ViewData["Title"] = "تقارير الشيكات";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid" dir="rtl">
+    <h1 class="text-right">@ViewData["Title"]</h1>
+
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-white text-right">
+            فلترة التقارير
+        </div>
+        <div class="card-body">
+            <form method="get">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="startDate" class="form-label">تاريخ البدء:</label>
+                        <input type="date" class="form-control" id="startDate" name="startDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="endDate" class="form-label">تاريخ الانتهاء:</label>
+                        <input type="date" class="form-control" id="endDate" name="endDate" value="@Model.EndDate?.ToString("yyyy-MM-dd")">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="chequeNumber" class="form-label">رقم الشيك:</label>
+                        <input type="text" class="form-control" id="chequeNumber" name="chequeNumber" value="@Model.ChequeNumber">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="bankName" class="form-label">اسم البنك:</label>
+                        <input type="text" class="form-control" id="bankName" name="bankName" value="@Model.BankName">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="status" class="form-label">الحالة:</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">الكل</option>
+                            <option value="صادر" selected="@(Model.Status == "صادر")">صادر</option>
+                            <option value="مستلم" selected="@(Model.Status == "مستلم")">مستلم</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="text-left">
+                    <button type="submit" class="btn btn-primary">بحث</button>
+                    <a href="/Reports/ChequeReports" class="btn btn-secondary">إعادة تعيين</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-white text-right">
+            نتائج التقارير
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped text-right">
+                <thead>
+                    <tr>
+                        <th>تاريخ الاستحقاق</th>
+                        <th>رقم الشيك</th>
+                        <th>اسم البنك</th>
+                        <th>المبلغ</th>
+                        <th>الحالة</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Cheques != null && Model.Cheques.Any())
+                    {
+                        foreach (var cheque in Model.Cheques)
+                        {
+                            <tr>
+                                <td>@cheque.DueDate.ToShortDateString()</td>
+                                <td>@cheque.ChequeNumber</td>
+                                <td>@cheque.BankName</td>
+                                <td>@cheque.Amount.ToString("C")</td>
+                                <td>@cheque.Status</td>
+                                <td>
+                                    <a href="/Cheques/Details/@cheque.Id" class="btn btn-info btn-sm">تفاصيل</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center">لا توجد بيانات لعرضها</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="text-left">
+                <button class="btn btn-success">طباعة</button>
+                <button class="btn btn-danger">تصدير PDF</button>
+            </div>
+        </div>
+    </div>
+</div>

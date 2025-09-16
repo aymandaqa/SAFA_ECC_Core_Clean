@@ -1,0 +1,110 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model CommissionReportViewModel
+
+@{ 
+    ViewData["Title"] = "تقرير العمولات";
+}
+
+<div class="container-fluid" dir="rtl">
+    <h1 class="text-end mb-4">@ViewData["Title"]</h1>
+
+    <div class="card mb-4">
+        <div class="card-header text-end">
+            فلترة التقرير
+        </div>
+        <div class="card-body">
+            <form class="row g-3 justify-content-end">
+                <div class="col-md-4">
+                    <label for="startDate" class="form-label text-end w-100">تاريخ البدء:</label>
+                    <input type="date" class="form-control text-end" id="startDate" />
+                </div>
+                <div class="col-md-4">
+                    <label for="endDate" class="form-label text-end w-100">تاريخ الانتهاء:</label>
+                    <input type="date" class="form-control text-end" id="endDate" />
+                </div>
+                <div class="col-md-4">
+                    <label for="agent" class="form-label text-end w-100">الوكيل:</label>
+                    <select class="form-select text-end" id="agent">
+                        <option selected>اختر وكيلاً...</option>
+                        <option value="1">وكيل 1</option>
+                        <option value="2">وكيل 2</option>
+                    </select>
+                </div>
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-primary">تطبيق الفلتر</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header text-end">
+            نتائج التقرير
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered text-end">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>تاريخ العملية</th>
+                            <th>اسم العميل</th>
+                            <th>الخدمة</th>
+                            <th>قيمة العمولة</th>
+                            <th>حالة الدفع</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @* Example Row - Replace with actual data from Model *@
+                        <tr>
+                            <td>1</td>
+                            <td>2023-01-15</td>
+                            <td>أحمد محمود</td>
+                            <td>تحويل أموال</td>
+                            <td>15.00 ر.س</td>
+                            <td>مدفوعة</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>2023-01-20</td>
+                            <td>فاطمة علي</td>
+                            <td>دفع فواتير</td>
+                            <td>10.50 ر.س</td>
+                            <td>معلقة</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-3" dir="ltr">
+                <button class="btn btn-success">تصدير إلى Excel</button>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination mb-0">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">السابق</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">التالي</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // JavaScript for any client-side functionality
+        $(document).ready(function () {
+            // Example: Handle form submission with AJAX
+            $(\'form\').on(\'submit\', function (e) {
+                e.preventDefault();
+                alert(\'Filter applied!\');
+                // Here you would typically make an AJAX call to fetch filtered data
+            });
+        });
+    </script>
+}

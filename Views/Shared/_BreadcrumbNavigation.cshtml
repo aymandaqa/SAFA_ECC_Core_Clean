@@ -1,0 +1,36 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model SAFA_ECC_Core_Clean.ViewModels.SharedViewModels.BreadcrumbViewModel
+
+<nav aria-label="breadcrumb" dir="rtl">
+    <ol class="breadcrumb">
+        @if (Model != null && Model.Items != null)
+        {
+            @foreach (var item in Model.Items)
+            {
+                @if (item.IsActive)
+                {
+                    <li class="breadcrumb-item active" aria-current="page">@item.Text</li>
+                }
+                else
+                {
+                    <li class="breadcrumb-item"><a href="@item.Url">@item.Text</a></li>
+                }
+            }
+        }
+    </ol>
+</nav>
+
+@* ViewModel for Breadcrumb Navigation *
+@*
+public class BreadcrumbViewModel
+{
+    public List<BreadcrumbItem> Items { get; set; }
+}
+
+public class BreadcrumbItem
+{
+    public string Text { get; set; }
+    public string Url { get; set; }
+    public bool IsActive { get; set; }
+}
+*@

@@ -1,0 +1,8 @@
+/home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/SAFA_ECC_Core.csproj.AssemblyReference.cache
+/home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/SAFA_ECC_Core.GeneratedMSBuildEditorConfig.editorconfig
+/home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/SAFA_ECC_Core.AssemblyInfoInputs.cache
+/home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/SAFA_ECC_Core.AssemblyInfo.cs
+/home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/SAFA_ECC_Core.csproj.CoreCompileInputs.cache
+/home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/SAFA_ECC_Core.MvcApplicationPartsAssemblyInfo.cache
+/home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/SAFA_ECC_Core.RazorAssemblyInfo.cache
+/home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/SAFA_ECC_Core.RazorAssemblyInfo.cs

@@ -1,0 +1,114 @@
+@page
+@using SAFA_ECC_Core_Clean.ViewModels
+@model PDC_PDCCheques20240429ViewModel
+
+@{ 
+    ViewData["Title"] = "الشيكات الآجلة";
+}
+
+<div class="container-fluid" dir="rtl">
+    <h1 class="text-right">الشيكات الآجلة</h1>
+
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-white text-right">
+            <h5 class="mb-0">إدارة الشيكات الآجلة</h5>
+        </div>
+        <div class="card-body">
+            <!-- قسم النموذج لإدخال بيانات الشيك -->
+            <form>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="chequeNumber" class="form-label float-end">رقم الشيك</label>
+                        <input type="text" class="form-control text-right" id="chequeNumber" placeholder="أدخل رقم الشيك">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="chequeDate" class="form-label float-end">تاريخ الشيك</label>
+                        <input type="date" class="form-control text-right" id="chequeDate">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="amount" class="form-label float-end">المبلغ</label>
+                        <input type="number" class="form-control text-right" id="amount" placeholder="أدخل المبلغ">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="beneficiary" class="form-label float-end">المستفيد</label>
+                        <input type="text" class="form-control text-right" id="beneficiary" placeholder="اسم المستفيد">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="bank" class="form-label float-end">البنك</label>
+                        <select class="form-select text-right" id="bank">
+                            <option selected>اختر البنك...</option>
+                            <option value="1">بنك فلسطين</option>
+                            <option value="2">البنك الإسلامي العربي</option>
+                            <option value="3">بنك القدس</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary me-2">حفظ الشيك</button>
+                    <button type="reset" class="btn btn-secondary">إلغاء</button>
+                </div>
+            </form>
+
+            <hr class="my-4">
+
+            <!-- قسم الجدول لعرض الشيكات -->
+            <h5 class="text-right">الشيكات المسجلة</h5>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered text-right">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>رقم الشيك</th>
+                            <th>تاريخ الشيك</th>
+                            <th>المبلغ</th>
+                            <th>المستفيد</th>
+                            <th>البنك</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- سيتم ملء هذا الجزء ببيانات الشيكات من ViewModel -->
+                        @if (Model.Cheques != null && Model.Cheques.Any())
+                        {
+                            @foreach (var cheque in Model.Cheques)
+                            {
+                                <tr>
+                                    <td>@cheque.ChequeId</td>
+                                    <td>@cheque.ChequeNumber</td>
+                                    <td>@cheque.ChequeDate.ToShortDateString()</td>
+                                    <td>@cheque.Amount.ToString("N2")</td>
+                                    <td>@cheque.Beneficiary</td>
+                                    <td>@cheque.BankName</td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm">عرض</button>
+                                        <button class="btn btn-warning btn-sm">تعديل</button>
+                                        <button class="btn btn-danger btn-sm">حذف</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center">لا توجد شيكات مسجلة حالياً.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة أي سكريبتات خاصة بالصفحة هنا
+        $(document).ready(function () {
+            // تهيئة أي مكونات Bootstrap أو JavaScript هنا
+        });
+    </script>
+}

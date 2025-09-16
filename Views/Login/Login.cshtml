@@ -1,0 +1,50 @@
+
+@using SAFA_ECC_Core_Clean.ViewModels
+@model LoginViewModel
+
+@{ 
+    ViewData["Title"] = "تسجيل الدخول";
+    Layout = "_Layout"; // افتراض أن لديك تخطيط (Layout) أساسي
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="font-weight-light my-4">تسجيل الدخول</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Login" asp-controller="Account" method="post" dir="rtl">
+                        <div asp-validation-summary="ModelOnly" class="text-danger text-end"></div>
+                        <div class="form-floating mb-3">
+                            <input asp-for="Username" class="form-control text-end" id="inputUsername" type="text" placeholder="اسم المستخدم" />
+                            <label for="inputUsername">اسم المستخدم</label>
+                            <span asp-validation-for="Username" class="text-danger text-end"></span>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input asp-for="Password" class="form-control text-end" id="inputPassword" type="password" placeholder="كلمة المرور" />
+                            <label for="inputPassword">كلمة المرور</label>
+                            <span asp-validation-for="Password" class="text-danger text-end"></span>
+                        </div>
+                        <div class="form-check mb-3 text-end">
+                            <input class="form-check-input" asp-for="RememberMe" type="checkbox" id="inputRememberPassword" />
+                            <label class="form-check-label" for="inputRememberPassword">تذكرني</label>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
+                            <a class="small" href="#">هل نسيت كلمة المرور؟</a>
+                            <button type="submit" class="btn btn-primary">تسجيل الدخول</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center py-3">
+                    <div class="small"><a href="#">ليس لديك حساب؟ سجل الآن!</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

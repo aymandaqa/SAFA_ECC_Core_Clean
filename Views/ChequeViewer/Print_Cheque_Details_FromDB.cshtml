@@ -1,0 +1,102 @@
+
+@model ChequeDetailsViewModel // Placeholder for the actual ViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل الشيكات";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Assuming a shared layout
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h2 class="text-end mb-4">تفاصيل الشيكات</h2>
+
+    <!-- نموذج البحث -->
+    <div class="card mb-4">
+        <div class="card-header text-end">
+            <h5 class="mb-0">بحث عن شيك</h5>
+        </div>
+        <div class="card-body">
+            <form class="row g-3 justify-content-end">
+                <div class="col-md-4">
+                    <label for="chequeNumber" class="form-label text-end">رقم الشيك</label>
+                    <input type="text" class="form-control text-end" id="chequeNumber" placeholder="أدخل رقم الشيك">
+                </div>
+                <div class="col-md-4">
+                    <label for="accountNumber" class="form-label text-end">رقم الحساب</label>
+                    <input type="text" class="form-control text-end" id="accountNumber" placeholder="أدخل رقم الحساب">
+                </div>
+                <div class="col-md-4 d-flex align-items-end justify-content-end">
+                    <button type="submit" class="btn btn-primary">بحث</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- جدول عرض البيانات -->
+    <div class="card mb-4">
+        <div class="card-header text-end">
+            <h5 class="mb-0">نتائج البحث</h5>
+        </div>
+        <div class="card-body">
+            @if (Model != null && Model.Cheques != null && Model.Cheques.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped text-end">
+                        <thead>
+                            <tr>
+                                <th>رقم الشيك</th>
+                                <th>تاريخ الشيك</th>
+                                <th>المبلغ</th>
+                                <th>اسم المستفيد</th>
+                                <th>رقم الحساب</th>
+                                <th>البنك</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var cheque in Model.Cheques)
+                            {
+                                <tr>
+                                    <td>@cheque.ChequeNumber</td>
+                                    <td>@(cheque.ChequeDate?.ToShortDateString())</td>
+                                    <td>@cheque.Amount.ToString("N2")</td>
+                                    <td>@cheque.PayeeName</td>
+                                    <td>@cheque.AccountNumber</td>
+                                    <td>@cheque.BankName</td>
+                                    <td>@cheque.Status</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-center">لا توجد بيانات لعرضها.</p>
+            }
+        </div>
+    </div>
+
+    <!-- أزرار الطباعة -->
+    <div class="d-flex justify-content-end mb-4">
+        <button type="button" class="btn btn-success me-2" onclick="window.print()">طباعة الشيكات</button>
+        <button type="button" class="btn btn-secondary">تصدير إلى PDF</button>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة أي سكريبتات خاصة بالصفحة هنا، مثل معالجة البحث أو الطباعة المخصصة
+        // For example, a simple print function for the table content
+        function printChequeDetails() {
+            var printContents = document.querySelector(\".table-responsive\").innerHTML;
+            var originalContents = document.body.innerHTML;
+
+            document.body.innerHTML = printContents;
+
+            window.print();
+
+            document.body.innerHTML = originalContents;
+        }
+    </script>
+}

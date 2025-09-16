@@ -1,0 +1,106 @@
+
+@model SAFA_ECC_Core_Clean.ViewModels.ResendINWViewModel
+
+@{ 
+    ViewData["Title"] = "إعادة إرسال ملف INW";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h2 class="text-right mb-4">@ViewData["Title"]</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white text-right">
+            <h5 class="mb-0">تفاصيل إعادة إرسال ملف INW</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="ResendINWFile" method="post">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group text-right">
+                            <label asp-for="FileId" class="control-label">معرف الملف</label>
+                            <input asp-for="FileId" class="form-control text-right" />
+                            <span asp-validation-for="FileId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group text-right">
+                            <label asp-for="Reason" class="control-label">السبب</label>
+                            <textarea asp-for="Reason" class="form-control text-right" rows="3"></textarea>
+                            <span asp-validation-for="Reason" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group text-right">
+                            <label asp-for="ResendAttempts" class="control-label">عدد محاولات إعادة الإرسال</label>
+                            <input asp-for="ResendAttempts" class="form-control text-right" type="number" />
+                            <span asp-validation-for="ResendAttempts" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group text-right">
+                            <label asp-for="Priority" class="control-label">الأولوية</label>
+                            <select asp-for="Priority" class="form-control text-right">
+                                <option value="">-- اختر الأولوية --</option>
+                                <option value="High">عالية</option>
+                                <option value="Medium">متوسطة</option>
+                                <option value="Low">منخفضة</option>
+                            </select>
+                            <span asp-validation-for="Priority" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group text-center mt-4">
+                    <button type="submit" class="btn btn-success me-2">إعادة إرسال</button>
+                    <a asp-action="Index" class="btn btn-secondary">إلغاء</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mt-5">
+        <div class="card-header bg-info text-white text-right">
+            <h5 class="mb-0">سجل إعادة الإرسال</h5>
+        </div>
+        <div class="card-body">
+            @if (Model != null && Model.ResendHistory != null && Model.ResendHistory.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered text-right">
+                        <thead>
+                            <tr>
+                                <th>تاريخ الإرسال</th>
+                                <th>السبب</th>
+                                <th>الحالة</th>
+                                <th>بواسطة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ResendHistory)
+                            {
+                                <tr>
+                                    <td>@item.ResendDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@item.Reason</td>
+                                    <td>@item.Status</td>
+                                    <td>@item.SentBy</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-center">لا يوجد سجل لإعادة الإرسال.</p>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

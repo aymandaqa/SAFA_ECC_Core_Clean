@@ -1,0 +1,93 @@
+
+
+@model ChequeDetailsViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل الشيك";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // افتراض تخطيط مشترك
+}
+
+<style>
+    body {
+        direction: rtl; /* دعم RTL */
+        text-align: right;
+    }
+    .container-fluid {
+        padding-right: var(--bs-gutter-x, 0.75rem);
+        padding-left: var(--bs-gutter-x, 0.75rem);
+    }
+    .form-label {
+        float: right;
+    }
+    .table th, .table td {
+        text-align: right;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <h1 class="mb-4">تفاصيل الشيك</h1>
+
+    <!-- Placeholder for Search Form -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">بحث عن شيك</h5>
+        </div>
+        <div class="card-body">
+
+            <form asp-action="GetChequeDetails" method="get">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label for="ChequeNumber" class="form-label">رقم الشيك:</label>
+                        <input type="text" class="form-control" id="ChequeNumber" name="chequeNumber" value="@ViewBag.ChequeNumber" />
+                    </div>
+                    <div class="col-md-4">
+                        <label for="BankName" class="form-label">اسم البنك:</label>
+                        <input type="text" class="form-control" id="BankName" name="bankName" value="@ViewBag.BankName" />
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary">بحث</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Placeholder for Cheque Details Display -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">بيانات الشيك</h5>
+        </div>
+        <div class="card-body">
+
+            @if (Model != null)
+            {
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>رقم الشيك:</strong> @Model.ChequeNumber</p>
+                        <p><strong>تاريخ الشيك:</strong> @(Model.ChequeDate?.ToShortDateString())</p>
+                        <p><strong>المبلغ:</strong> @(Model.Amount?.ToString("N2"))</p>
+                        <p><strong>اسم المستفيد:</strong> @Model.PayeeName</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>اسم البنك:</strong> @Model.BankName</p>
+                        <p><strong>رقم الحساب:</strong> @Model.AccountNumber</p>
+                        <p><strong>حالة الشيك:</strong> @Model.Status</p>
+                        <p><strong>ملاحظات:</strong> @Model.Notes</p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <p class="text-info">الرجاء إدخال رقم الشيك والبنك للبحث.</p>
+            }
+
+        </div>
+    </div>
+
+    <!-- Placeholder for Print Button -->
+    <div class="text-center mb-4">
+        <button type="button" class="btn btn-info btn-lg" onclick="window.print();">طباعة الشيك</button>
+    </div>
+</div>
+

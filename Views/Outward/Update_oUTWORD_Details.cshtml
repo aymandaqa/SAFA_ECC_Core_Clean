@@ -1,0 +1,63 @@
+@model SAFA_ECC_Core_Clean.ViewModels.OutwardUpdateViewModel
+
+@{ 
+    ViewData["Title"] = "تحديث تفاصيل الصادر";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // افتراض وجود ملف تخطيط عام
+}
+
+<div class="container mt-5" dir="rtl">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white text-end">
+                    <h4 class="mb-0">تحديث تفاصيل الصادر</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="UpdateOutwardDetails" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger text-end"></div>
+                        <input type="hidden" asp-for="OutwardId" />
+
+                        <div class="mb-3 text-end">
+                            <label asp-for="Subject" class="form-label">الموضوع</label>
+                            <input asp-for="Subject" class="form-control text-end" />
+                            <span asp-validation-for="Subject" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3 text-end">
+                            <label asp-for="Sender" class="form-label">المرسل</label>
+                            <input asp-for="Sender" class="form-control text-end" />
+                            <span asp-validation-for="Sender" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3 text-end">
+                            <label asp-for="Recipient" class="form-label">المستلم</label>
+                            <input asp-for="Recipient" class="form-control text-end" />
+                            <span asp-validation-for="Recipient" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3 text-end">
+                            <label asp-for="OutwardDate" class="form-label">تاريخ الصادر</label>
+                            <input asp-for="OutwardDate" type="date" class="form-control text-end" />
+                            <span asp-validation-for="OutwardDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3 text-end">
+                            <label asp-for="Description" class="form-label">الوصف</label>
+                            <textarea asp-for="Description" class="form-control text-end" rows="5"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+                            <a asp-action="Index" class="btn btn-secondary">العودة إلى القائمة</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

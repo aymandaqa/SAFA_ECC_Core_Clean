@@ -1,0 +1,96 @@
+@page
+@model SAFA_ECC_Core_Clean.ViewModels.RepresentDisDetailsViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل تمثيل الخصم";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div dir="rtl" lang="ar">
+    <h1 class="text-end">@ViewData["Title"]</h1>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white text-end">
+            تفاصيل الخصم
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row mb-3">
+                    <label for="discountNumber" class="col-sm-2 col-form-label text-end">رقم الخصم:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control text-end" id="discountNumber" value="@Model.DiscountNumber" readonly>
+                    </div>
+                    <label for="discountDate" class="col-sm-2 col-form-label text-end">تاريخ الخصم:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control text-end" id="discountDate" value="@(Model.DiscountDate?.ToShortDateString())" readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="customerName" class="col-sm-2 col-form-label text-end">اسم العميل:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control text-end" id="customerName" value="@Model.CustomerName" readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="discountAmount" class="col-sm-2 col-form-label text-end">مبلغ الخصم:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control text-end" id="discountAmount" value="@(Model.DiscountAmount?.ToString("N2"))" readonly>
+                    </div>
+                    <label for="currency" class="col-sm-2 col-form-label text-end">العملة:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control text-end" id="currency" value="@Model.Currency" readonly>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white text-end">
+            بنود الخصم
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped text-end">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>الوصف</th>
+                        <th>الكمية</th>
+                        <th>السعر</th>
+                        <th>الإجمالي</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.DiscountItems != null && Model.DiscountItems.Any())
+                    {
+                        @foreach (var item in Model.DiscountItems)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@item.Description</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.Price.ToString("N2")</td>
+                                <td>@item.Total.ToString("N2")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5">لا توجد بنود خصم لعرضها.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="text-end">
+        <a asp-action="Index" class="btn btn-secondary">العودة إلى القائمة</a>
+        <button type="button" class="btn btn-primary">حفظ التغييرات</button>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

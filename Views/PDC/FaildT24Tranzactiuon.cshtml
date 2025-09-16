@@ -1,0 +1,107 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model IEnumerable<SAFA_ECC_Core_Clean.ViewModels.FailedT24TransactionViewModel>
+
+@{ 
+    ViewData["Title"] = "معاملات T24 الفاشلة";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // افتراض تخطيط مشترك
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h1 class="text-right">@ViewData["Title"]</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary text-right">قائمة المعاملات الفاشلة</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered text-right" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>معرف المعاملة</th>
+                            <th>تاريخ المعاملة</th>
+                            <th>المبلغ</th>
+                            <th>العملة</th>
+                            <th>سبب الفشل</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.TransactionId</td>
+                                    <td>@item.TransactionDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@item.Amount</td>
+                                    <td>@item.Currency</td>
+                                    <td>@item.FailureReason</td>
+                                    <td>
+                                        <a href="#" class="btn btn-info btn-sm">عرض التفاصيل</a>
+                                        <a href="#" class="btn btn-danger btn-sm">إعادة المحاولة</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center">لا توجد معاملات فاشلة لعرضها.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4 mt-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary text-right">خيارات البحث والتصفية</h6>
+        </div>
+        <div class="card-body">
+            <form dir="rtl">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="transactionId" class="form-label">معرف المعاملة:</label>
+                        <input type="text" class="form-control" id="transactionId" placeholder="أدخل معرف المعاملة">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="startDate" class="form-label">تاريخ البدء:</label>
+                        <input type="date" class="form-control" id="startDate">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="endDate" class="form-label">تاريخ الانتهاء:</label>
+                        <input type="date" class="form-control" id="endDate">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="failureReason" class="form-label">سبب الفشل:</label>
+                        <select class="form-control" id="failureReason">
+                            <option value="">الكل</option>
+                            <option value="InsufficientFunds">عدم كفاية الرصيد</option>
+                            <option value="InvalidAccount">حساب غير صالح</option>
+                            <option value="SystemError">خطأ في النظام</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="text-left">
+                    <button type="submit" class="btn btn-primary">بحث</button>
+                    <button type="reset" class="btn btn-secondary">مسح</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة أي منطق JavaScript خاص بالصفحة هنا، مثل تهيئة DataTable
+        $(document).ready(function () {
+            // تهيئة DataTable إذا كانت مستخدمة
+            // $(\'#dataTable\').DataTable();
+        });
+    </script>
+}

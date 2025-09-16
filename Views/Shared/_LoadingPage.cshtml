@@ -1,0 +1,41 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@{
+    Layout = "_Layout"; // Assuming _Layout is the main layout for shared pages
+}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh; direction: rtl;">
+    <div class="text-center">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">جاري التحميل...</span>
+        </div>
+        <h3 class="mt-3">جاري تحميل البيانات، يرجى الانتظار...</h3>
+        <p class="text-muted">قد يستغرق هذا بضع لحظات.</p>
+
+        <!-- Example of a ViewModel usage (if needed for dynamic loading messages or progress) -->
+        @{
+    LoadingViewModel? loadingModel = Model as LoadingViewModel;
+}
+@if (loadingModel != null)
+        {
+            <p class="mt-4">@loadingModel.Message</p>
+            @if (loadingModel.ShowProgressBar)
+            {
+                <div class="progress mt-3" style="direction: ltr;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: @loadingModel.Progress%" aria-valuenow="@loadingModel.Progress" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            }
+        }
+
+        <!-- Example of a button (if needed to cancel loading or retry) -->
+        <button class="btn btn-outline-secondary mt-4" onclick="window.history.back()">العودة للخلف</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Optional: JavaScript to handle loading animations or dynamic content updates
+        // For example, you might want to hide this page after a certain event or time
+        // Or update the progress bar dynamically via AJAX calls
+        console.log("Loading page script initialized.");
+    </script>
+}

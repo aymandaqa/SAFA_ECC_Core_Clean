@@ -1,0 +1,95 @@
+@model SAFA_ECC_Core_Clean.ViewModels.PDC_GET_G1_G14_REPORT_ViewModel
+
+@{ 
+    ViewData["Title"] = "تقرير G1-G14";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="text-center">تقرير G1-G14</h1>
+
+<div class="container-fluid" dir="rtl">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- هنا سيتم إضافة النماذج والجداول والأزرار -->
+        </div>
+    </div>
+</div>
+
+
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="card-title">معايير البحث</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="GET_G1_G14_REPORT" method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="StartDate" class="form-label">تاريخ البدء:</label>
+                <input type="date" class="form-control" id="StartDate" name="StartDate" value="@ViewBag.StartDate" />
+            </div>
+            <div class="col-md-4">
+                <label for="EndDate" class="form-label">تاريخ الانتهاء:</label>
+                <input type="date" class="form-control" id="EndDate" name="EndDate" value="@ViewBag.EndDate" />
+            </div>
+            <div class="col-md-4">
+                <label for="ReportType" class="form-label">نوع التقرير:</label>
+                <select class="form-select" id="ReportType" name="ReportType">
+                    <option value="1" selected="@(ViewBag.ReportType == 1)">تقرير يومي</option>
+                    <option value="2" selected="@(ViewBag.ReportType == 2)">تقرير شهري</option>
+                </select>
+            </div>
+            <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary">بحث</button>
+                <button type="button" class="btn btn-secondary">إعادة تعيين</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="card-title">نتائج التقرير</h5>
+    </div>
+    <div class="card-body">
+        @if (Model != null && Model.ReportData != null && Model.ReportData.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>البيان</th>
+                            <th>المبلغ</th>
+                            <th>العملة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.ReportData)
+                        {
+                            <tr>
+                                <td>@item.Date.ToShortDateString()</td>
+                                <td>@item.Description</td>
+                                <td>@item.Amount.ToString("N2")</td>
+                                <td>@item.Currency</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-end mt-3">
+                <button type="button" class="btn btn-success me-2">تصدير إلى Excel</button>
+                <button type="button" class="btn btn-info">طباعة</button>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info" role="alert">
+                لا توجد بيانات لعرضها.
+            </div>
+        }
+    </div>
+</div>
+</div>
+</div>

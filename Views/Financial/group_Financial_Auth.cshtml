@@ -1,0 +1,113 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model FinancialAuthViewModel
+
+@{ 
+    ViewData["Title"] = "تفويض مالي للمجموعات";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h2 class="text-center mb-4">@ViewData["Title"]</h2>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">إدارة تفويضات المجموعات المالية</h5>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label for="groupName" class="form-label">اسم المجموعة:</label>
+                        <input type="text" class="form-control" id="groupName" placeholder="أدخل اسم المجموعة">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="authType" class="form-label">نوع التفويض:</label>
+                        <select class="form-select" id="authType">
+                            <option selected>اختر...</option>
+                            <option value="1">تفويض صرف</option>
+                            <option value="2">تفويض استلام</option>
+                            <option value="3">تفويض تحويل</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-success w-100">بحث</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">قائمة التفويضات</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>اسم المجموعة</th>
+                            <th>نوع التفويض</th>
+                            <th>الحالة</th>
+                            <th>تاريخ الإنشاء</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>مجموعة المستثمرين أ</td>
+                            <td>تفويض صرف</td>
+                            <td>نشط</td>
+                            <td>2023-01-15</td>
+                            <td>
+                                <button class="btn btn-info btn-sm">عرض</button>
+                                <button class="btn btn-warning btn-sm">تعديل</button>
+                                <button class="btn btn-danger btn-sm">حذف</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>مجموعة المطورين ب</td>
+                            <td>تفويض استلام</td>
+                            <td>معلق</td>
+                            <td>2023-02-20</td>
+                            <td>
+                                <button class="btn btn-info btn-sm">عرض</button>
+                                <button class="btn btn-warning btn-sm">تعديل</button>
+                                <button class="btn btn-danger btn-sm">حذف</button>
+                            </td>
+                        </tr>
+                        <!-- يمكن إضافة المزيد من الصفوف هنا -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <button class="btn btn-primary">إضافة تفويض جديد</button>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-end mb-0">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">السابق</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">التالي</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة أي سكريبتات خاصة بالصفحة هنا
+        $(document).ready(function () {
+            console.log("صفحة تفويض مالي للمجموعات جاهزة!");
+        });
+    </script>
+}

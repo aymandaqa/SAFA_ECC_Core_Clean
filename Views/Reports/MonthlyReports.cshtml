@@ -1,0 +1,95 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model MonthlyReportsViewModel
+
+@{ 
+    ViewData["Title"] = "التقارير الشهرية";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h1 class="text-right mb-4">@ViewData["Title"]</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary text-right">فلترة التقارير</h6>
+        </div>
+        <div class="card-body">
+            <form asp-action="MonthlyReports" method="get">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group text-right">
+                            <label for="Year">السنة:</label>
+                            <select asp-for="Year" class="form-control" asp-items="Model.AvailableYears"></select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group text-right">
+                            <label for="Month">الشهر:</label>
+                            <select asp-for="Month" class="form-control" asp-items="Model.AvailableMonths"></select>
+                        </div>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end justify-content-end">
+                        <button type="submit" class="btn btn-primary">عرض التقرير</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model.Reports != null && Model.Reports.Any())
+    {
+        <div class="card shadow mb-4 mt-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary text-right">نتائج التقرير</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered text-right" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+
+                                <th>معرف التقرير</th>
+                                <th>التاريخ</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var report in Model.Reports)
+                            {
+                                <tr>
+
+                                    <td>@report.Id</td>
+                                    <td>@report.Date.ToShortDateString()</td>
+                                    <td>
+                                        <a href="@Url.Action("ViewReport", new { id = report.Id })" class="btn btn-info btn-sm">عرض</a>
+                                        <a href="@Url.Action("DownloadReport", new { id = report.Id })" class="btn btn-success btn-sm">تحميل</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-right mt-4" role="alert">
+            لا توجد تقارير لعرضها للفترة المحددة.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // يمكنك إضافة أي سكريبتات خاصة بالصفحة هنا
+        // على سبيل المثال، تهيئة مكتبة DataTable
+        $(document).ready(function () {
+            $(\'#dataTable\').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Arabic.json"
+                }
+            });
+        });
+    </script>
+}

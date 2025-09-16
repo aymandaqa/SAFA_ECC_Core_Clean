@@ -1,0 +1,86 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model IEnumerable<SAFA_ECC_Core_Clean.ViewModels.EmailViewModel>
+
+@{ 
+    ViewData["Title"] = "قائمة البريد الوارد";
+}
+
+<div class="container-fluid" dir="rtl">
+    <h1 class="text-right">@ViewData["Title"]</h1>
+
+    <div class="row mb-3">
+        <div class="col-md-12 text-left">
+            <a asp-action="Create" class="btn btn-primary">إضافة بريد إلكتروني جديد</a>
+        </div>
+    </div>
+
+    <form asp-action="Email_List" method="get" class="mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="SearchTerm" class="form-label">البحث عن طريق الموضوع أو المرسل:</label>
+                    <input type="text" name="SearchTerm" id="SearchTerm" class="form-control" value="@ViewBag.SearchTerm" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="StartDate" class="form-label">تاريخ البدء:</label>
+                    <input type="date" name="StartDate" id="StartDate" class="form-control" value="@ViewBag.StartDate" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="EndDate" class="form-label">تاريخ الانتهاء:</label>
+                    <input type="date" name="EndDate" id="EndDate" class="form-control" value="@ViewBag.EndDate" />
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-12 text-left">
+                <button type="submit" class="btn btn-info">بحث</button>
+                <a asp-action="Email_List" class="btn btn-secondary">مسح البحث</a>
+            </div>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.Subject)</th>
+                    <th>@Html.DisplayNameFor(model => model.Sender)</th>
+                    <th>@Html.DisplayNameFor(model => model.ReceivedDate)</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.Subject)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Sender)</td>
+                            <td>@Html.DisplayFor(modelItem => item.ReceivedDate)</td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">تفاصيل</a> |
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">تعديل</a> |
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">حذف</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center">لا توجد رسائل بريد إلكتروني لعرضها.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

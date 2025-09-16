@@ -1,0 +1,106 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model WFChqStatusViewModel
+
+@{
+    ViewData["Title"] = "حالة الشيكات الواردة";
+}
+
+<div class="container-fluid" dir="rtl">
+    <h1 class="text-center mb-4">@ViewData["Title"]</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">بحث عن حالة الشيك</h6>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="chqNumber" class="form-label">رقم الشيك:</label>
+                        <input type="text" class="form-control" id="chqNumber" placeholder="أدخل رقم الشيك">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="bankName" class="form-label">اسم البنك:</label>
+                        <select class="form-select" id="bankName">
+                            <option selected>اختر البنك...</option>
+                            <option value="1">بنك 1</option>
+                            <option value="2">بنك 2</option>
+                            <option value="3">بنك 3</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="fromDate" class="form-label">من تاريخ:</label>
+                        <input type="date" class="form-control" id="fromDate">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="toDate" class="form-label">إلى تاريخ:</label>
+                        <input type="date" class="form-control" id="toDate">
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary me-2">بحث</button>
+                    <button type="reset" class="btn btn-secondary">مسح</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4 mt-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">نتائج البحث</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>رقم الشيك</th>
+                            <th>اسم البنك</th>
+                            <th>تاريخ الشيك</th>
+                            <th>المبلغ</th>
+                            <th>الحالة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Cheques != null)
+                        {
+                            @foreach (var cheque in Model.Cheques)
+                            {
+                                <tr>
+                                    <td>@cheque.ChequeNumber</td>
+                                    <td>@cheque.BankName</td>
+                                    <td>@cheque.ChequeDate.ToShortDateString()</td>
+                                    <td>@cheque.Amount.ToString("N2")</td>
+                                    <td>@cheque.Status</td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm">تفاصيل</button>
+                                        <button class="btn btn-warning btn-sm">تعديل</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center">لا توجد بيانات لعرضها.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكنك إضافة أي سكريبتات خاصة بالصفحة هنا
+        $(document).ready(function() {
+            // تهيئة Datatables إذا لزم الأمر
+            // $(\'#dataTable\').DataTable();
+        });
+    </script>
+}

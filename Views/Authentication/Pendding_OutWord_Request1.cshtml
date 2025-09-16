@@ -1,0 +1,130 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model Pendding_OutWord_Request1ViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل طلب صادر معلق";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // افتراضًا أن لديك ملف Layout مشترك
+}
+
+<style>
+    body {
+        direction: rtl;
+        text-align: right;
+    }
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .table th, .table td {
+        text-align: right;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <h2 class="mb-4">تفاصيل طلب صادر معلق</h2>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>معلومات الطلب</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>رقم الطلب:</strong> @Model.RequestId</p>
+                    <p><strong>تاريخ الطلب:</strong> @Model.RequestDate</p>
+                    <p><strong>حالة الطلب:</strong> @Model.RequestStatus</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>اسم مقدم الطلب:</strong> @Model.RequesterName</p>
+                    <p><strong>القسم:</strong> @Model.Department</p>
+                    <p><strong>الموضوع:</strong> @Model.Subject</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>تفاصيل التفويض</h4>
+        </div>
+        <div class="card-body">
+            @if (Model.AuthorizationDetails != null && Model.AuthorizationDetails.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>اسم الموافق</th>
+                                <th>حالة الموافقة</th>
+                                <th>تاريخ الموافقة</th>
+                                <th>ملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var auth in Model.AuthorizationDetails)
+                            {
+                                <tr>
+                                    <td>@auth.ApproverName</td>
+                                    <td>@auth.ApprovalStatus</td>
+                                    <td>@auth.ApprovalDate</td>
+                                    <td>@auth.Comments</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p>لا توجد تفاصيل تفويض لعرضها.</p>
+            }
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>تفاصيل المعاملات</h4>
+        </div>
+        <div class="card-body">
+            @if (Model.TransactionDetails != null && Model.TransactionDetails.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>رقم المعاملة</th>
+                                <th>نوع المعاملة</th>
+                                <th>المبلغ</th>
+                                <th>العملة</th>
+                                <th>الوصف</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var trans in Model.TransactionDetails)
+                            {
+                                <tr>
+                                    <td>@trans.TransactionId</td>
+                                    <td>@trans.TransactionType</td>
+                                    <td>@trans.Amount</td>
+                                    <td>@trans.Currency</td>
+                                    <td>@trans.Description</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p>لا توجد تفاصيل معاملات لعرضها.</p>
+            }
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end mt-4">
+        <button type="button" class="btn btn-primary me-2">موافقة</button>
+        <button type="button" class="btn btn-danger">رفض</button>
+    </div>
+</div>
+
+

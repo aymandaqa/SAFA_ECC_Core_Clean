@@ -1,0 +1,107 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model InwardCustomerDuesViewModel
+
+@{ 
+    ViewData["Title"] = "مستحقات العملاء الواردة";
+}
+
+<div class="container-fluid" dir="rtl">
+    <h1 class="text-right mb-4">@ViewData["Title"]</h1>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white text-right">
+            <h5 class="mb-0">بحث وتصفية</h5>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label for="customerName" class="form-label text-right d-block">اسم العميل:</label>
+                        <input type="text" class="form-control text-right" id="customerName" placeholder="أدخل اسم العميل">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="dueDate" class="form-label text-right d-block">تاريخ الاستحقاق:</label>
+                        <input type="date" class="form-control text-right" id="dueDate">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary w-100">بحث</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white text-right">
+            <h5 class="mb-0">قائمة مستحقات العملاء</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered text-right">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>#</th>
+                            <th>اسم العميل</th>
+                            <th>المبلغ المستحق</th>
+                            <th>تاريخ الاستحقاق</th>
+                            <th>الحالة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.CustomerDues != null && Model.CustomerDues.Any())
+                        {
+                            @foreach (var item in Model.CustomerDues)
+                            {
+                                <tr>
+                                    <td>@item.Id</td>
+                                    <td>@item.CustomerName</td>
+                                    <td>@item.Amount.ToString("C", new System.Globalization.CultureInfo("ar-SA"))</td>
+                                    <td>@item.DueDate.ToShortDateString()</td>
+                                    <td>@item.Status</td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm">عرض</button>
+                                        <button class="btn btn-warning btn-sm">تعديل</button>
+                                        <button class="btn btn-danger btn-sm">حذف</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center">لا توجد مستحقات عملاء لعرضها.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <button class="btn btn-success">إضافة مستحق جديد</button>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-end">
+                        <li class="page-item disabled"><a class="page-link" href="#">السابق</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">التالي</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة أي سكريبتات خاصة بالصفحة هنا
+        $(document).ready(function () {
+            // مثال: تهيئة Datepicker إذا كان مستخدمًا
+            // $(\'#dueDate\').datepicker({
+            //     format: \'yyyy-mm-dd\',
+            //     autoclose: true,
+            //     rtl: true
+            // });
+        });
+    </script>
+}

@@ -1,0 +1,103 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model OutwardViewModel
+
+@{ 
+    ViewData["Title"] = "عرض الصادر";
+}
+
+<div dir="rtl" lang="ar">
+    <h1 class="text-end">عرض الصادر</h1>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white text-end">
+            <h5 class="mb-0">تفاصيل الصادر</h5>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="outwardNumber" class="form-label text-end w-100">رقم الصادر:</label>
+                        <input type="text" class="form-control text-end" id="outwardNumber" value="@Model.OutwardNumber" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="outwardDate" class="form-label text-end w-100">تاريخ الصادر:</label>
+                        <input type="date" class="form-control text-end" id="outwardDate" value="@Model.OutwardDate.ToString("yyyy-MM-dd")" readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="subject" class="form-label text-end w-100">الموضوع:</label>
+                        <input type="text" class="form-control text-end" id="subject" value="@Model.Subject" readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="description" class="form-label text-end w-100">الوصف:</label>
+                        <textarea class="form-control text-end" id="description" rows="3" readonly>@Model.Description</textarea>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="sender" class="form-label text-end w-100">المرسل:</label>
+                        <input type="text" class="form-control text-end" id="sender" value="@Model.Sender" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="recipient" class="form-label text-end w-100">المستلم:</label>
+                        <input type="text" class="form-control text-end" id="recipient" value="@Model.Recipient" readonly>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white text-end">
+            <h5 class="mb-0">المرفقات</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped text-end">
+                <thead>
+                    <tr>
+                        <th class="text-end">اسم الملف</th>
+                        <th class="text-end">الحجم</th>
+                        <th class="text-end">الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Attachments != null && Model.Attachments.Any())
+                    {
+                        @foreach (var attachment in Model.Attachments)
+                        {
+                            <tr>
+                                <td>@attachment.FileName</td>
+                                <td>@attachment.FileSize KB</td>
+                                <td>
+                                    <a href="@attachment.FilePath" class="btn btn-info btn-sm" target="_blank">عرض</a>
+                                    <a href="@attachment.FilePath" class="btn btn-success btn-sm" download>تحميل</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="3">لا توجد مرفقات.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="text-end">
+        <a href="#" class="btn btn-secondary">رجوع</a>
+        <button type="button" class="btn btn-primary">تعديل</button>
+        <button type="button" class="btn btn-danger">حذف</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة أي سكربتات خاصة بالصفحة هنا
+    </script>
+}

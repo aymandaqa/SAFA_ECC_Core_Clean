@@ -1,0 +1,40 @@
+@model SAFA_ECC_Core_Clean.ViewModels.SystemConfigurationViewModel
+
+@{ 
+    ViewData["Title"] = "إعدادات النظام";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="container" dir="rtl">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <form asp-action="SystemConfiguration" method="post">
+
+                <div class="mb-3">
+                    <label asp-for="ApplicationName" class="form-label"></label>
+                    <input asp-for="ApplicationName" class="form-control" />
+                    <span asp-validation-for="ApplicationName" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="AdminEmail" class="form-label"></label>
+                    <input asp-for="AdminEmail" class="form-control" />
+                    <span asp-validation-for="AdminEmail" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="ItemsPerPage" class="form-label"></label>
+                    <input asp-for="ItemsPerPage" class="form-control" type="number" />
+                    <span asp-validation-for="ItemsPerPage" class="text-danger"></span>
+                </div>
+                <div class="mb-3 form-check">
+                    <input asp-for="EnableRegistration" class="form-check-input" />
+                    <label asp-for="EnableRegistration" class="form-check-label"></label>
+                </div>
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">حفظ الإعدادات</button>
+                </div>
+                <div asp-validation-summary="All" class="text-danger"></div>
+            </form>
+        </div>
+    </div>
+</div>

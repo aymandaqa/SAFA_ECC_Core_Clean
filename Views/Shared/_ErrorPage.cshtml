@@ -1,0 +1,29 @@
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "خطأ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container text-center mt-5" dir="rtl">
+    <h1 class="display-4 text-danger">خطأ!</h1>
+    <h2 class="text-muted">حدث خطأ أثناء معالجة طلبك.</h2>
+
+    @if (Model != null && !string.IsNullOrEmpty(Model.RequestId))
+    {
+        <p>
+            <strong>معرف الطلب:</strong> <code>@Model.RequestId</code>
+        </p>
+    }
+
+    <h3>وضع التطوير</h3>
+    <p>
+        يتم عرض مبادلة البيئة على معلومات مفصلة حول الأخطاء التي حدثت.
+    </p>
+    <p>
+        <strong>يجب ألا يتم تمكين بيئة التطوير</strong> للطلبات المنشورة، حيث يمكن أن تؤدي إلى عرض معلومات حساسة من الاستثناءات للمستخدمين النهائيين.
+        للتصحيح المحلي، قم بتمكين بيئة <strong>التطوير</strong> عن طريق تعيين متغير البيئة <code>ASPNETCORE_ENVIRONMENT</code> على <code>Development</code>
+        وإعادة تشغيل التطبيق.
+    </p>
+
+    <a href="/" class="btn btn-primary mt-3">العودة إلى الصفحة الرئيسية</a>
+</div>

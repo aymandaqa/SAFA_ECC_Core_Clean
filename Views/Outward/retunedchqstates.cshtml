@@ -1,0 +1,105 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model RetunedChequeStatesViewModel
+
+@{ 
+    ViewData["Title"] = "حالات الشيكات المرتجعة";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="text-center mb-4">@ViewData["Title"]</h1>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">معايير البحث</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="RetunedChequeStates" method="get" class="row g-3">
+            <div class="col-md-4">
+                <label asp-for="ChequeNumber" class="form-label">رقم الشيك</label>
+                <input asp-for="ChequeNumber" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="FromDate" class="form-label">من تاريخ</label>
+                <input asp-for="FromDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="ToDate" class="form-label">إلى تاريخ</label>
+                <input asp-for="ToDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Status" class="form-label">الحالة</label>
+                <select asp-for="Status" class="form-select">
+                    <option value="">الكل</option>
+                    <option value="Returned">مرتجع</option>
+                    <option value="Pending">معلق</option>
+                    <option value="Cleared">تمت التسوية</option>
+                </select>
+            </div>
+            <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary me-2">بحث</button>
+                <a asp-action="RetunedChequeStates" class="btn btn-secondary">مسح</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">نتائج الشيكات المرتجعة</h5>
+    </div>
+    <div class="card-body">
+        @if (Model != null && Model.Cheques != null && Model.Cheques.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>رقم الشيك</th>
+                            <th>تاريخ الشيك</th>
+                            <th>المبلغ</th>
+                            <th>اسم العميل</th>
+                            <th>حالة الارتجاع</th>
+                            <th>تاريخ الارتجاع</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var cheque in Model.Cheques)
+                        {
+                            <tr>
+                                <td>@cheque.ChequeNumber</td>
+                                <td>@cheque.ChqDate.ToShortDateString()</td>
+                                <td>@cheque.Amount.ToString("N2")</td>
+                                <td>@cheque.CustomerName</td>
+                                <td>@cheque.ReturnStatus</td>
+                                <td>@cheque.ReturnDate.ToShortDateString()</td>
+                                <td>
+                                    <button class="btn btn-info btn-sm">تفاصيل</button>
+                                    <button class="btn btn-warning btn-sm">تعديل</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center" role="alert">
+                لا توجد بيانات لعرضها.
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة أي سكريبتات خاصة بالصفحة هنا
+        // على سبيل المثال، لتفعيل DatePicker أو أي وظائف JavaScript أخرى
+        $(document).ready(function () {
+            // مثال: تفعيل DatePicker إذا كان مستخدماً
+            // $(\'input[type="date"]\').datepicker();
+        });
+    </script>
+}
+

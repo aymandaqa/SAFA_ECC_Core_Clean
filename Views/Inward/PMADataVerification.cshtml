@@ -1,0 +1,153 @@
+
+@using SAFA_ECC_Core_Clean.ViewModels
+@model PMADataVerificationViewModel
+
+@{ 
+    ViewData["Title"] = "التحقق من بيانات PMA";
+    Layout = "_Layout"; // افتراض استخدام تخطيط مشترك
+}
+
+<div class="container-fluid" dir="rtl" lang="ar">
+    <h1 class="mt-4 text-right">@ViewData["Title"]</h1>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white text-right">
+            <i class="fas fa-table me-1"></i>
+            نموذج التحقق من بيانات PMA
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group text-right">
+                            <label asp-for="PMAId" class="form-label">معرف PMA:</label>
+                            <input asp-for="PMAId" class="form-control" />
+                            <span asp-validation-for="PMAId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group text-right">
+                            <label asp-for="ItemCode" class="form-label">رمز الصنف:</label>
+                            <input asp-for="ItemCode" class="form-control" />
+                            <span asp-validation-for="ItemCode" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group text-right">
+                            <label asp-for="Quantity" class="form-label">الكمية:</label>
+                            <input asp-for="Quantity" class="form-control" type="number" />
+                            <span asp-validation-for="Quantity" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group text-right">
+                            <label asp-for="VerificationStatus" class="form-label">حالة التحقق:</label>
+                            <select asp-for="VerificationStatus" class="form-select">
+                                <option value="">اختر حالة</option>
+                                <option value="Pending">معلق</option>
+                                <option value="Approved">معتمد</option>
+                                <option value="Rejected">مرفوض</option>
+                            </select>
+                            <span asp-validation-for="VerificationStatus" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="form-group text-right">
+                            <label asp-for="Notes" class="form-label">ملاحظات:</label>
+                            <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary me-2">تحقق وحفظ</button>
+                    <button type="button" class="btn btn-secondary">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white text-right">
+            <i class="fas fa-table me-1"></i>
+            قائمة بيانات PMA للتحقق
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered text-right" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>معرف PMA</th>
+                            <th>رمز الصنف</th>
+                            <th>الكمية</th>
+                            <th>الحالة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @* هنا يتم عرض البيانات من Model.PMADataList *@
+                        @if (Model.PMADataList != null && Model.PMADataList.Any())
+                        {
+                            @foreach (var item in Model.PMADataList)
+                            {
+                                <tr>
+                                    <td>@item.PMAId</td>
+                                    <td>@item.ItemCode</td>
+                                    <td>@item.Quantity</td>
+                                    <td>@item.VerificationStatus</td>
+                                    <td>
+                                        <a href="#" class="btn btn-info btn-sm">عرض</a>
+                                        <a href="#" class="btn btn-warning btn-sm">تعديل</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center">لا توجد بيانات لعرضها.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // يمكن إضافة أي سكربتات خاصة بالصفحة هنا
+        $(document).ready(function () {
+            // تهيئة DataTable إذا كانت مستخدمة
+            // $('#dataTable').DataTable();
+        });
+    </script>
+}
+
+@*
+    // ViewModel افتراضي لـ PMADataVerificationViewModel
+    // يجب أن يكون هذا ViewModel موجودًا في مشروع SAFA_ECC_Core_Clean.ViewModels
+    public class PMADataVerificationViewModel
+    {
+        public int PMAId { get; set; }
+        public string ItemCode { get; set; }
+        public int Quantity { get; set; }
+        public string VerificationStatus { get; set; }
+        public string Notes { get; set; }
+        public List<PMADataItem> PMADataList { get; set; }
+    }
+
+    public class PMADataItem
+    {
+        public int PMAId { get; set; }
+        public string ItemCode { get; set; }
+        public int Quantity { get; set; }
+        public string VerificationStatus { get; set; }
+    }
+*@

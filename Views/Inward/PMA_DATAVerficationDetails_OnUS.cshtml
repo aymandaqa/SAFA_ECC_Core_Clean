@@ -1,0 +1,97 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model PMA_DATAVerficationDetailsViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل التحقق من بيانات PMA";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h2 class="text-end mb-4">@ViewData["Title"]</h2>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary text-end">معلومات التحقق</h6>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="itemId" class="form-label float-end">معرف العنصر:</label>
+                        <input type="text" class="form-control text-end" id="itemId" value="@Model.ItemId" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="itemName" class="form-label float-end">اسم العنصر:</label>
+                        <input type="text" class="form-control text-end" id="itemName" value="@Model.ItemName" readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="verificationStatus" class="form-label float-end">حالة التحقق:</label>
+                        <select class="form-select text-end" id="verificationStatus">
+                            <option value="">اختر حالة</option>
+                            <option value="Verified" selected="@(Model.VerificationStatus == "Verified")">تم التحقق</option>
+                            <option value="Pending" selected="@(Model.VerificationStatus == "Pending")">معلق</option>
+                            <option value="Rejected" selected="@(Model.VerificationStatus == "Rejected")">مرفوض</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="verifierNotes" class="form-label float-end">ملاحظات المدقق:</label>
+                        <textarea class="form-control text-end" id="verifierNotes" rows="3">@Model.VerifierNotes</textarea>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary me-2">حفظ التغييرات</button>
+                    <button type="button" class="btn btn-secondary">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4 mt-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary text-end">سجل التغييرات</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered text-end" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>المستخدم</th>
+                            <th>التغيير</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.ChangeLog != null && Model.ChangeLog.Any())
+                        {
+                            foreach (var log in Model.ChangeLog)
+                            {
+                                <tr>
+                                    <td>@log.Date.ToShortDateString()</td>
+                                    <td>@log.User</td>
+                                    <td>@log.ChangeDescription</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3">لا يوجد سجل تغييرات متاح.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة أي سكريبتات خاصة بالصفحة هنا
+        $(document).ready(function() {
+            // تهيئة أي مكونات Bootstrap أو JavaScript أخرى
+        });
+    </script>
+}

@@ -1,0 +1,13 @@
+/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj : warning NU1903: Package 'System.Data.SqlClient' 4.8.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7
+/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj : warning NU1903: Package 'System.Data.SqlClient' 4.8.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/InwardViewModels.cs(37,57): error CS1513: } expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+
+Build FAILED.
+
+/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj : warning NU1903: Package 'System.Data.SqlClient' 4.8.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7
+/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj : warning NU1903: Package 'System.Data.SqlClient' 4.8.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/InwardViewModels.cs(37,57): error CS1513: } expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+    2 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:01.67

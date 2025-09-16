@@ -1,0 +1,82 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model PenddingRequestViewModel
+
+@{ 
+    ViewData["Title"] = "الطلبات المعلقة";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h2 class="text-right mb-4">@ViewData["Title"]</h2>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-primary text-white text-right">
+            <h6 class="m-0 font-weight-bold">تفاصيل التفويض</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 text-right">
+                    <p><strong>اسم المستخدم:</strong> @Model.UserName</p>
+                    <p><strong>تاريخ الطلب:</strong> @Model.RequestDate.ToShortDateString()</p>
+                </div>
+                <div class="col-md-6 text-right">
+                    <p><strong>نوع التفويض:</strong> @Model.AuthorizationType</p>
+                    <p><strong>حالة الطلب:</strong> <span class="badge badge-warning">@Model.Status</span></p>
+                </div>
+            </div>
+            <hr>
+            <p class="text-right"><strong>ملاحظات:</strong> @Model.Notes</p>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-primary text-white text-right">
+            <h6 class="m-0 font-weight-bold">تفاصيل المعاملات</h6>
+        </div>
+        <div class="card-body">
+            @if (Model.Transactions != null && Model.Transactions.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover text-right" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>رقم المعاملة</th>
+                                <th>المبلغ</th>
+                                <th>الوصف</th>
+                                <th>تاريخ المعاملة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var transaction in Model.Transactions)
+                            {
+                                <tr>
+                                    <td>@(Model.Transactions.IndexOf(transaction) + 1)</td>
+                                    <td>@transaction.TransactionNumber</td>
+                                    <td>@transaction.Amount.ToString("C")</td>
+                                    <td>@transaction.Description</td>
+                                    <td>@transaction.TransactionDate.ToShortDateString()</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-center">لا توجد معاملات لعرضها.</p>
+            }
+        </div>
+    </div>
+
+    <div class="text-left mt-4">
+        <button type="button" class="btn btn-success mx-2">قبول</button>
+        <button type="button" class="btn btn-danger mx-2">رفض</button>
+        <button type="button" class="btn btn-secondary mx-2">رجوع</button>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- يمكن إضافة أي سكريبتات خاصة بالصفحة هنا -->
+}
+

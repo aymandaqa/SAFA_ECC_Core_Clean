@@ -1,0 +1,33 @@
+
+@using SAFA_ECC_Core_Clean.ViewModels
+@model SAFA_ECC_Core_Clean.ViewModels.SharedViewModels.NotificationViewModel
+
+<div dir="rtl" lang="ar">
+    @if (Model != null && !string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-@Model.Type alert-dismissible fade show" role="alert">
+            @if (!string.IsNullOrEmpty(Model.Title))
+            {
+                <h4 class="alert-heading">@Model.Title</h4>
+            }
+            <p>@Model.Message</p>
+            @if (Model.Timestamp.HasValue)
+            {
+                <hr>
+                <p class="mb-0"><small>@Model.Timestamp.Value.ToString("dd/MM/yyyy HH:mm")</small></p>
+            }
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="إغلاق"></button>
+        </div>
+    }
+</div>
+
+@* 
+    ViewModel Example (SAFA_ECC_Core_Clean.ViewModels.NotificationViewModel):
+    public class NotificationViewModel
+    {
+        public string Title { get; set; }
+        public string Message { get; set; }
+        public string Type { get; set; } // e.g., "success", "info", "warning", "danger"
+        public DateTime? Timestamp { get; set; }
+    }
+*@

@@ -1,0 +1,109 @@
+@model SAFA_ECC_Core_Clean.ViewModels.DailyReportViewModel
+
+@{ 
+    ViewData["Title"] = "التقارير اليومية";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid" dir="rtl">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">@ViewData["Title"]</h3>
+                </div>
+                <div class="card-body">
+                    <form id="dailyReportFilterForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="startDate" class="form-label">تاريخ البدء:</label>
+                                <input type="date" id="startDate" name="startDate" class="form-control" value="@DateTime.Today.AddMonths(-1).ToString("yyyy-MM-dd")" />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="endDate" class="form-label">تاريخ الانتهاء:</label>
+                                <input type="date" id="endDate" name="endDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-12 text-start">
+                                <button type="button" id="generateReportBtn" class="btn btn-primary">توليد التقرير</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="table-responsive">
+                        <table id="dailyReportsTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>التاريخ</th>
+                                    <th>عدد المعاملات</th>
+                                    <th>إجمالي الإيرادات</th>
+                                    <th>إجمالي المصروفات</th>
+                                    <th>الصافي</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- سيتم تحميل البيانات هنا بواسطة AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $(\'#generateReportBtn\').on(\'click\', function () {
+                var startDate = $(\'#startDate\').val();
+                var endDate = $(\'#endDate\').val();
+
+                // هنا يمكنك إضافة استدعاء AJAX لجلب البيانات
+                // مثال:
+                // $.ajax({
+                //     url: \'/api/DailyReports\',
+                //     method: \'GET\',
+                //     data: { startDate: startDate, endDate: endDate },
+                //     success: function (data) {
+                //         // تحديث الجدول بالبيانات المستلمة
+                //         var tableBody = $(\'#dailyReportsTable tbody\');
+                //         tableBody.empty();
+                //         $.each(data, function (index, report) {
+                //             tableBody.append(\'<tr>\' +
+                //                 \'<td>\' + report.date + \'</td>\' +
+                //                 \'<td>\' + report.transactionCount + \'</td>\' +
+                //                 \'<td>\' + report.totalRevenue + \'</td>\' +
+                //                 \'<td>\' + report.totalExpenses + \'</td>\' +
+                //                 \'<td>\' + report.netAmount + \'</td>\' +
+                //                 \'</tr>\');
+                //         });
+                //     },
+                //     error: function (error) {
+                //         console.log(\'Error fetching daily reports:\', error);
+                //     }
+                // });
+
+                // بيانات وهمية للاختبار
+                var dummyData = [
+                    { date: \'2025-08-15\', transactionCount: 150, totalRevenue: 5000, totalExpenses: 1500, netAmount: 3500 },
+                    { date: \'2025-08-16\', transactionCount: 200, totalRevenue: 7000, totalExpenses: 2000, netAmount: 5000 },
+                    { date: \'2025-08-17\', transactionCount: 180, totalRevenue: 6000, totalExpenses: 1800, netAmount: 4200 }
+                ];
+
+                var tableBody = $(\'#dailyReportsTable tbody\');
+                tableBody.empty();
+                $.each(dummyData, function (index, report) {
+                    tableBody.append(\'<tr>\' +
+                        \'<td>\' + report.date + \'</td>\' +
+                        \'<td>\' + report.transactionCount + \'</td>\' +
+                        \'<td>\' + report.totalRevenue + \'</td>\' +
+                        \'<td>\' + report.totalExpenses + \'</td>\' +
+                        \'<td>\' + report.netAmount + \'</td>\' +
+                        \'</tr>\');
+                });
+            });
+        });
+    </script>
+}

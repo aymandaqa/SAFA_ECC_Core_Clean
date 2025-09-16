@@ -1,0 +1,60 @@
+
+@model SAFA_ECC_Core_Clean.ViewModels.ReturnOnUsStoppedChequeDetailsViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل الشيك الموقوف";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h2 class="text-end mb-4">@ViewData["Title"]</h2>
+
+    <!-- Placeholder for details, forms, tables, and buttons -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white text-end">
+            <h5 class="mb-0">معلومات الشيك</h5>
+        </div>
+        <div class="card-body">
+            <dl class="row text-end">
+                <dt class="col-sm-3">رقم الشيك:</dt>
+                <dd class="col-sm-9">@Model.ChequeNumber</dd>
+
+                <dt class="col-sm-3">تاريخ الشيك:</dt>
+                <dd class="col-sm-9">@Model.ChequeDate.ToShortDateString()</dd>
+
+                <dt class="col-sm-3">المبلغ:</dt>
+                <dd class="col-sm-9">@Model.Amount.ToString("N2")</dd>
+
+                <dt class="col-sm-3">اسم المستفيد:</dt>
+                <dd class="col-sm-9">@Model.PayeeName</dd>
+
+                <dt class="col-sm-3">اسم الساحب:</dt>
+                <dd class="col-sm-9">@Model.DrawerName</dd>
+
+                <dt class="col-sm-3">رقم حساب الساحب:</dt>
+                <dd class="col-sm-9">@Model.DrawerAccountNumber</dd>
+
+                <dt class="col-sm-3">سبب الإيقاف:</dt>
+                <dd class="col-sm-9">@Model.StopReason</dd>
+
+                <dt class="col-sm-3">تاريخ الإيقاف:</dt>
+                <dd class="col-sm-9">@Model.StopDate.ToShortDateString()</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white text-end">
+            <h5 class="mb-0">إجراءات</h5>
+        </div>
+        <div class="card-body text-end">
+            <button type="button" class="btn btn-success">قبول</button>
+            <button type="button" class="btn btn-danger">رفض</button>
+            <a asp-action="Index" class="btn btn-secondary">العودة إلى القائمة</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

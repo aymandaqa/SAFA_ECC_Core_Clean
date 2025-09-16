@@ -1,0 +1,95 @@
+@model SAFA_ECC_Core_Clean.ViewModels.InwardViewModel
+
+@{ 
+    ViewData["Title"] = "إدارة الإشعارات الداخلية";
+}
+
+<div class="container-fluid" dir="rtl">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">إدارة الإشعارات الداخلية</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="InwardDate" class="control-label">تاريخ الإشعار</label>
+                                    <input asp-for="InwardDate" class="form-control" />
+                                    <span asp-validation-for="InwardDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="InwardSource" class="control-label">مصدر الإشعار</label>
+                                    <input asp-for="InwardSource" class="form-control" />
+                                    <span asp-validation-for="InwardSource" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="InwardSubject" class="control-label">موضوع الإشعار</label>
+                                    <input asp-for="InwardSubject" class="form-control" />
+                                    <span asp-validation-for="InwardSubject" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mt-3">
+                            <button type="submit" class="btn btn-primary">حفظ</button>
+                            <a asp-action="Index" class="btn btn-secondary">إلغاء</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">قائمة الإشعارات الداخلية</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>تاريخ الإشعار</th>
+                                <th>مصدر الإشعار</th>
+                                <th>موضوع الإشعار</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Inwards.Any()) {
+                                foreach (var item in Model.Inwards)
+                                {
+                                    <tr>
+                                        <td>@item.InwardDate.ToShortDateString()</td>
+                                        <td>@item.InwardSource</td>
+                                        <td>@item.InwardSubject</td>
+                                        <td>
+                                            <a asp-action="Edit" asp-route-id="@item.InwardId" class="btn btn-sm btn-primary">تعديل</a>
+                                            <a asp-action="Details" asp-route-id="@item.InwardId" class="btn btn-sm btn-info">تفاصيل</a>
+                                            <a asp-action="Delete" asp-route-id="@item.InwardId" class="btn btn-sm btn-danger">حذف</a>
+                                        </td>
+                                    </tr>
+                                }
+                            } else {
+                                <tr>
+                                    <td colspan="4" class="text-center">لا توجد بيانات لعرضها</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,134 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model UserFinancialAuthViewModel
+
+@{ 
+    ViewData["Title"] = "التحكم المالي للمستخدم";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // افتراض وجود تخطيط مشترك
+}
+
+<div class="container-fluid" dir="rtl">
+    <h1 class="text-center mb-4">@ViewData["Title"]</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">تفاصيل المستخدم المالية</h6>
+        </div>
+        <div class="card-body">
+            <form asp-action="UserFinancialAuth" method="post">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="UserId" class="control-label">معرف المستخدم</label>
+                            <input asp-for="UserId" class="form-control" />
+                            <span asp-validation-for="UserId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="UserName" class="control-label">اسم المستخدم</label>
+                            <input asp-for="UserName" class="form-control" readonly />
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="CurrentBalance" class="control-label">الرصيد الحالي</label>
+                            <input asp-for="CurrentBalance" class="form-control" readonly />
+                            <span asp-validation-for="CurrentBalance" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="LastTransactionDate" class="control-label">تاريخ آخر معاملة</label>
+                            <input asp-for="LastTransactionDate" class="form-control" readonly />
+                            <span asp-validation-for="LastTransactionDate" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="AuthAmount" class="control-label">المبلغ المراد تخويله</label>
+                    <input asp-for="AuthAmount" class="form-control" />
+                    <span asp-validation-for="AuthAmount" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Notes" class="control-label">ملاحظات</label>
+                    <textarea asp-for="Notes" class="form-control"></textarea>
+                    <span asp-validation-for="Notes" class="text-danger"></span>
+                </div>
+                <div class="form-group text-start">
+                    <button type="submit" class="btn btn-primary">تخويل</button>
+                    <a asp-action="Index" class="btn btn-secondary">إلغاء</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4 mt-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">سجل المعاملات المالية</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>تاريخ المعاملة</th>
+                            <th>نوع المعاملة</th>
+                            <th>المبلغ</th>
+                            <th>الحالة</th>
+                            <th>ملاحظات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @* افترض أن Model.Transactions هو قائمة من المعاملات لعرضها *@
+                        @if (Model != null && Model.Transactions != null)
+                        {
+                            @foreach (var transaction in Model.Transactions)
+                            {
+                                <tr>
+                                    <td>@transaction.TransactionDate.ToShortDateString()</td>
+                                    <td>@transaction.TransactionType</td>
+                                    <td>@transaction.Amount.ToString("C")</td>
+                                    <td>@transaction.Status</td>
+                                    <td>@transaction.Description</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center">لا توجد معاملات لعرضها.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // يمكن إضافة أي سكريبتات خاصة بالصفحة هنا
+        // على سبيل المثال، لجلب اسم المستخدم تلقائياً عند إدخال معرف المستخدم
+        $(document).ready(function () {
+            $(\'#UserId\').on(\'change\', function () {
+                var userId = $(this).val();
+                if (userId) {
+                    // هنا يمكن إضافة استدعاء AJAX لجلب بيانات المستخدم
+                    // For demonstration, let\'s just populate some dummy data
+                    $(\'#UserName\').val(\'اسم المستخدم التجريبي\');
+                    $(\'#CurrentBalance\').val(\'1234.56\');
+                    $(\'#LastTransactionDate\').val(\'2023-01-01\');
+                } else {
+                    $(\'#UserName\').val(\'\');
+                    $(\'#CurrentBalance\').val(\'\');
+                    $(\'#LastTransactionDate\').val(\'\');
+                }
+            });
+        });
+    </script>
+}

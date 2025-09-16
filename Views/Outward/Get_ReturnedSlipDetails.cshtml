@@ -1,0 +1,93 @@
+
+@page
+@model SAFA_ECC_Core_Clean.ViewModels.ReturnedSlipDetailsViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل إذن الإرجاع";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div dir="rtl" lang="ar">
+    <h1 class="text-right">@ViewData["Title"]</h1>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white text-right">
+                    <h4>معلومات إذن الإرجاع</h4>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3 text-right">
+                            @Html.DisplayNameFor(model => model.SlipNumber)
+                        </dt>
+                        <dd class="col-sm-9 text-right">
+                            @Html.DisplayFor(model => model.SlipNumber)
+                        </dd>
+                        <dt class="col-sm-3 text-right">
+                            @Html.DisplayNameFor(model => model.ReturnDate)
+                        </dt>
+                        <dd class="col-sm-9 text-right">
+                            @Html.DisplayFor(model => model.ReturnDate)
+                        </dd>
+                        <dt class="col-sm-3 text-right">
+                            @Html.DisplayNameFor(model => model.CustomerName)
+                        </dt>
+                        <dd class="col-sm-9 text-right">
+                            @Html.DisplayFor(model => model.CustomerName)
+                        </dd>
+                        <dt class="col-sm-3 text-right">
+                            @Html.DisplayNameFor(model => model.TotalAmount)
+                        </dt>
+                        <dd class="col-sm-9 text-right">
+                            @Html.DisplayFor(model => model.TotalAmount)
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <h4 class="mt-4 text-right">تفاصيل الأصناف المرتجعة</h4>
+            <table class="table table-bordered table-striped text-right">
+                <thead class="bg-light">
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.Items.FirstOrDefault().ItemName)</th>
+                        <th>@Html.DisplayNameFor(model => model.Items.FirstOrDefault().Quantity)</th>
+                        <th>@Html.DisplayNameFor(model => model.Items.FirstOrDefault().UnitPrice)</th>
+                        <th>@Html.DisplayNameFor(model => model.Items.FirstOrDefault().LineTotal)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items != null && Model.Items.Any())
+                    {
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.ItemName)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Quantity)</td>
+                                <td>@Html.DisplayFor(modelItem => item.UnitPrice)</td>
+                                <td>@Html.DisplayFor(modelItem => item.LineTotal)</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center">لا توجد أصناف مرتجعة.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="mt-4 text-right">
+                <a asp-action="Index" class="btn btn-secondary">العودة إلى القائمة</a>
+                <button type="button" class="btn btn-primary">طباعة</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

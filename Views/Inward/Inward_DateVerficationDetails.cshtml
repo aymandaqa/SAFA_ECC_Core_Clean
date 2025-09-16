@@ -1,0 +1,90 @@
+@page
+@model SAFA_ECC_Core_Clean.ViewModels.Inward_DateVerficationDetailsViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل التحقق من تاريخ الوارد";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <h1 class="text-center">@ViewData["Title"]</h1>
+
+    <!-- Content will be added here -->
+
+</div>
+
+
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">معلومات التحقق</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="inwardDate" class="form-label">تاريخ الوارد:</label>
+                            <input type="date" class="form-control" id="inwardDate" asp-for="InwardDate">
+                        </div>
+                        <div class="mb-3">
+                            <label for="verificationStatus" class="form-label">حالة التحقق:</label>
+                            <select class="form-select" id="verificationStatus" asp-for="VerificationStatus">
+                                <option value="">اختر حالة</option>
+                                <option value="verified">تم التحقق</option>
+                                <option value="pending">قيد الانتظار</option>
+                                <option value="rejected">مرفوض</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success">بحث</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">نتائج التحقق</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>رقم الوارد</th>
+                                <th>تاريخ الوارد</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Example Row - will be populated by data -->
+                            <tr>
+                                <td>12345</td>
+                                <td>2025-09-15</td>
+                                <td>تم التحقق</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary">عرض</button>
+                                    <button class="btn btn-sm btn-danger">حذف</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>67890</td>
+                                <td>2025-09-14</td>
+                                <td>قيد الانتظار</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary">عرض</button>
+                                    <button class="btn btn-sm btn-warning">تعديل</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <button class="btn btn-secondary">العودة</button>
+        </div>
+    </div>

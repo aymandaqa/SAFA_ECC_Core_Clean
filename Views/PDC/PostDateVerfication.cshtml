@@ -1,0 +1,101 @@
+@model SAFA_ECC_Core_Clean.ViewModels.PostDateVerificationViewModel
+
+@{ 
+    ViewData["Title"] = "التحقق من تاريخ ما بعد";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h1 class="text-right mb-4">التحقق من تاريخ ما بعد</h1>
+
+    <!-- قسم النموذج (Form Section) -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white text-right">
+            <h5 class="mb-0">إدخال بيانات التحقق</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="PostDateVerification" method="post">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Field1" class="form-label float-end">الحقل الأول:</label>
+                        <input asp-for="Field1" class="form-control text-right" />
+                        <span asp-validation-for="Field1" class="text-danger float-end"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Field2" class="form-label float-end">الحقل الثاني:</label>
+                        <input asp-for="Field2" class="form-control text-right" />
+                        <span asp-validation-for="Field2" class="text-danger float-end"></span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="DateInput" class="form-label float-end">تاريخ الإدخال:</label>
+                        <input asp-for="DateInput" type="date" class="form-control text-right" />
+                        <span asp-validation-for="DateInput" class="text-danger float-end"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="DropdownSelection" class="form-label float-end">اختيار من القائمة:</label>
+                        <select asp-for="DropdownSelection" class="form-select text-right">
+                            <option value="">-- اختر --</option>
+                            <option value="Option1">الخيار الأول</option>
+                            <option value="Option2">الخيار الثاني</option>
+                        </select>
+                        <span asp-validation-for="DropdownSelection" class="text-danger float-end"></span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary me-2">تحقق</button>
+                    <button type="reset" class="btn btn-secondary">إعادة تعيين</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- قسم الجدول (Table Section) -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white text-right">
+            <h5 class="mb-0">نتائج التحقق</h5>
+        </div>
+        <div class="card-body">
+            @if (Model != null && Model.VerificationResults != null && Model.VerificationResults.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered text-right">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">النتيجة 1</th>
+                                <th scope="col">النتيجة 2</th>
+                                <th scope="col">الحالة</th>
+                                <th scope="col">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.VerificationResults)
+                            {
+                                <tr>
+                                    <td>@item.Id</td>
+                                    <td>@item.Result1</td>
+                                    <td>@item.Result2</td>
+                                    <td>@item.Status</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-outline-primary">عرض</a>
+                                        <a href="#" class="btn btn-sm btn-outline-info">تعديل</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-center">لا توجد نتائج عرض.</p>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

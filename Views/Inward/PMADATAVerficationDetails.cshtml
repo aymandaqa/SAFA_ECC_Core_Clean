@@ -1,0 +1,122 @@
+@model SAFA_ECC_Core_Clean.ViewModels.PMADATAVerficationDetailsViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل التحقق من بيانات PMA";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title mb-0">تفاصيل التحقق من بيانات PMA</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="SubmitPmaVerification" method="post">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="ReferenceNumber" class="form-label">الرقم المرجعي</label>
+                            <input asp-for="ReferenceNumber" class="form-control" readonly />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="TransactionDate" class="form-label">تاريخ الحركة</label>
+                            <input asp-for="TransactionDate" class="form-control" readonly />
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="mt-4">بيانات العميل</h5>
+                <hr />
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label asp-for="CustomerName" class="form-label">اسم العميل</label>
+                            <input asp-for="CustomerName" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label asp-for="CustomerId" class="form-label">رقم هوية العميل</label>
+                            <input asp-for="CustomerId" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label asp-for="CustomerAddress" class="form-label">عنوان العميل</label>
+                            <input asp-for="CustomerAddress" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="mt-4">تفاصيل الشيك</h5>
+                <hr />
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label asp-for="ChequeAmount" class="form-label">مبلغ الشيك</label>
+                            <input asp-for="ChequeAmount" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label asp-for="ChequeNumber" class="form-label">رقم الشيك</label>
+                            <input asp-for="ChequeNumber" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label asp-for="BankName" class="form-label">اسم البنك</label>
+                            <input asp-for="BankName" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label asp-for="BranchName" class="form-label">اسم الفرع</label>
+                            <input asp-for="BranchName" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">تحقق</button>
+                    <button type="button" class="btn btn-secondary">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">نتائج التحقق</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>الحقل</th>
+                        <th>الحالة</th>
+                        <th>ملاحظات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>اسم العميل</td>
+                        <td><span class="badge bg-success">متطابق</span></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>رقم هوية العميل</td>
+                        <td><span class="badge bg-danger">غير متطابق</span></td>
+                        <td>الرقم المدخل غير صحيح</td>
+                    </tr>
+                    <tr>
+                        <td>مبلغ الشيك</td>
+                        <td><span class="badge bg-success">متطابق</span></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

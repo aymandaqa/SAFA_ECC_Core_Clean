@@ -1,0 +1,129 @@
+@{
+    ViewData["Title"] = "تقارير النظام";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid" dir="rtl">
+    <h1 class="text-center mb-4">تقارير النظام</h1>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">خيارات التقرير</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Placeholder for report filtering form -->
+                    <form>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="reportType" class="form-label">نوع التقرير:</label>
+                                <select id="reportType" class="form-select">
+                                    <option selected>اختر نوع التقرير...</option>
+                                    <option value="1">تقرير المستخدمين</option>
+                                    <option value="2">تقرير المعاملات</option>
+                                    <option value="3">تقرير الأداء</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="dateRange" class="form-label">النطاق الزمني:</label>
+                                <input type="text" class="form-control" id="dateRange" placeholder="اختر نطاقًا زمنيًا">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="statusFilter" class="form-label">الحالة:</label>
+                                <select id="statusFilter" class="form-select">
+                                    <option selected>الكل</option>
+                                    <option value="active">نشط</option>
+                                    <option value="inactive">غير نشط</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="otherFilter" class="form-label">فلتر آخر:</label>
+                                <input type="text" class="form-control" id="otherFilter" placeholder="أدخل قيمة الفلتر">
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary me-md-2">عرض التقرير</button>
+                            <button type="button" class="btn btn-secondary">تصدير</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">نتائج التقرير</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Placeholder for report results table -->
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">العمود 1</th>
+                                    <th scope="col">العمود 2</th>
+                                    <th scope="col">العمود 3</th>
+                                    <th scope="col">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>بيانات 1-1</td>
+                                    <td>بيانات 1-2</td>
+                                    <td>بيانات 1-3</td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm">عرض</button>
+                                        <button class="btn btn-danger btn-sm">حذف</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">2</th>
+                                    <td>بيانات 2-1</td>
+                                    <td>بيانات 2-2</td>
+                                    <td>بيانات 2-3</td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm">عرض</button>
+                                        <button class="btn btn-danger btn-sm">حذف</button>
+                                    </td>
+                                </tr>
+                                <!-- More rows can be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Pagination placeholder -->
+                    <nav aria-label="Report Pagination">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">السابق</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">التالي</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Add any necessary scripts here, e.g., for date range picker or dynamic table loading -->
+    <script>
+        $(document).ready(function () {
+            // Initialize date range picker if needed
+            // $(\'#dateRange\').datepicker();
+        });
+    </script>
+}

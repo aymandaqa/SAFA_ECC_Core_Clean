@@ -1,0 +1,108 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model CustomerReportsViewModel
+
+@{ 
+    ViewData["Title"] = "تقارير العملاء";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h1 class="text-center mb-4">@ViewData["Title"]</h1>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">خيارات التقرير</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="GenerateCustomerReport" method="post">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label for="startDate" class="form-label">تاريخ البدء:</label>
+                        <input type="date" class="form-control" id="startDate" name="startDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-4">
+                        <label for="endDate" class="form-label">تاريخ الانتهاء:</label>
+                        <input type="date" class="form-control" id="endDate" name="endDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-4">
+                        <label for="customerName" class="form-label">اسم العميل:</label>
+                        <input type="text" class="form-control" id="customerName" name="customerName" value="@Model.CustomerName" placeholder="أدخل اسم العميل" />
+                    </div>
+                    <div class="col-12 mt-4 text-center">
+                        <button type="submit" class="btn btn-success"><i class="bi bi-file-earmark-text"></i> توليد التقرير</button>
+                        <button type="reset" class="btn btn-secondary"><i class="bi bi-arrow-counterclockwise"></i> إعادة تعيين</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model.Reports != null && Model.Reports.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">نتائج التقرير</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover table-bordered text-center">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>اسم العميل</th>
+                                <th>تاريخ الطلب</th>
+                                <th>إجمالي المبلغ</th>
+                                <th>حالة الطلب</th>
+                                <th>تفاصيل</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var report in Model.Reports)
+                            {
+                                <tr>
+                                    <td>@report.Id</td>
+                                    <td>@report.CustomerName</td>
+                                    <td>@report.OrderDate.ToShortDateString()</td>
+                                    <td>@report.TotalAmount.ToString("C")</td>
+                                    <td>@report.OrderStatus</td>
+                                    <td>
+                                        <a asp-action="ReportDetails" asp-route-id="@report.Id" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-info-circle"></i> عرض
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else if (Model.SearchAttempted)
+    {
+        <div class="alert alert-warning text-center" role="alert" dir="rtl">
+            <h4 class="alert-heading">لا توجد نتائج!</h4>
+            <p>لم يتم العثور على تقارير مطابقة لمعايير البحث المحددة.</p>
+            <hr>
+            <p class="mb-0">يرجى تعديل خيارات البحث والمحاولة مرة أخرى.</p>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // يمكنك إضافة أي سكربتات خاصة بالصفحة هنا
+        // على سبيل المثال، تهيئة مكتبات JavaScript أو معالجة الأحداث
+        $(document).ready(function () {
+            // تهيئة Datepickers إذا كنت تستخدم مكتبة مثل jQuery UI Datepicker
+            // $("#startDate").datepicker();
+            // $("#endDate").datepicker();
+
+            // مثال على إضافة وظيفة للزر "إعادة تعيين"
+            $("button[type=\"reset\"]").on("click", function () {
+                // يمكنك إضافة منطق خاص لإعادة تعيين النموذج هنا إذا لزم الأمر
+                console.log("تم إعادة تعيين النموذج.");
+            });
+        });
+    </script>
+}

@@ -1,0 +1,101 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model InwTimeoutViewModel
+
+@{
+    ViewData["Title"] = "مهلة الاستيراد";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h1 class="text-right">@ViewData["Title"]</h1>
+
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-white text-right">
+            <h4>تفاصيل مهلة الاستيراد</h4>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row mb-3">
+                    <label for="itemId" class="col-sm-2 col-form-label text-right">رقم البند:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="itemId" value="@Model.ItemId" readonly>
+                    </div>
+                    <label for="itemName" class="col-sm-2 col-form-label text-right">اسم البند:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="itemName" value="@Model.ItemName" readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="timeoutDate" class="col-sm-2 col-form-label text-right">تاريخ المهلة:</label>
+                    <div class="col-sm-4">
+                        <input type="date" class="form-control" id="timeoutDate" value="@Model.TimeoutDate.ToString("yyyy-MM-dd")">
+                    </div>
+                    <label for="status" class="col-sm-2 col-form-label text-right">الحالة:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="status" value="@Model.Status" readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="notes" class="col-sm-2 col-form-label text-right">ملاحظات:</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control" id="notes" rows="3">@Model.Notes</textarea>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-success me-2">حفظ</button>
+                    <button type="button" class="btn btn-secondary">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header bg-info text-white text-right">
+            <h4>سجل التعديلات</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered text-right">
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>المستخدم</th>
+                            <th>العملية</th>
+                            <th>التفاصيل</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.History != null && Model.History.Any())
+                        {
+                            @foreach (var entry in Model.History)
+                            {
+                                <tr>
+                                    <td>@entry.Date.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@entry.User</td>
+                                    <td>@entry.Action</td>
+                                    <td>@entry.Details</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4">لا يوجد سجل تعديلات.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // JavaScript for any client-side interactions
+        $(document).ready(function () {
+            // Example: Add a date picker if needed
+            // $(\'#timeoutDate\').datepicker();
+        });
+    </script>
+}

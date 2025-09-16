@@ -1,0 +1,86 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model PDCReportViewModel
+
+@{ 
+    ViewData["Title"] = "تقرير PDC";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h1 class="text-end mb-4">@ViewData["Title"]</h1>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white text-end">
+            <h5 class="mb-0">معلومات التقرير</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="PDC_Report" method="get" class="row g-3 justify-content-end">
+                <div class="col-md-4">
+                    <label for="startDate" class="form-label text-end w-100">تاريخ البدء:</label>
+                    <input type="date" class="form-control text-end" id="startDate" name="startDate" value="@Model.StartDate.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-4">
+                    <label for="endDate" class="form-label text-end w-100">تاريخ الانتهاء:</label>
+                    <input type="date" class="form-control text-end" id="endDate" name="endDate" value="@Model.EndDate.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-4 d-flex align-items-end justify-content-end">
+                    <button type="submit" class="btn btn-primary">تحديث التقرير</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model.ReportCheques != null && Model.ReportCheques.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white text-end">
+                <h5 class="mb-0">نتائج التقرير</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered text-end">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>رقم الشيك</th>
+                                <th>المستفيد</th>
+                                <th>المبلغ</th>
+                                <th>تاريخ الاستحقاق</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ReportCheques)
+                            {
+                                <tr>
+                                    <td>@item.ChequeNumber</td>
+                                    <td>@item.Beneficiary</td>
+                                    <td>@item.Amount.ToString("N2")</td>
+                                    <td>@item.DueDate.ToString("yyyy-MM-dd")</td>
+                                    <td>@item.Status</td>
+                                    <td>
+                                        <a asp-action="Details" asp-route-id="@item.ChequeId" class="btn btn-info btn-sm">تفاصيل</a>
+                                        <a asp-action="Edit" asp-route-id="@item.ChequeId" class="btn btn-warning btn-sm">تعديل</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-end" role="alert">
+            لا توجد بيانات لعرضها في هذا التقرير.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // يمكنك إضافة أي سكربتات خاصة بالصفحة هنا
+        // على سبيل المثال، تهيئة مكتبات JavaScript للتواريخ أو الجداول
+    </script>
+}

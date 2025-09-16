@@ -1,0 +1,230 @@
+@page
+@model SAFA_ECC_Core_Clean.ViewModels.UserManagementViewModel
+@{
+    ViewData["Title"] = "إدارة المستخدمين";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid" dir="rtl">
+    <h1 class="text-center mb-4">إدارة المستخدمين</h1>
+
+    <!-- هنا سيتم إضافة النماذج والجداول والأزرار -->
+
+</div>
+
+
+
+    <!-- قسم إضافة مستخدم جديد -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">إضافة مستخدم جديد</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="UserName" class="form-label">اسم المستخدم</label>
+                        <input type="text" class="form-control" id="UserName" asp-for="NewUser.UserName" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="Email" class="form-label">البريد الإلكتروني</label>
+                        <input type="email" class="form-control" id="Email" asp-for="NewUser.Email" required>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="Password" class="form-label">كلمة المرور</label>
+                        <input type="password" class="form-control" id="Password" asp-for="NewUser.Password" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="ConfirmPassword" class="form-label">تأكيد كلمة المرور</label>
+                        <input type="password" class="form-control" id="ConfirmPassword" asp-for="NewUser.ConfirmPassword" required>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="Role" class="form-label">الدور</label>
+                        <select class="form-select" id="Role" asp-for="NewUser.Role" required>
+                            <option value="">اختر دورًا</option>
+                            <option value="Admin">مسؤول</option>
+                            <option value="User">مستخدم</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 form-check form-switch d-flex align-items-end">
+                        <input class="form-check-input" type="checkbox" id="IsActive" asp-for="NewUser.IsActive">
+                        <label class="form-check-label me-2" for="IsActive">نشط</label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">إضافة مستخدم</button>
+                <button type="reset" class="btn btn-secondary">إلغاء</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- قسم قائمة المستخدمين -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">قائمة المستخدمين</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>اسم المستخدم</th>
+                            <th>البريد الإلكتروني</th>
+                            <th>الدور</th>
+                            <th>الحالة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Users != null && Model.Users.Any())
+                        {
+                            @foreach (var user in Model.Users!)
+                            {
+                                <tr>
+                                    <td>@user.UserName</td>
+                                    <td>@user.Email</td>
+                                    <td>@user.Role</td>
+                                    <td>
+                                        @if (user.IsActive)
+                                        {
+                                            <span class="badge bg-success">نشط</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">غير نشط</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal" data-user-id="@user.User_ID">تعديل</button>
+                                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteUserModal" data-user-id="@user.User_ID">حذف</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center">لا يوجد مستخدمون لعرضهم.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal لتعديل المستخدم -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="editUserModalLabel">تعديل المستخدم</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm">
+                        <input type="hidden" id="editUserId" asp-for="EditUser.UserId" />
+                        <div class="mb-3">
+                            <label for="editUserName" class="form-label">اسم المستخدم</label>
+                            <input type="text" class="form-control" id="editUserName" asp-for="EditUser.UserName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editEmail" class="form-label">البريد الإلكتروني</label>
+                            <input type="email" class="form-control" id="editEmail" asp-for="EditUser.Email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editRole" class="form-label">الدور</label>
+                            <select class="form-select" id="editRole" asp-for="EditUser.Role" required>
+                                <option value="Admin">مسؤول</option>
+                                <option value="User">مستخدم</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="editIsActive" asp-for="EditUser.IsActive">
+                            <label class="form-check-label" for="editIsActive">نشط</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="saveEditUser">حفظ التغييرات</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal لحذف المستخدم -->
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteUserModalLabel">حذف المستخدم</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>هل أنت متأكد أنك تريد حذف هذا المستخدم؟</p>
+                    <input type="hidden" id="deleteUserId" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteUser">حذف</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // عند فتح مودال التعديل، قم بملء البيانات
+            $(\'#editUserModal\').on(\'show.bs.modal\', function (event) {
+                var button = $(event.relatedTarget); // الزر الذي قام بتشغيل المودال
+                var userId = button.data(\'user-id\'); // استخراج معرف المستخدم من سمة data-user-id
+
+                // هنا يجب عليك إجراء طلب AJAX لجلب بيانات المستخدم بناءً على userId
+                // مثال (يجب استبداله بطلب حقيقي إلى API أو Controller):
+                var user = { Id: userId, UserName: \'اسم_مستخدم_مثال\', Email: \'example@example.com\', Role: \'User\', IsActive: true }; // بيانات وهمية
+
+                $(\'#editUserId\').val(user.Id);
+                $(\'#editUserName\').val(user.UserName);
+                $(\'#editEmail\').val(user.Email);
+                $(\'#editRole\').val(user.Role);
+                $(\'#editIsActive\').prop(\'checked\', user.IsActive);
+            });
+
+            // عند النقر على زر حفظ التغييرات في مودال التعديل
+            $(\'#saveEditUser\').on(\'click\', function () {
+                var userId = $(\'#editUserId\').val();
+                var userName = $(\'#editUserName\').val();
+                var email = $(\'#editEmail\').val();
+                var role = $(\'#editRole\').val();
+                var isActive = $(\'#editIsActive\').is(\'checked\');
+
+                // هنا يجب عليك إجراء طلب AJAX لإرسال البيانات المحدثة إلى الخادم
+                alert(\'تم حفظ التغييرات للمستخدم \' + userName);
+                $(\'#editUserModal\').modal(\'hide\');
+            });
+
+            // عند فتح مودال الحذف، قم بتعيين معرف المستخدم
+            $(\'#deleteUserModal\').on(\'show.bs.modal\', function (event) {
+                var button = $(event.relatedTarget);
+                var userId = button.data(\'user-id\');
+                $(\'#deleteUserId\').val(userId);
+            });
+
+            // عند النقر على زر الحذف في مودال الحذف
+            $(\'#confirmDeleteUser\').on(\'click\', function () {
+                var userId = $(\'#deleteUserId\').val();
+                // هنا يجب عليك إجراء طلب AJAX لحذف المستخدم من الخادم
+                alert(\'تم حذف المستخدم بمعرف: \' + userId);
+                $(\'#deleteUserModal\').modal(\'hide\');
+                // قد تحتاج إلى إعادة تحميل الصفحة أو تحديث الجدول هنا
+            });
+        });
+    </script>
+}

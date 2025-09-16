@@ -1,0 +1,15 @@
+  Determining projects to restore...
+/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj : warning NU1903: Package 'System.Data.SqlClient' 4.8.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7
+  All projects are up-to-date for restore.
+/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj : warning NU1903: Package 'System.Data.SqlClient' 4.8.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/UsersViewModels.cs(4,260): error CS0234: The type or namespace name 'Permissions_Tbl' does not exist in the namespace 'SAFA_ECC_Core.Models' (are you missing an assembly reference?) [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+
+Build FAILED.
+
+/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj : warning NU1903: Package 'System.Data.SqlClient' 4.8.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7
+/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj : warning NU1903: Package 'System.Data.SqlClient' 4.8.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/UsersViewModels.cs(4,260): error CS0234: The type or namespace name 'Permissions_Tbl' does not exist in the namespace 'SAFA_ECC_Core.Models' (are you missing an assembly reference?) [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+    2 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:03.12

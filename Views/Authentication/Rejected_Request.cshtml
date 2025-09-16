@@ -1,0 +1,83 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model RejectedRequestViewModel
+
+@{ ViewData["Title"] = "طلب مرفوض"; }
+
+<div class="container mt-5" dir="rtl">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white text-center">
+                    <h3 class="mb-0">طلبك مرفوض</h3>
+                </div>
+                <div class="card-body text-right">
+                    <p class="lead">نأسف لإبلاغك بأن طلبك قد تم رفضه.</p>
+                    <p>يمكنك مراجعة التفاصيل أدناه لمعرفة المزيد حول سبب الرفض.</p>
+
+                    <hr />
+
+                    <h4>تفاصيل الطلب</h4>
+                    <table class="table table-bordered table-striped mt-3">
+                        <tbody>
+                            <tr>
+                                <th scope="row" class="col-4">رقم الطلب:</th>
+                                <td>@Model.RequestId</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">تاريخ الطلب:</th>
+                                <td>@Model.RequestDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">نوع الطلب:</th>
+                                <td>@Model.RequestType</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">حالة الطلب:</th>
+                                <td><span class="badge bg-danger">مرفوض</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>سبب الرفض</h4>
+                    <div class="alert alert-warning mt-3" role="alert">
+                        <p><strong>السبب:</strong> @Model.RejectionReason</p>
+                        <p>@Model.RejectionDetails</p>
+                    </div>
+
+                    @if (Model.TransactionDetails != null && Model.TransactionDetails.Any())
+                    {
+                        <h4>تفاصيل المعاملات</h4>
+                        <table class="table table-bordered table-striped mt-3">
+                            <thead>
+                                <tr>
+                                    <th scope="col">رقم المعاملة</th>
+                                    <th scope="col">المبلغ</th>
+                                    <th scope="col">الحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var transaction in Model.TransactionDetails)
+                                {
+                                    <tr>
+                                        <td>@transaction.TransactionId</td>
+                                        <td>@transaction.Amount.ToString("C")</td>
+                                        <td>@transaction.Status</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-primary me-md-2">العودة إلى لوحة التحكم</a>
+                        <a asp-controller="Support" asp-action="Contact" class="btn btn-secondary">اتصل بالدعم</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

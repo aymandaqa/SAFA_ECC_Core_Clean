@@ -1,0 +1,110 @@
+
+@using SAFA_ECC_Core_Clean.ViewModels
+@model PermissionSettingsViewModel
+
+@{ 
+    ViewData["Title"] = "إعدادات الأذونات";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title float-right">إعدادات الأذونات</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="SavePermissionSettings" method="post">
+                        <div class="form-group row">
+                            <label for="RoleName" class="col-md-2 col-form-label text-md-right">اسم الدور:</label>
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" id="RoleName" name="RoleName" value="@Model.RoleName" />
+                                <span asp-validation-for="RoleName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <h5 class="mt-4 mb-3">الأذونات:</h5>
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>الوحدة</th>
+                                    <th>العرض</th>
+                                    <th>الإضافة</th>
+                                    <th>التعديل</th>
+                                    <th>الحذف</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null && Model.Permissions != null)
+                                {
+                                    @for (int i = 0; i < Model.Permissions.Count(); i++)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" asp-for="Permissions[i].ModuleId" />
+                                                <input type="hidden" asp-for="Permissions[i].ModuleName" />
+                                                @Html.DisplayFor(modelItem => Model.Permissions[i].ModuleName)
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" asp-for="Permissions[i].CanView" />
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" asp-for="Permissions[i].CanAdd" />
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" asp-for="Permissions[i].CanEdit" />
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" asp-for="Permissions[i].CanDelete" />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center">لا توجد أذونات لعرضها.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-primary float-right">حفظ التغييرات</button>
+                            <a asp-action="Index" class="btn btn-secondary float-left">إلغاء</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+<style>
+    body {
+        direction: rtl;
+        text-align: right;
+    }
+    .float-right {
+        float: right !important;
+    }
+    .float-left {
+        float: left !important;
+    }
+    .text-md-right {
+        text-align: right !important;
+    }
+</style>

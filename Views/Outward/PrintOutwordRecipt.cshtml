@@ -1,0 +1,122 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model OutwardReceiptViewModel
+
+@{ 
+    ViewData["Title"] = "طباعة إيصال صادر";
+    Layout = "_Layout"; // Assuming a shared layout is used
+}
+
+<div class="container-fluid" dir="rtl">
+    <div class="row">
+        <div class="col-12 text-center mb-4">
+            <h1 class="display-4">إيصال صادر</h1>
+            <p class="lead">تفاصيل الإيصال الصادر رقم: @Model.ReceiptNumber</p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">معلومات العميل</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">اسم العميل:</label>
+                    <p class="form-control-plaintext">@Model.CustomerName</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">رقم الهاتف:</label>
+                    <p class="form-control-plaintext">@Model.CustomerPhone</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <label class="form-label">العنوان:</label>
+                    <p class="form-control-plaintext">@Model.CustomerAddress</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">تفاصيل الأصناف</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped text-right">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>الصنف</th>
+                            <th>الكمية</th>
+                            <th>سعر الوحدة</th>
+                            <th>الإجمالي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Items != null && Model.Items.Any())
+                        {
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td>@(Model.Items.IndexOf(item) + 1)</td>
+                                    <td>@item.ItemName</td>
+                                    <td>@item.Quantity</td>
+                                    <td>@item.UnitPrice.ToString("C")</td>
+                                    <td>@item.Total.ToString("C")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center">لا توجد أصناف في هذا الإيصال.</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="4" class="text-left">المجموع الكلي:</th>
+                            <td>@Model.TotalAmount.ToString("C")</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">معلومات الدفع</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">طريقة الدفع:</label>
+                    <p class="form-control-plaintext">@Model.PaymentMethod</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">تاريخ الإيصال:</label>
+                    <p class="form-control-plaintext">@Model.ReceiptDate.ToShortDateString()</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <label class="form-label">ملاحظات:</label>
+                    <p class="form-control-plaintext">@Model.Notes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <button type="button" class="btn btn-success btn-lg" onclick="window.print();">طباعة الإيصال</button>
+            <a href="/Outward" class="btn btn-secondary btn-lg">العودة</a>
+        </div>
+    </div>
+</div>
+
+@* Define a placeholder ViewModel for demonstration purposes. 
+   In a real application, this would be defined in SAFA_ECC_Core_Clean.ViewModels. *@

@@ -1,0 +1,85 @@
+
+@model SAFA_ECC_Core_Clean.ViewModels.ExcemptionsDetailsViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل الإعفاءات";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div dir="rtl">
+    <h1 class="text-right">@ViewData["Title"]</h1>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Content will be added here -->
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title">تفاصيل الإعفاء</h5>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Id)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Id)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ExcemptionName)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.ExcemptionName)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.StartDate)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.StartDate)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.EndDate)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.EndDate)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Status)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title">المنتجات المستثناة</h5>
+    </div>
+    <div class="card-body">
+        @if (Model.ExcemptedProducts != null && Model.ExcemptedProducts.Any())
+        {
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.ExcemptedProducts.FirstOrDefault().ProductName)</th>
+                        <th>@Html.DisplayNameFor(model => model.ExcemptedProducts.FirstOrDefault().ProductCode)</th>
+                        <th>@Html.DisplayNameFor(model => model.ExcemptedProducts.FirstOrDefault().ExcemptedAmount)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ExcemptedProducts)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.ProductName)</td>
+                            <td>@Html.DisplayFor(modelItem => item.ProductCode)</td>
+                            <td>@Html.DisplayFor(modelItem => item.ExcemptedAmount)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>لا توجد منتجات مستثناة.</p>
+        }
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-action="EditExcemptionRecord" asp-route-id="@Model.ExcemptionId" class="btn btn-primary">تعديل</a>
+    <a asp-action="Index" class="btn btn-secondary">العودة إلى القائمة</a>
+</div>

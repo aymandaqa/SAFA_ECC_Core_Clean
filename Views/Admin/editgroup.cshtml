@@ -1,0 +1,43 @@
+
+@model SAFA_ECC_Core_Clean.ViewModels.EditGroupViewModel
+
+@{ 
+    ViewData["Title"] = "تعديل مجموعة";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // افتراضًا أن هذا هو تخطيط لوحة التحكم
+}
+
+<div dir="rtl" lang="ar">
+    <h1 class="text-center mb-4">@ViewData["Title"]</h1>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form asp-action="EditGroup" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="GroupId" />
+
+
+                <div class="form-group mb-3">
+                    <label asp-for="GroupName" class="form-label"></label>
+                    <input asp-for="GroupName" class="form-control" dir="rtl" />
+                    <span asp-validation-for="GroupName" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control" rows="3" dir="rtl"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                <!-- هنا ستضاف عناصر النموذج -->
+
+                <div class="form-group text-center mt-4">
+                    <button type="submit" class="btn btn-primary">حفظ التعديلات</button>
+                    <a asp-action="Index" class="btn btn-secondary">العودة إلى القائمة</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

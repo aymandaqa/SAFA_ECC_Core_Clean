@@ -1,0 +1,59 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model SAFA_ECC_Core_Clean.ViewModels.DataExportViewModel
+
+@{ 
+    ViewData["Title"] = "تصدير البيانات";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <h1 class="mt-4 text-right">تصدير البيانات</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="#">لوحة التحكم</a></li>
+        <li class="breadcrumb-item active">تصدير البيانات</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header text-right">
+            <i class="fas fa-table ml-1"></i>
+            خيارات تصدير البيانات
+        </div>
+        <div class="card-body">
+            <form asp-action="ExportData" method="post">
+                <div class="form-group row mb-3">
+                    <label asp-for="DataType" class="col-md-2 col-form-label text-right">نوع البيانات:</label>
+                    <div class="col-md-10">
+                        <select asp-for="DataType" asp-items="Html.GetEnumSelectList<DataExportType>()" class="form-control" dir="rtl"></select>
+                        <span asp-validation-for="DataType" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-3">
+                    <label asp-for="StartDate" class="col-md-2 col-form-label text-right">تاريخ البدء:</label>
+                    <div class="col-md-10">
+                        <input asp-for="StartDate" type="date" class="form-control" dir="rtl" />
+                        <span asp-validation-for="StartDate" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-3">
+                    <label asp-for="EndDate" class="col-md-2 col-form-label text-right">تاريخ الانتهاء:</label>
+                    <div class="col-md-10">
+                        <input asp-for="EndDate" type="date" class="form-control" dir="rtl" />
+                        <span asp-validation-for="EndDate" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-3">
+                    <div class="col-md-10 offset-md-2">
+                        <button type="submit" class="btn btn-primary">تصدير</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,86 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model InwardFixedErrorDetailsONUSViewModel
+
+@{
+    ViewData["Title"] = "تفاصيل خطأ ثابت داخلي ONUS";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h2 class="text-end mb-4">@ViewData["Title"]</h2>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white text-end">
+            <h5 class="mb-0">معلومات الخطأ</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6 text-end">
+                    <label for="errorId" class="form-label">معرف الخطأ:</label>
+                    <input type="text" class="form-control text-end" id="errorId" value="@Model.ErrorId" readonly>
+                </div>
+                <div class="col-md-6 text-end">
+                    <label for="errorDate" class="form-label">تاريخ الخطأ:</label>
+                    <input type="text" class="form-control text-end" id="errorDate" value="@Model.ErrorDate.ToShortDateString()" readonly>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-12 text-end">
+                    <label for="errorMessage" class="form-label">رسالة الخطأ:</label>
+                    <textarea class="form-control text-end" id="errorMessage" rows="3" readonly>@Model.ErrorMessage</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-info text-white text-end">
+            <h5 class="mb-0">تفاصيل المعاملة</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4 text-end">
+                    <label for="transactionRef" class="form-label">المرجع:</label>
+                    <input type="text" class="form-control text-end" id="transactionRef" value="@Model.TransactionReference" readonly>
+                </div>
+                <div class="col-md-4 text-end">
+                    <label for="amount" class="form-label">المبلغ:</label>
+                    <input type="text" class="form-control text-end" id="amount" value="@Model.Amount.ToString("N2")" readonly>
+                </div>
+                <div class="col-md-4 text-end">
+                    <label for="currency" class="form-label">العملة:</label>
+                    <input type="text" class="form-control text-end" id="currency" value="@Model.Currency" readonly>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6 text-end">
+                    <label for="sender" class="form-label">المرسل:</label>
+                    <input type="text" class="form-control text-end" id="sender" value="@Model.SenderName" readonly>
+                </div>
+                <div class="col-md-6 text-end">
+                    <label for="receiver" class="form-label">المستلم:</label>
+                    <input type="text" class="form-control text-end" id="receiver" value="@Model.ReceiverName" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white text-end">
+            <h5 class="mb-0">الإجراءات</h5>
+        </div>
+        <div class="card-body text-end">
+            <button type="button" class="btn btn-success me-2">معالجة الخطأ</button>
+            <button type="button" class="btn btn-danger">إلغاء المعاملة</button>
+        </div>
+    </div>
+
+    <div class="text-end mt-4">
+        <a asp-action="Index" class="btn btn-secondary">العودة إلى القائمة</a>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

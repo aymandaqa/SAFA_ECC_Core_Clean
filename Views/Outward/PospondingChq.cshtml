@@ -1,0 +1,109 @@
+@page
+@model SAFA_ECC_Core_Clean.ViewModels.PospondingChqViewModel
+
+@{ 
+    ViewData["Title"] = "تأجيل الشيكات الصادرة";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        direction: rtl;
+        text-align: right;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <h1 class="mb-4">@ViewData["Title"]</h1>
+
+    <!-- Placeholder for forms, tables, and buttons -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">تفاصيل تأجيل الشيكات</h5>
+                </div>
+                <div class="card-body">
+
+                    <form>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="chqNumber" class="form-label">رقم الشيك</label>
+                                <input type="text" class="form-control" id="chqNumber" asp-for="NewCheque.ChequeNumber" placeholder="أدخل رقم الشيك">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="chqDate" class="form-label">تاريخ الشيك</label>
+                                <input type="date" class="form-control" id="chqDate" asp-for="NewCheque.ChequeDate">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="beneficiary" class="form-label">المستفيد</label>
+                                <input type="text" class="form-control" id="beneficiary" asp-for="NewCheque.Beneficiary" placeholder="اسم المستفيد">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="amount" class="form-label">المبلغ</label>
+                                <input type="number" class="form-control" id="amount" asp-for="NewCheque.Amount" placeholder="المبلغ">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="reason" class="form-label">سبب التأجيل</label>
+                                <textarea class="form-control" id="reason" rows="3" asp-for="NewCheque.Reason" placeholder="أدخل سبب التأجيل"></textarea>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary me-2">حفظ</button>
+                            <button type="reset" class="btn btn-secondary">إلغاء</button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <h5 class="mb-3">الشيكات المؤجلة</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>رقم الشيك</th>
+                                    <th>تاريخ الشيك</th>
+                                    <th>المستفيد</th>
+                                    <th>المبلغ</th>
+                                    <th>سبب التأجيل</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Cheques != null && Model.Cheques.Any())
+                                {
+                                    @foreach (var cheque in Model.Cheques)
+                                    {
+                                        <tr>
+                                            <td>@cheque.ChequeNumber</td>
+                                            <td>@cheque.ChequeDate.ToShortDateString()</td>
+                                            <td>@cheque.Beneficiary</td>
+                                            <td>@cheque.Amount.ToString("N2")</td>
+                                            <td>@cheque.Reason</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-info me-2">تعديل</button>
+                                                <button class="btn btn-sm btn-danger">حذف</button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center">لا توجد شيكات مؤجلة لعرضها.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

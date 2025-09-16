@@ -1,0 +1,108 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model PDCChequesAuthViewModel
+
+@{ 
+    ViewData["Title"] = "تفويض شيكات الدفع الآجل";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // افتراض وجود تخطيط مشترك
+}
+
+<div class="container-fluid" dir="rtl">
+    <h1 class="text-end mb-4">@ViewData["Title"]</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary text-end">معلومات التفويض</h6>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="chequeNumber" class="form-label text-end w-100">رقم الشيك:</label>
+                        <input type="text" class="form-control text-end" id="chequeNumber" placeholder="أدخل رقم الشيك">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="authDate" class="form-label text-end w-100">تاريخ التفويض:</label>
+                        <input type="date" class="form-control text-end" id="authDate">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="notes" class="form-label text-end w-100">ملاحظات:</label>
+                        <textarea class="form-control text-end" id="notes" rows="3" placeholder="أدخل أي ملاحظات"></textarea>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary me-2">بحث</button>
+                    <button type="reset" class="btn btn-secondary">مسح</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4 mt-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary text-end">الشيكات المعلقة للتفويض</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover text-end" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" class="form-check-input"></th>
+                            <th>رقم الشيك</th>
+                            <th>تاريخ الاستحقاق</th>
+                            <th>المبلغ</th>
+                            <th>اسم العميل</th>
+                            <th>الحالة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @* هنا سيتم عرض بيانات الشيكات من ViewModel *@
+                        <tr>
+                            <td><input type="checkbox" class="form-check-input"></td>
+                            <td>12345</td>
+                            <td>2025-10-01</td>
+                            <td>1500.00</td>
+                            <td>أحمد محمود</td>
+                            <td>معلق</td>
+                            <td>
+                                <button class="btn btn-success btn-sm">تفويض</button>
+                                <button class="btn btn-danger btn-sm">رفض</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="form-check-input"></td>
+                            <td>67890</td>
+                            <td>2025-10-15</td>
+                            <td>2500.50</td>
+                            <td>فاطمة علي</td>
+                            <td>معلق</td>
+                            <td>
+                                <button class="btn btn-success btn-sm">تفويض</button>
+                                <button class="btn btn-danger btn-sm">رفض</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-end mt-3">
+                <button class="btn btn-success me-2">تفويض المحدد</button>
+                <button class="btn btn-danger">رفض المحدد</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة أكواد JavaScript هنا للتعامل مع التفاعلات مثل تحديد الكل، إرسال النموذج، إلخ.
+        $(document).ready(function () {
+            // مثال: تحديد/إلغاء تحديد الكل في الجدول
+            $(\'#dataTable thead input[type="checkbox"]\').on(\'change\', function () {
+                var isChecked = $(this).prop(\'checked\');
+                $(\'#dataTable tbody input[type="checkbox"]\').prop(\'checked\', isChecked);
+            });
+        });
+    </script>
+}

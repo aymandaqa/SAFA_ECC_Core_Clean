@@ -1,0 +1,110 @@
+@model SAFA_ECC_Core_Clean.ViewModels.SystemSettingsViewModel
+
+@{ 
+    ViewData["Title"] = "إعدادات الأمان";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // افتراضياً، يجب أن يكون لديك تخطيط للمسؤول
+}
+
+<div class="container-fluid" dir="rtl">
+    <h1 class="mt-4 text-right">@ViewData["Title"]</h1>
+    <ol class="breadcrumb mb-4 float-right">
+        <li class="breadcrumb-item"><a href="#">لوحة التحكم</a></li>
+        <li class="breadcrumb-item active">إعدادات الأمان</li>
+    </ol>
+    <div class="clearfix"></div>
+
+    <div class="card mb-4">
+        <div class="card-header text-right">
+            <i class="fas fa-shield-alt mr-1"></i>
+            تكوين إعدادات الأمان
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger text-right"></div>
+
+                <div class="form-group text-right">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="enableTwoFactorAuth" asp-for="EnableTwoFactorAuth">
+                        <label class="custom-control-label" for="enableTwoFactorAuth">تمكين المصادقة الثنائية (2FA)</label>
+                    </div>
+                    <span asp-validation-for="EnableTwoFactorAuth" class="text-danger"></span>
+                </div>
+
+                <hr />
+
+                <h5 class="text-right mb-3">سياسة كلمة المرور</h5>
+                <div class="form-group text-right">
+                    <label asp-for="MinimumPasswordLength" class="control-label">الحد الأدنى لطول كلمة المرور:</label>
+                    <input asp-for="MinimumPasswordLength" class="form-control text-right" type="number" min="6" max="30" />
+                    <span asp-validation-for="MinimumPasswordLength" class="text-danger"></span>
+                </div>
+                <div class="form-group text-right">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="requireUppercase" asp-for="RequireUppercase">
+                        <label class="custom-control-label" for="requireUppercase">تتطلب أحرفاً كبيرة</label>
+                    </div>
+                    <span asp-validation-for="RequireUppercase" class="text-danger"></span>
+                </div>
+                <div class="form-group text-right">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="requireLowercase" asp-for="RequireLowercase">
+                        <label class="custom-control-label" for="requireLowercase">تتطلب أحرفاً صغيرة</label>
+                    </div>
+                    <span asp-validation-for="RequireLowercase" class="text-danger"></span>
+                </div>
+                <div class="form-group text-right">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="requireDigit" asp-for="RequireDigit">
+                        <label class="custom-control-label" for="requireDigit">تتطلب أرقاماً</label>
+                    </div>
+                    <span asp-validation-for="RequireDigit" class="text-danger"></span>
+                </div>
+                <div class="form-group text-right">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="requireNonAlphanumeric" asp-for="RequireNonAlphanumeric">
+                        <label class="custom-control-label" for="requireNonAlphanumeric">تتطلب أحرفاً خاصة</label>
+                    </div>
+                    <span asp-validation-for="RequireNonAlphanumeric" class="text-danger"></span>
+                </div>
+
+                <hr />
+
+                <h5 class="text-right mb-3">إعدادات قفل الحساب</h5>
+                <div class="form-group text-right">
+                    <div class="custom-control custom-switch">
+                       <input type="checkbox" class="custom-control-input" id="enableAccountLockout" asp-for="EnableAccountLockout">
+                        <label class="custom-control-label" for="enableAccountLockout">تمكين قفل الحساب</label>
+                    </div>
+                    <span asp-validation-for="EnableAccountLockout" class="text-danger"></span>
+                </div>
+                <div class="form-group text-right">
+                    <label asp-for="MaxLoginAttempts" class="control-label">الحد الأقصى لمحاولات تسجيل الدخول الفاشلة:</label>
+                    <input asp-for="MaxLoginAttempts" class="form-control text-right" type="number" min="1" max="10" />
+                    <span asp-validation-for="MaxLoginAttempts" class="text-danger"></span>
+                </div>
+                <div class="form-group text-right">
+                    <label asp-for="LockoutDurationMinutes" class="control-label">مدة قفل الحساب (بالدقائق):</label>
+                    <input asp-for="LockoutDurationMinutes" class="form-control text-right" type="number" min="1" max="1440" />
+                    <span asp-validation-for="LockoutDurationMinutes" class="text-danger"></span>
+                </div>
+
+                <hr />
+
+                <h5 class="text-right mb-3">إعدادات الجلسة</h5>
+                <div class="form-group text-right">
+                    <label asp-for="SessionTimeoutInMinutes" class="control-label">انتهاء صلاحية الجلسة (بالدقائق):</label>
+                    <input asp-for="SessionTimeoutInMinutes" class="form-control text-right" type="number" min="10" max="360" />
+                    <span asp-validation-for="SessionTimeoutInMinutes" class="text-danger"></span>
+                </div>
+
+                <div class="form-group text-right">
+                    <input type="submit" value="حفظ التغييرات" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

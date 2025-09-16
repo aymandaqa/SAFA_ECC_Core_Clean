@@ -1,0 +1,155 @@
+@model SAFA_ECC_Core_Clean.ViewModels.ChequeDetailsViewModel
+
+@{ 
+    ViewData["Title"] = "تفاصيل الشيكات للطباعة";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // افتراض أن هناك ملف تخطيط مشترك
+}
+
+<style>
+    /* تخصيص RTL لـ Bootstrap 5 إذا لم يكن مضمنًا في ملف CSS الرئيسي */
+    body {
+        direction: rtl;
+        text-align: right;
+    }
+    .container-fluid {
+        padding-right: var(--bs-gutter-x, 0.75rem);
+        padding-left: var(--bs-gutter-x, 0.75rem);
+    }
+    .form-label {
+        float: right;
+    }
+    .input-group > .form-control, .input-group > .form-select {
+        border-top-left-radius: 0.375rem;
+        border-bottom-left-radius: 0.375rem;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    .input-group > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
+        margin-right: -1px;
+        border-top-right-radius: 0.375rem;
+        border-bottom-right-radius: 0.375rem;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+    .table th, .table td {
+        text-align: right;
+    }
+    @@media print {
+        .no-print {
+            display: none;
+        }
+        .container-fluid {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <h1 class="mb-4 text-center no-print">@ViewData["Title"]</h1>
+
+    <!-- نموذج البحث -->
+    <div class="card shadow-sm mb-4 no-print">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">بحث عن شيكات</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="PrintChequeDetails" method="get">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="ChequeNumber" class="form-label">رقم الشيك:</label>
+                        <input type="text" class="form-control" id="ChequeNumber" name="ChequeNumber" value="@ViewBag.ChequeNumber" placeholder="أدخل رقم الشيك">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="BeneficiaryName" class="form-label">اسم المستفيد:</label>
+                        <input type="text" class="form-control" id="BeneficiaryName" name="BeneficiaryName" value="@ViewBag.BeneficiaryName" placeholder="أدخل اسم المستفيد">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="ChequeDateFrom" class="form-label">تاريخ الشيك من:</label>
+                        <input type="date" class="form-control" id="ChequeDateFrom" name="ChequeDateFrom" value="@ViewBag.ChequeDateFrom">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="ChequeDateTo" class="form-label">تاريخ الشيك إلى:</label>
+                        <input type="date" class="form-control" id="ChequeDateTo" name="ChequeDateTo" value="@ViewBag.ChequeDateTo">
+                    </div>
+                    <div class="col-md-12 text-center">
+                        <button type="submit" class="btn btn-primary me-2"><i class="bi bi-search"></i> بحث</button>
+                        <button type="button" class="btn btn-secondary" onclick="window.location.href=\'@Url.Action("PrintChequeDetails", "ChequeViewer")\'" ><i class="bi bi-arrow-clockwise"></i> مسح البحث</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- جدول عرض البيانات -->
+    @if (Model != null && Model.Cheques != null && Model.Cheques.Any())
+    {
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">نتائج البحث</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>رقم الشيك</th>
+                                <th>تاريخ الشيك</th>
+                                <th>اسم المستفيد</th>
+                                <th>المبلغ</th>
+                                <th>الحالة</th>
+                                <th class="no-print">إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var cheque in Model.Cheques)
+                            {
+                                <tr>
+                                    <td>@cheque.ChequeNumber</td>
+                                    <td>@cheque.ChequeDate?.ToString("yyyy-MM-dd")</td>
+                                    <td>@cheque.BeneficiaryName</td>
+                                    <td>@cheque.Amount.ToString("N2")</td>
+                                    <td>@cheque.Status</td>
+                                    <td class="no-print">
+                                        <a asp-action="ViewCheque" asp-route-id="@cheque.Id" class="btn btn-info btn-sm">عرض</a>
+                                        <a asp-action="EditCheque" asp-route-id="@cheque.Id" class="btn btn-warning btn-sm">تعديل</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- أزرار الطباعة -->
+        <div class="text-center mb-4 no-print">
+            <button type="button" class="btn btn-primary btn-lg" onclick="window.print()"><i class="bi bi-printer"></i> طباعة هذه الصفحة</button>
+        </div>
+    }
+    else if (ViewBag.SearchPerformed == true)
+    {
+        <div class="alert alert-warning text-center" role="alert">
+            لا توجد شيكات مطابقة لمعايير البحث.
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center" role="alert">
+            الرجاء إدخال معايير البحث والضغط على زر "بحث" لعرض الشيكات.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // يمكنك إضافة أي سكريبتات خاصة بالصفحة هنا، مثل معالجة التواريخ أو التنسيقات
+        // التأكد من تحميل Bootstrap Icons إذا لم يكن في _Layout.cshtml
+        // <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@@1.11.3/font/bootstrap-icons.min.css">
+    </script>
+}

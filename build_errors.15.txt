@@ -1,0 +1,19 @@
+/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj : warning NU1903: Package 'System.Data.SqlClient' 4.8.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7
+/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj : warning NU1903: Package 'System.Data.SqlClient' 4.8.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7
+/home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/Microsoft.CodeAnalysis.Razor.Compiler/Microsoft.NET.Sdk.Razor.SourceGenerators.RazorSourceGenerator/Views_Inward_test_amani_cshtml.g.cs(32,140): error CS0426: The type name 'InwardViewModel' does not exist in the type 'InwardModule' [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/Microsoft.CodeAnalysis.Razor.Compiler/Microsoft.NET.Sdk.Razor.SourceGenerators.RazorSourceGenerator/Views_Inward_test_amani_cshtml.g.cs(576,109): error CS0426: The type name 'InwardViewModel' does not exist in the type 'InwardModule' [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/Microsoft.CodeAnalysis.Razor.Compiler/Microsoft.NET.Sdk.Razor.SourceGenerators.RazorSourceGenerator/Views_Login_Index_cshtml.g.cs(32,121): error CS0234: The type or namespace name 'LoginViewModel' does not exist in the namespace 'SAFA_ECC_Core.ViewModels' (are you missing an assembly reference?) [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/Microsoft.CodeAnalysis.Razor.Compiler/Microsoft.NET.Sdk.Razor.SourceGenerators.RazorSourceGenerator/Views_Login_Index_cshtml.g.cs(355,96): error CS0234: The type or namespace name 'LoginViewModel' does not exist in the namespace 'SAFA_ECC_Core.ViewModels' (are you missing an assembly reference?) [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+
+Build FAILED.
+
+/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj : warning NU1903: Package 'System.Data.SqlClient' 4.8.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7
+/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj : warning NU1903: Package 'System.Data.SqlClient' 4.8.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7
+/home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/Microsoft.CodeAnalysis.Razor.Compiler/Microsoft.NET.Sdk.Razor.SourceGenerators.RazorSourceGenerator/Views_Inward_test_amani_cshtml.g.cs(32,140): error CS0426: The type name 'InwardViewModel' does not exist in the type 'InwardModule' [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/Microsoft.CodeAnalysis.Razor.Compiler/Microsoft.NET.Sdk.Razor.SourceGenerators.RazorSourceGenerator/Views_Inward_test_amani_cshtml.g.cs(576,109): error CS0426: The type name 'InwardViewModel' does not exist in the type 'InwardModule' [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/Microsoft.CodeAnalysis.Razor.Compiler/Microsoft.NET.Sdk.Razor.SourceGenerators.RazorSourceGenerator/Views_Login_Index_cshtml.g.cs(32,121): error CS0234: The type or namespace name 'LoginViewModel' does not exist in the namespace 'SAFA_ECC_Core.ViewModels' (are you missing an assembly reference?) [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/Microsoft.CodeAnalysis.Razor.Compiler/Microsoft.NET.Sdk.Razor.SourceGenerators.RazorSourceGenerator/Views_Login_Index_cshtml.g.cs(355,96): error CS0234: The type or namespace name 'LoginViewModel' does not exist in the namespace 'SAFA_ECC_Core.ViewModels' (are you missing an assembly reference?) [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+    2 Warning(s)
+    4 Error(s)
+
+Time Elapsed 00:00:03.34

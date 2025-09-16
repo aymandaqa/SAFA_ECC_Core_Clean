@@ -1,0 +1,100 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model PMA_DATAVerficationDetailsViewModel
+
+@{
+    ViewData["Title"] = "تفاصيل التحقق من بيانات PMA الواردة";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // افتراض أن هناك تخطيط مشترك
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h1 class="text-end mb-4">@ViewData["Title"]</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary text-end">معلومات التحقق</h6>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="pmaNumber" class="form-label float-end">رقم PMA:</label>
+                        <input type="text" class="form-control text-end" id="pmaNumber" value="@Model.PmaNumber" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="verificationStatus" class="form-label float-end">حالة التحقق:</label>
+                        <input type="text" class="form-control text-end" id="verificationStatus" value="@Model.VerificationStatus" readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="notes" class="form-label float-end">ملاحظات:</label>
+                        <textarea class="form-control text-end" id="notes" rows="3">@Model.Notes</textarea>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary me-2">حفظ التغييرات</button>
+                    <button type="button" class="btn btn-secondary">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4 mt-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary text-end">تفاصيل البنود</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered text-end" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>الرقم</th>
+                            <th>وصف البند</th>
+                            <th>الكمية</th>
+                            <th>الحالة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Items != null && Model.Items.Any())
+                        {
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td>@item.Id</td>
+                                    <td>@item.Description</td>
+                                    <td>@item.Quantity</td>
+                                    <td>@item.Status</td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm">عرض</button>
+                                        <button class="btn btn-warning btn-sm">تعديل</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5">لا توجد بنود لعرضها.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end mt-4">
+        <button type="button" class="btn btn-success me-2">اعتماد التحقق</button>
+        <button type="button" class="btn btn-danger">رفض التحقق</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة أي سكربتات خاصة بالصفحة هنا
+        $(document).ready(function () {
+            // تهيئة أي مكونات Bootstrap أو JavaScript هنا
+        });
+    </script>
+}

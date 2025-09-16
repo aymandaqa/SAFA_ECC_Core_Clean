@@ -1,0 +1,86 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model RejectedOutRequestViewModel
+
+@{ 
+    ViewData["Title"] = "الطلبات الخارجية المرفوضة";
+    Layout = "_Layout";
+}
+
+<h1 class="text-center mb-4">@ViewData["Title"]</h1>
+
+<div class="container-fluid">
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white text-end">
+            <h5 class="mb-0">فلترة الطلبات</h5>
+        </div>
+        <div class="card-body">
+            <form dir="rtl">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label for="requestNumber" class="form-label">رقم الطلب:</label>
+                        <input type="text" class="form-control" id="requestNumber" placeholder="أدخل رقم الطلب">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="startDate" class="form-label">تاريخ البدء:</label>
+                        <input type="date" class="form-control" id="startDate">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="endDate" class="form-label">تاريخ الانتهاء:</label>
+                        <input type="date" class="form-control" id="endDate">
+                    </div>
+                    <div class="col-12 text-start">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> بحث</button>
+                        <button type="reset" class="btn btn-secondary"><i class="bi bi-arrow-counterclockwise"></i> مسح</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white text-end">
+            <h5 class="mb-0">قائمة الطلبات الخارجية المرفوضة</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive" dir="rtl">
+                <table class="table table-striped table-hover text-end">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>رقم الطلب</th>
+                            <th>تاريخ الطلب</th>
+                            <th>المستلم</th>
+                            <th>سبب الرفض</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.RejectedRequests != null && Model.RejectedRequests.Any())
+                        {
+                            @foreach (var request in Model.RejectedRequests)
+                            {
+                                <tr>
+                                    <td>@request.Id</td>
+                                    <td>@request.RequestNumber</td>
+                                    <td>@request.RequestDate.ToShortDateString()</td>
+                                    <td>@request.Recipient</td>
+                                    <td>@request.RejectionReason</td>
+                                    <td>
+                                        <a href="@Url.Action("Details", "Outward", new { id = request.Id })" class="btn btn-info btn-sm">عرض</a>
+                                        <a href="@Url.Action("Resubmit", "Outward", new { id = request.Id })" class="btn btn-success btn-sm">إعادة إرسال</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center">لا توجد طلبات مرفوضة لعرضها.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

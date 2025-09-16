@@ -1,0 +1,35 @@
+  Determining projects to restore...
+/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj : warning NU1903: Package 'System.Data.SqlClient' 4.8.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7
+  All projects are up-to-date for restore.
+/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj : warning NU1903: Package 'System.Data.SqlClient' 4.8.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,20): error CS8124: Tuple must contain at least two elements. [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,20): error CS1026: ) expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,24): error CS1002: ; expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,32): error CS1002: ; expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,48): error CS1002: ; expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,58): error CS1002: ; expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,70): error CS1002: ; expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,78): error CS1002: ; expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,95): error CS1003: Syntax error, ',' expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,96): error CS1002: ; expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(353,2): error CS1513: } expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+
+Build FAILED.
+
+/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj : warning NU1903: Package 'System.Data.SqlClient' 4.8.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7
+/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj : warning NU1903: Package 'System.Data.SqlClient' 4.8.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,20): error CS8124: Tuple must contain at least two elements. [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,20): error CS1026: ) expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,24): error CS1002: ; expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,32): error CS1002: ; expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,48): error CS1002: ; expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,58): error CS1002: ; expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,70): error CS1002: ; expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,78): error CS1002: ; expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,95): error CS1003: Syntax error, ',' expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(332,96): error CS1002: ; expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+/home/ubuntu/SAFA_ECC_Core_Clean/ViewModels/ReportViewModels.cs(353,2): error CS1513: } expected [/home/ubuntu/SAFA_ECC_Core_Clean/SAFA_ECC_Core.csproj]
+    2 Warning(s)
+    11 Error(s)
+
+Time Elapsed 00:00:01.85

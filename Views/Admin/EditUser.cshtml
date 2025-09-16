@@ -1,0 +1,70 @@
+@model SAFA_ECC_Core_Clean.ViewModels.EditUserViewModel
+
+@{ 
+    ViewData["Title"] = "تعديل المستخدم";
+    Layout = "_Layout";
+}
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header text-end">
+            <h2>تعديل المستخدم</h2>
+        </div>
+        <div class="card-body">
+            <form asp-action="EditUser" method="post">
+                <div asp-validation-summary="All" class="text-danger text-end"></div>
+                <input type="hidden" asp-for="UserId" />
+
+                <div class="mb-3 text-end">
+                    <label asp-for="UserName" class="form-label"></label>
+                    <input asp-for="UserName" class="form-control" readonly />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 text-end">
+                    <label asp-for="FullName" class="form-label"></label>
+                    <input asp-for="FullName" class="form-control" />
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 text-end">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 text-end">
+                    <label asp-for="NewPassword" class="form-label">كلمة المرور (اتركها فارغة لعدم التغيير)</label>
+                    <input asp-for="NewPassword" class="form-control" />
+                    <span asp-validation-for="NewPassword" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 text-end">
+                    <label asp-for="ConfirmNewPassword" class="form-label"></label>
+                    <input asp-for="ConfirmNewPassword" class="form-control" />
+                    <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 text-end">
+                    <label asp-for="RoleId" class="form-label"></label>
+                    <select asp-for="RoleId" asp-items="Model.AvailableRoles" class="form-select"></select>
+                    <span asp-validation-for="RoleId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 form-check text-end">
+                    <input type="checkbox" asp-for="IsActive" class="form-check-input" />
+                    <label asp-for="IsActive" class="form-check-label"></label>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary me-2">حفظ</button>
+                    <a asp-action="Index" class="btn btn-secondary">إلغاء</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

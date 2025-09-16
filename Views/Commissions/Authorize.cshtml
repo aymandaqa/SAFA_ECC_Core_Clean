@@ -1,0 +1,62 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model AuthorizeCommissionViewModel
+
+@{
+    ViewData["Title"] = "تفويض العمولات";
+}
+
+<div class="container-fluid" dir="rtl">
+    <h1 class="text-right">@ViewData["Title"]</h1>
+
+    <div class="row">
+        <div class="col-md-12">
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">تفاصيل العمولة</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">معرف العمولة:</dt>
+                        <dd class="col-sm-8">@Model.CommissionId</dd>
+
+                        <dt class="col-sm-4">اسم العميل:</dt>
+                        <dd class="col-sm-8">@Model.CustomerName</dd>
+
+                        <dt class="col-sm-4">المبلغ:</dt>
+                        <dd class="col-sm-8">@Model.Amount.ToString("C")</dd>
+
+                        <dt class="col-sm-4">تاريخ الإنشاء:</dt>
+                        <dd class="col-sm-8">@Model.CreatedDate.ToShortDateString()</dd>
+
+                        <dt class="col-sm-4">الحالة:</dt>
+                        <dd class="col-sm-8">@Model.Status</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">إجراء التفويض</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Authorize" method="post">
+                        <input type="hidden" asp-for="CommissionId" />
+                        <div class="form-group mb-3">
+                            <label asp-for="AuthorizationNotes" class="form-label">ملاحظات التفويض:</label>
+                            <textarea asp-for="AuthorizationNotes" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="AuthorizationNotes" class="text-danger"></span>
+                        </div>
+                        <div class="form-group form-check mb-3">
+                            <input type="checkbox" class="form-check-input" id="isApproved" asp-for="IsApproved">
+                            <label class="form-check-label" for="isApproved">الموافقة على التفويض</label>
+                        </div>
+                        <button type="submit" class="btn btn-success">تفويض</button>
+                        <a asp-action="Index" class="btn btn-secondary">إلغاء</a>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

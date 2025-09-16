@@ -1,0 +1,98 @@
+@model SAFA_ECC_Core_Clean.ViewModels.AllOutChqViewModel
+
+@{ 
+    ViewData["Title"] = "شيكات صادرة";
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+    <h1 class="text-right">@ViewData["Title"]</h1>
+
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-white text-right">
+            فلترة الشيكات الصادرة
+        </div>
+        <div class="card-body">
+            <form asp-action="AllOutChq" method="get">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="startDate" class="form-label float-end">تاريخ البدء:</label>
+                        <input type="date" class="form-control text-right" id="startDate" name="startDate" value="@ViewBag.StartDate" />
+                    </div>
+                    <div class="col-md-4">
+                        <label for="endDate" class="form-label float-end">تاريخ الانتهاء:</label>
+                        <input type="date" class="form-control text-right" id="endDate" name="endDate" value="@ViewBag.EndDate" />
+                    </div>
+                    <div class="col-md-4">
+                        <label for="status" class="form-label float-end">الحالة:</label>
+                        <select class="form-select text-right" id="status" name="status">
+                            <option value="">الكل</option>
+                            <option value="Pending" selected="@(ViewBag.Status == "Pending")">معلق</option>
+                            <option value="Approved" selected="@(ViewBag.Status == "Approved")">موافق عليه</option>
+                            <option value="Rejected" selected="@(ViewBag.Status == "Rejected")">مرفوض</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 text-end">
+                        <button type="submit" class="btn btn-primary">بحث</button>
+                        <a asp-action="CreateOutChq" class="btn btn-success">إضافة شيك صادر جديد</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-white text-right">
+            قائمة الشيكات الصادرة
+        </div>
+        <div class="card-body">
+            @if (Model != null && Model.OutwardChecks != null && Model.OutwardChecks.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover text-right">
+                        <thead class="table-light">
+                            <tr>
+                                <th>رقم الشيك</th>
+                                <th>المبلغ</th>
+                                <th>تاريخ الاستحقاق</th>
+                                <th>المستفيد</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.OutwardChecks)
+                            {
+                                <tr>
+                                    <td>@item.CheckNumber</td>
+                                    <td>@item.Amount.ToString("N2")</td>
+                                    <td>@item.DueDate.ToShortDateString()</td>
+                                    <td>@item.BeneficiaryName</td>
+                                    <td>@item.Status</td>
+                                    <td>
+                                        <a asp-action="DetailsOutChq" asp-route-id="@item.Id" class="btn btn-info btn-sm">تفاصيل</a>
+                                        <a asp-action="EditOutChq" asp-route-id="@item.Id" class="btn btn-warning btn-sm">تعديل</a>
+                                        <a asp-action="DeleteOutChq" asp-route-id="@item.Id" class="btn btn-danger btn-sm">حذف</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-right" role="alert">
+                    لا توجد شيكات صادرة لعرضها.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // يمكنك إضافة أي سكريبتات خاصة بالصفحة هنا إذا لزم الأمر
+    </script>
+}

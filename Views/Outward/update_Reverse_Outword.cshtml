@@ -1,0 +1,94 @@
+@{
+    ViewData["Title"] = "تعديل عكسي للصادر";
+}
+
+@model SAFA_ECC_Core_Clean.ViewModels.UpdateReverseOutwordViewModel
+
+<div class="container-fluid" dir="rtl" style="text-align: right;">
+    <h1 class="mt-4">تعديل عكسي للصادر</h1>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-edit me-1"></i>
+            نموذج تعديل الصادر العكسي
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="outwardNumber">رقم الصادر:</label>
+                            <input type="text" class="form-control" id="outwardNumber" placeholder="أدخل رقم الصادر">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="outwardDate">تاريخ الصادر:</label>
+                            <input type="date" class="form-control" id="outwardDate">
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="subject">الموضوع:</label>
+                            <input type="text" class="form-control" id="subject" placeholder="أدخل الموضوع">
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="notes">ملاحظات:</label>
+                            <textarea class="form-control" id="notes" rows="3" placeholder="أدخل الملاحظات"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">حفظ التعديلات</button>
+                <button type="button" class="btn btn-secondary">إلغاء</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            تفاصيل الصادر العكسي
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>الخاصية</th>
+                        <th>القيمة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>رقم الصادر</td>
+                        <td>12345</td>
+                    </tr>
+                    <tr>
+                        <td>تاريخ الصادر</td>
+                        <td>2023-01-01</td>
+                    </tr>
+                    <tr>
+                        <td>الموضوع</td>
+                        <td>موضوع تجريبي</td>
+                    </tr>
+                    <tr>
+                        <td>الملاحظات</td>
+                        <td>ملاحظات تجريبية للصفحة</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        // يمكن إضافة أي سكربتات خاصة بهذه الصفحة هنا
+    </script>
+}

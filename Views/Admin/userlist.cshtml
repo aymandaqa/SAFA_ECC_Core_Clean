@@ -1,0 +1,92 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model UserListViewModel
+
+@{ 
+    ViewData["Title"] = "قائمة المستخدمين";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // افتراض وجود تخطيط خاص بالمسؤول
+}
+
+<div dir="rtl" lang="ar">
+    <h1 class="mb-4">@ViewData["Title"]</h1>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">إدارة المستخدمين</h5>
+        </div>
+        <div class="card-body">
+            <!-- Search Form -->
+            <form asp-action="UserList" method="get" class="mb-4">
+                <div class="input-group">
+                    <input type="text" name="searchQuery" class="form-control" placeholder="البحث عن مستخدم..." value="@Model.SearchQuery" />
+                    <button class="btn btn-outline-secondary" type="submit">بحث</button>
+                </div>
+            </form>
+
+            <!-- User Table -->
+            @if (Model.Users != null && Model.Users.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>@Html.DisplayNameFor(model => model.Users.FirstOrDefault().UserName)</th>
+                                <th>@Html.DisplayNameFor(model => model.Users.FirstOrDefault().Email)</th>
+                                <th>@Html.DisplayNameFor(model => model.Users.FirstOrDefault().Role)</th>
+                                <th>@Html.DisplayNameFor(model => model.Users.FirstOrDefault().IsActive)</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model.Users)
+                            {
+                                <tr>
+                                    <td>@user.UserName</td>
+                                    <td>@user.Email</td>
+                                    <td>@user.Role</td>
+                                    <td>
+                                        @if (user.IsActive)
+                                        {
+                                            <span class="badge bg-success">نشط</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">غير نشط</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a asp-action="EditUser" asp-route-id="@user.User_ID" class="btn btn-sm btn-primary">تعديل</a>
+                                        <a asp-action="DeleteUser" asp-route-id="@user.User_ID" class="btn btn-sm btn-danger">حذف</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
+                            <a class="page-link" asp-action="UserList" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-searchQuery="@Model.SearchQuery">السابق</a>
+                        </li>
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                <a class="page-link" asp-action="UserList" asp-route-pageNumber="@i" asp-route-searchQuery="@Model.SearchQuery">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" asp-action="UserList" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-searchQuery="@Model.SearchQuery">التالي</a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+            else
+            {
+                <div class="alert alert-info" role="alert">
+                    لا يوجد مستخدمون لعرضهم.
+                </div>
+            }
+        </div>
+    </div>
+</div>

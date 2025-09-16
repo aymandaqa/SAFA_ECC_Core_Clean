@@ -1,0 +1,108 @@
+
+@using SAFA_ECC_Core_Clean.ViewModels
+@model AuthrizationCodeViewModel
+
+@{ 
+    ViewData["Title"] = "رمز التفويض";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid" dir="rtl">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center my-4">إدارة رموز التفويض</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white text-end">
+                    إنشاء/تعديل رمز تفويض
+                </div>
+                <div class="card-body">
+                    <form asp-action="SaveAuthrizationCode" method="post">
+                        <div class="mb-3 text-end">
+                            <label asp-for="Code" class="form-label">الرمز:</label>
+                            <input asp-for="Code" class="form-control" />
+                            <span asp-validation-for="Code" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3 text-end">
+                            <label asp-for="Description" class="form-label">الوصف:</label>
+                            <textarea asp-for="Description" class="form-control"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3 form-check text-end">
+                            <input asp-for="IsActive" type="checkbox" class="form-check-input" />
+                            <label asp-for="IsActive" class="form-check-label">نشط</label>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-success">حفظ</button>
+                            <button type="reset" class="btn btn-secondary">إلغاء</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-10 offset-md-1">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white text-end">
+                    قائمة رموز التفويض
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-bordered text-end">
+                            <thead>
+                                <tr>
+                                    <th>الرمز</th>
+                                    <th>الوصف</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @* @foreach (var item in Model.AuthrizationCodes)
+                                {
+                                    <tr>
+                                        <td>@item.Code</td>
+                                        <td>@item.Description</td>
+                                        <td>@(item.IsActive ? "نشط" : "غير نشط")</td>
+                                        <td>
+                                            <a asp-action="EditAuthrizationCode" asp-route-id="@item.Id" class="btn btn-sm btn-warning">تعديل</a>
+                                            <a asp-action="DeleteAuthrizationCode" asp-route-id="@item.Id" class="btn btn-sm btn-danger">حذف</a>
+                                        </td>
+                                    </tr>
+                                } *@
+                                <tr>
+                                    <td>PDC001</td>
+                                    <td>رمز تفويض للمشروع أ</td>
+                                    <td>نشط</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning">تعديل</button>
+                                        <button class="btn btn-sm btn-danger">حذف</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>PDC002</td>
+                                    <td>رمز تفويض للمشروع ب</td>
+                                    <td>غير نشط</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning">تعديل</button>
+                                        <button class="btn btn-sm btn-danger">حذف</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

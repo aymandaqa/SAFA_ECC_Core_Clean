@@ -1,0 +1,76 @@
+@model SAFA_ECC_Core_Clean.ViewModels.UpdatePostOutwardViewModel
+
+@{ 
+    ViewData["Title"] = "تعديل منشور صادر";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="text-center mb-4">تعديل منشور صادر</h1>
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-end">
+                    <h4 class="mb-0">تفاصيل المنشور الصادر</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="UpdatePostOutward" method="post" dir="rtl">
+                        <div asp-validation-summary="ModelOnly" class="text-danger text-end"></div>
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="ChequeId" />
+
+                        <div class="mb-3 text-end">
+                            <label asp-for="Title" class="form-label">العنوان</label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+
+
+                        </div>
+
+                        <div class="mb-3 text-end">
+                            <label asp-for="Description" class="form-label">الوصف</label>
+                            <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+
+
+                        </div>
+
+                        <div class="mb-3 text-end">
+                            <label asp-for="OutwardDate" class="form-label">تاريخ الصدور</label>
+                            <input asp-for="OutwardDate" type="date" class="form-control" />
+                            <span asp-validation-for="OutwardDate" class="text-danger"></span>
+
+
+                        </div>
+
+                        <div class="mb-3 text-end">
+                            <label asp-for="Recipient" class="form-label">المستلم</label>
+                            <input asp-for="Recipient" class="form-control" />
+                            <span asp-validation-for="Recipient" class="text-danger"></span>
+
+
+                        </div>
+
+                        <div class="mb-3 text-end">
+                            <label asp-for="ReferenceNumber" class="form-label">الرقم المرجعي</label>
+                            <input asp-for="ReferenceNumber" class="form-control" />
+                            <span asp-validation-for="ReferenceNumber" class="text-danger"></span>
+
+
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <button type="submit" class="btn btn-success me-md-2">حفظ التعديلات</button>
+                            <a asp-action="Index" class="btn btn-secondary">العودة إلى القائمة</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

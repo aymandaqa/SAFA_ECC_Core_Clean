@@ -1,0 +1,104 @@
+@using SAFA_ECC_Core_Clean.ViewModels
+@model FinancialReportViewModel
+
+@{
+    ViewData["Title"] = "التقارير المالية";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <h1 class="text-center mb-4">التقارير المالية</h1>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">خيارات التقرير</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="startDate" class="form-label">تاريخ البدء:</label>
+                                <input type="date" class="form-control" id="startDate" value="@Model.StartDate.ToString("yyyy-MM-dd")">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="endDate" class="form-label">تاريخ الانتهاء:</label>
+                                <input type="date" class="form-control" id="endDate" value="@Model.EndDate.ToString("yyyy-MM-dd")">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="reportType" class="form-label">نوع التقرير:</label>
+                                <select class="form-select" id="reportType">
+                                    <option value="">اختر نوع التقرير...</option>
+                                    @foreach (var type in Model.AvailableReportTypes)
+                                    {
+                                        <option value="@type.Value" selected="@(type.Value == Model.SelectedReportType.ToString())">@type.Text</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="currency" class="form-label">العملة:</label>
+                                <select class="form-select" id="currency">
+                                    <option value="">اختر العملة...</option>
+                                    @foreach (var currency in Model.AvailableCurrencies)
+                                    {
+                                        <option value="@currency.Value" selected="@(currency.Value == Model.SelectedCurrency.ToString())">@currency.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary me-md-2">عرض التقرير</button>
+                            <button type="button" class="btn btn-success">تصدير إلى Excel</button>
+                            <button type="button" class="btn btn-danger">تصدير إلى PDF</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">نتائج التقرير</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered text-end">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="text-end">البند</th>
+                                    <th scope="col" class="text-end">المبلغ</th>
+                                    <th scope="col" class="text-end">النسبة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.ReportData != null && Model.ReportData.Any())
+                                {
+                                    @foreach (var item in Model.ReportData)
+                                    {
+                                        <tr>
+                                            <td>@item.ItemName</td>
+                                            <td>@item.Amount.ToString("N2")</td>
+                                            <td>@item.Percentage.ToString("P2")</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="3" class="text-center">لا توجد بيانات لعرضها.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- هنا يمكن إضافة أي سكربتات خاصة بالصفحة -->
+}
