@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using SAFA_ECC_Core_Clean.ViewModels.SharedViewModels;
 
-namespace SAFA_ECC_Core_Clean.ViewModels
+namespace SAFA_ECC_Core_Clean.ViewModels.InwardViewModels
 {
     public class EmailListViewModel { public List<string> Emails { get; set; } = new List<string>(); }
     public class FixRetCHQViewModel { public int ChequeId { get; set; } public string? NewStatus { get; set; } }

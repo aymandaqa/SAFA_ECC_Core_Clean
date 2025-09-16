@@ -133,14 +133,6 @@ namespace SAFA_ECC_Core_Clean.ViewModels
 
     public class CommissionReportViewModel { }
 
-
-
-
-}
-
-
-
-
     public class BankBranchItemViewModel
     {
         public int Id { get; set; }
@@ -148,10 +140,6 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public int BankId { get; set; }
         public string? BankName { get; set; }
     }
-
-
-
-
     public class ChangeLogItemViewModel
     {
         public int Id { get; set; }
@@ -160,31 +148,4 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public string? Operation { get; set; }
         public string? Details { get; set; }
     }
-
-
-
-    public class CustomerConcentrateViewModel
-    {
-        public List<CustomerConcentrateItemViewModel>? CustomerConcentrates { get; set; }
-    }
-
-    public class CustomerConcentrateItemViewModel
-    {
-        public int Id { get; set; }
-        public string? CustomerName { get; set; }
-        public string? Region { get; set; }
-        public decimal ConcentrationPercentage { get; set; }
-    }
-
-
-
-
-
-    public class AttachmentViewModel
-    {
-        public string? FileName { get; set; }
-        public string? FileType { get; set; }
-        public string? FilePath { get; set; }
-    }
-
-
+}

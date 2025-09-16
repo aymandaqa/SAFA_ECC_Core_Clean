@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SAFA_ECC_Core_Clean.ViewModels.SharedViewModels;
 
-namespace SAFA_ECC_Core_Clean.ViewModels
+namespace SAFA_ECC_Core_Clean.ViewModels.OutwardViewModels
 {
     public class DeleteOutwardChequeViewModel { public int ChequeId { get; set; } public string? ChequeNumber { get; set; } public string? BeneficiaryName { get; set; } public decimal Amount { get; set; } public DateTime DueDate { get; set; } public string? IssueDate { get; set; } public string? BankName { get; set; } public int Id { get; set; } }
     public class GetReturnedINHOUSESlipDetailsViewModel { public string? Details { get; set; } }

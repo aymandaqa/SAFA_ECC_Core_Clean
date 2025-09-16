@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SAFA_ECC_Core_Clean.ViewModels
+namespace SAFA_ECC_Core_Clean.ViewModels.ChequeViewerViewModels
 {
     public class ChequeViewerSearchModel
     {

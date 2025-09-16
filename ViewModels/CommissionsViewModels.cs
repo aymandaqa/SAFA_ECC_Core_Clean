@@ -1,4 +1,4 @@
-namespace SAFA_ECC_Core_Clean.ViewModels
+namespace SAFA_ECC_Core_Clean.ViewModels.CommissionsViewModels
 {
     public class EditCommissionRecordViewModel { public int Id { get; set; } public DateTime CommissionDate { get; set; } public decimal Amount { get; set; } public int RecordId { get; set; } public decimal NewAmount { get; set; } public string? Reason { get; set; } public string? AgentName { get; set; } public string? Description { get; set; } }
     public class ExcemptionRecordViewModel { public int ExcemptionId { get; set; } public string? Description { get; set; } public decimal Amount { get; set; } public string? EmployeeName { get; set; } public string? Reason { get; set; } public DateTime StartDate { get; set; } public DateTime EndDate { get; set; } }

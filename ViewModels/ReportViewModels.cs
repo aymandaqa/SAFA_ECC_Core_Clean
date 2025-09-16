@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace SAFA_ECC_Core_Clean.ViewModels
+namespace SAFA_ECC_Core_Clean.ViewModels.ReportViewModels
 {
     public enum ReportTypeViewModel
     {

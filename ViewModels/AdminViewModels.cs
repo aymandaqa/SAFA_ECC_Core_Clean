@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Http;
 
-namespace SAFA_ECC_Core_Clean.ViewModels
+namespace SAFA_ECC_Core_Clean.ViewModels.AdminViewModels
 {
     public class AdminDashboard2ViewModel
     {

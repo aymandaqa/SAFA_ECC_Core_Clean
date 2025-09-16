@@ -2,7 +2,7 @@ using SAFA_ECC_Core_Clean.Models;
 using System.Collections.Generic;
 using SAFA_ECC_Core_Clean.ViewModels;
 
-namespace SAFA_ECC_Core_Clean.ViewModels
+namespace SAFA_ECC_Core_Clean.ViewModels.SystemViewModels
 {
     public class PermissionSettingsViewModel 
     {
