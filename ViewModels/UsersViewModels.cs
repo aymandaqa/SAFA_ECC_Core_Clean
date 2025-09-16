@@ -1,6 +1,6 @@
 using SAFA_ECC_Core_Clean.Models;
 
-namespace SAFA_ECC_Core_Clean.ViewModels
+namespace SAFA_ECC_Core_Clean.ViewModels.UsersViewModels
 {
 
     public class AddUserPermissionViewModel { public int UserId { get; set; } public int PermissionId { get; set; } public List<SAFA_ECC_Core_Clean.Models.Users_Tbl> Users { get; set; } = new List<SAFA_ECC_Core_Clean.Models.Users_Tbl>(); public List<SAFA_ECC_Core_Clean.Models.Permissions_Tbl> Permissions { get; set; } = new List<SAFA_ECC_Core_Clean.Models.Permissions_Tbl>(); }

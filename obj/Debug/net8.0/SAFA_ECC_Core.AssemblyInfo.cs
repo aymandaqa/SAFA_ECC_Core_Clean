@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SAFA_ECC_Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b9ad82404c180f129ed93244af03eadbb13d41a7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0cb9ce47f108fdd33a8e09276b238a57d79a605b")]
 [assembly: System.Reflection.AssemblyProductAttribute("SAFA_ECC_Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SAFA_ECC_Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

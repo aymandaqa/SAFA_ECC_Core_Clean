@@ -1,4 +1,4 @@
-namespace SAFA_ECC_Core_Clean.ViewModels
+namespace SAFA_ECC_Core_Clean.ViewModels.PDCViewModels
 {
     public class PDCChequesViewModel { public int Id { get; set; } public int ChequeId { get; set; } public string? ChequeNumber { get; set; } public decimal Amount { get; set; } public DateTime ChequeDate { get; set; } public string? Beneficiary { get; set; } public string? BankName { get; set; } public DateTime DueDate { get; set; } public string? Status { get; set; } public string? PayeeName { get; set; } }
     public class PDCIndexViewModel { public PDCIndexSearchModel SearchModel { get; set; } = new PDCIndexSearchModel(); public List<PDCIndexTransactionViewModel> Transactions { get; set; } = new List<PDCIndexTransactionViewModel>(); }
