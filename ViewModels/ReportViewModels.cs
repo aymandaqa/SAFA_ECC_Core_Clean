@@ -128,6 +128,17 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public string? Status { get; set; }
     }
 
+    public class TransactionReportItemViewModel
+    {
+        public int Id { get; set; }
+        public DateTime TransactionDate { get; set; }
+        public string? TransactionType { get; set; }
+        public decimal Amount { get; set; }
+        public string? AccountNumber { get; set; }
+        public string? Status { get; set; }
+        public string? Description { get; set; }
+    }
+
     public class TransactionReportsViewModel
     {
         public DateTime? StartDate { get; set; }
@@ -138,17 +149,6 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public decimal? MaxAmount { get; set; }
         public string? Status { get; set; }
         public List<TransactionReportItemViewModel>? Transactions { get; set; }
-    }
-
-    public class TransactionReportItemViewModel
-    {
-        public int Id { get; set; }
-        public DateTime TransactionDate { get; set; }
-        public string? TransactionType { get; set; }
-        public decimal Amount { get; set; }
-        public string? AccountNumber { get; set; }
-        public string? Status { get; set; }
-        public string? Description { get; set; }
     }
 
     public class UserReportsViewModel
@@ -168,10 +168,20 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public string? Description { get; set; }
     }
 
-
-
-
-
+    public class UserFinancialAuthViewModel
+    {
+        public int Id { get; set; }
+        public string? UserId { get; set; }
+        public string? UserName { get; set; }
+        public string? AuthType { get; set; }
+        public string? Description { get; set; }
+        public DateTime AuthDate { get; set; }
+        public decimal AuthAmount { get; set; }
+        public string? Notes { get; set; }
+        public decimal CurrentBalance { get; set; }
+        public DateTime LastTransactionDate { get; set; }
+        public List<TransactionReportItemViewModel>? Transactions { get; set; }
+    }
 }
 
 

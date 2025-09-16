@@ -46,4 +46,13 @@ namespace SAFA_ECC_Core_Clean.ViewModels.SharedViewModels
         public string? Key { get; set; }
         public string? Value { get; set; }
     }
+    public class ChangeLogItemViewModel
+    {
+        public DateTime ModificationDate { get; set; }
+        public string? SenderEmail { get; set; }
+        public string? SmtpServer { get; set; }
+        public int SmtpPort { get; set; }
+        public string? Username { get; set; }
+        public string? ModifiedBy { get; set; }
+    }
 }

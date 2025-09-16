@@ -4,7 +4,6 @@ using SAFA_ECC_Core_Clean.ViewModels.SharedViewModels;
 
 namespace SAFA_ECC_Core_Clean.ViewModels
 {
-    public class AddEmailViewModel { public string? EmailAddress { get; set; } public string? Subject { get; set; } public string? Body { get; set; } }
     public class EmailListViewModel { public List<string> Emails { get; set; } = new List<string>(); }
     public class FixRetCHQViewModel { public int ChequeId { get; set; } public string? NewStatus { get; set; } }
     public class InitialAcceptChequesViewModel { public List<int> ChequeIds { get; set; } = new List<int>(); }
@@ -37,15 +36,17 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public List<InwardViewModel> InwardCheques { get; set; } = new List<InwardViewModel>();
         public List<SAFA_ECC_Core_Clean.Models.Inward_Trans> Transactions { get; set; } = new List<SAFA_ECC_Core_Clean.Models.Inward_Trans>();
     }
-        public class InwardSearchViewModel 
+    public class InwardSearchViewModel 
     {
-        public string? InwardNumber { get; set; }
-        public string? Subject { get; set; }
-        public string? Sender { get; set; }
-        public DateTime? DateFrom { get; set; }
-        public DateTime? DateTo { get; set; }
-        public List<InwardViewModel>? SearchResults { get; set; }
-        public bool SearchPerformed { get; set; }
+        public string? ChqSequance { get; set; }
+        public string? DrwChqNo { get; set; }
+        public string? DrwAcctNo { get; set; }
+        public string? BenName { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
+        public decimal? MinAmount { get; set; }
+        public decimal? MaxAmount { get; set; }
+        public string? Status { get; set; }
     }
     public class InwardViewModel 
     {
@@ -134,7 +135,7 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public DateTime EndDate { get; set; }
         public bool IsActive { get; set; }
     }
-    public class RejectChequeViewModel { public int ChequeId { get; set; } public string? Reason { get; set; } public string? AccountName { get; set; } public decimal Amount { get; set; } public string? RejectReason { get; set; } }
+    public class RejectChequeViewModel { public int ChequeId { get; set; } public string? ChequeNumber { get; set; } public string? Reason { get; set; } public string? AccountName { get; set; } public decimal Amount { get; set; } public string? RejectReason { get; set; } }
     public class ChequeViewerViewModel { public string? ChequeImageBase64 { get; set; } public string? ChequeNumber { get; set; } }
     public class FixedErrorViewModel { public int ErrorId { get; set; } public string? ErrorDescription { get; set; } }
     public class StoppedChequeDetailsViewModel { public string? ChequeNumber { get; set; } public string? Reason { get; set; } }
@@ -162,6 +163,10 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>? Statuses { get; set; }
         public decimal? MinAmount { get; set; }
         public decimal? MaxAmount { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
+        public string? AccountNumber { get; set; }
+        public string? CustomerName { get; set; }
     }
     public class InwardDataChequeViewModel { public string? ChequeData { get; set; } }
     public class InwardFinancialWFDetailsPMADISViewModel { public string? Details { get; set; } }
@@ -183,7 +188,6 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public string? Value { get; set; }
     }
     public class InwardModule { public string? ModuleName { get; set; } }
-    public class ADDEmailViewModel { public string? EmailAddress { get; set; } public string? Subject { get; set; } public string? Body { get; set; } }
     public class PMA_DATAVerficationDetailsViewModel
     {
         public string? Details { get; set; }
@@ -191,6 +195,11 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public string? DetailField1 { get; set; }
         public string? DetailField2 { get; set; }
         public string? DetailField3 { get; set; }
+        public int ItemId { get; set; }
+        public string? ItemName { get; set; }
+        public string? VerificationStatus { get; set; }
+        public string? VerifierNotes { get; set; }
+        public List<SharedViewModels.ChangeLogItemViewModel>? ChangeLog { get; set; }
     }
 
     public class IndextestViewModel

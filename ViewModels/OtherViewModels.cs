@@ -127,7 +127,7 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public string? Status { get; set; }
         public string? Notes { get; set; }
     }
-    public class ReturnOnUsStoppedChequeDetailsViewModel { }
+    public class ReturnOnUsStoppedChequeDetailsViewModel { public string? ChequeNumber { get; set; } public string? PayeeName { get; set; } public string? DrawerName { get; set; } public string? DrawerAccountNumber { get; set; } public string? StopReason { get; set; } public DateTime StopDate { get; set; } }
     public class ReturnStoppedChequesViewModel { }
     public class SecuritySettingsViewModel { }
 

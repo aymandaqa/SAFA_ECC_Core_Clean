@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using SAFA_ECC_Core_Clean.ViewModels.SharedViewModels;
+
 namespace SAFA_ECC_Core_Clean.ViewModels
 {
     public class OutwardViewModel 
@@ -29,6 +33,13 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public DateTime ReturnDate { get; set; }
         public string? RequestNumber { get; set; }
         public string? RejectionReason { get; set; }
+        public DateTime IssueDate { get; set; }
+        public List<AttachmentViewModel>? OutwardDocuments { get; set; }
+        public string? DocumentNumber { get; set; }
+        public string? AccountHolderName { get; set; }
+        public DateTime HoldDate { get; set; }
+        public string? HoldReason { get; set; }
+        public string? CheckNumber { get; set; }
+        public DateTime DueDate { get; set; }
     }
 }
-

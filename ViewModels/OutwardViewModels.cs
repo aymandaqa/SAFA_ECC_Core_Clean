@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -6,7 +5,7 @@ using SAFA_ECC_Core_Clean.ViewModels.SharedViewModels;
 
 namespace SAFA_ECC_Core_Clean.ViewModels
 {
-    public class DeleteOutwardChequeViewModel { public int ChequeId { get; set; } }
+    public class DeleteOutwardChequeViewModel { public int ChequeId { get; set; } public string? ChequeNumber { get; set; } public string? BeneficiaryName { get; set; } public decimal Amount { get; set; } public DateTime DueDate { get; set; } public string? IssueDate { get; set; } public string? BankName { get; set; } public int Id { get; set; } }
     public class GetReturnedINHOUSESlipDetailsViewModel { public string? Details { get; set; } }
     public class GetReturnedSlipDetailsViewModel { public string? Details { get; set; } }
 
@@ -29,6 +28,9 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public decimal ItemAmount { get; set; }
         public int Quantity { get; set; }
         public string? Status { get; set; }
+        public string? ItemName { get; set; }
+        public decimal UnitPrice { get; set; }
+        public decimal LineTotal { get; set; }
     }
 
     public class ReturnedSlipDetailsViewModel
@@ -36,42 +38,11 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public string? SlipDetails { get; set; }
         public decimal TotalAmount { get; set; }
         public List<ReturnedSlipItemViewModel>? Items { get; set; }
-    }
-
-    public class OutwardViewModel
-    {
-        public int Id { get; set; }
-        public string? ChequeNumber { get; set; }
-        public decimal Amount { get; set; }
-        public string? BeneficiaryName { get; set; }
-        public string? OutwardNumber { get; set; }
-        public DateTime OutwardDate { get; set; }
-        public string? Subject { get; set; }
-        public string? Description { get; set; }
-        public string? Sender { get; set; }
-        public string? Recipient { get; set; }
-        public DateTime RequestDate { get; set; }
-        public string? EmployeeName { get; set; }
-        public string? TimeOutType { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public string? Status { get; set; }
-        public string? ChqNumber { get; set; }
-        public DateTime ChqDate { get; set; }
-        public string? BankName { get; set; }
-        public string? Notes { get; set; }
-        public DateTime ChequeDate { get; set; }
-        public string? CustomerName { get; set; }
-        public string? ReturnStatus { get; set; }
+        public string? SlipNumber { get; set; }
         public DateTime ReturnDate { get; set; }
-        public string? RequestNumber { get; set; }
-        public string? RejectionReason { get; set; }
-        public DateTime IssueDate { get; set; }
-        public List<AttachmentViewModel>? OutwardDocuments { get; set; }
-        public string? DocumentNumber { get; set; }
-        public string? AccountHolderName { get; set; }
-        public DateTime HoldDate { get; set; }
-        public string? HoldReason { get; set; }
+        public string? CustomerName { get; set; }
+        public string? BankName { get; set; }
+        public string? ChequeNumber { get; set; }
     }
 
     public class HoldChequeViewModel
@@ -98,8 +69,6 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public string? RequesterName { get; set; }
     }
 
-    public class Outward { public int Id { get; set; } public string? ChequeNumber { get; set; } }
-
     public class OutwardChqViewModel
     {
         public int ChequeId { get; set; }
@@ -118,7 +87,7 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public List<SAFA_ECC_Core_Clean.Models.Outward_Trans> Transactions { get; set; } = new List<SAFA_ECC_Core_Clean.Models.Outward_Trans>();
     }
 
-    public class OutwardReceiptViewModel { public string? ReceiptDetails { get; set; } }
+    public class OutwardReceiptViewModel { public string? ReceiptDetails { get; set; } public string? ReceiptNumber { get; set; } public string? CustomerName { get; set; } public string? CustomerPhone { get; set; } public string? CustomerAddress { get; set; } public List<OutwardSlipItemViewModel>? Items { get; set; } public decimal TotalAmount { get; set; } public string? PaymentMethod { get; set; } public DateTime ReceiptDate { get; set; } public string? Notes { get; set; } }
 
     public class OutwardReturnedOutwardSlipsViewModel
     {
@@ -138,7 +107,21 @@ namespace SAFA_ECC_Core_Clean.ViewModels
 
     public class PenddingOutWordRequestViewModel { public List<OutwardViewModel> PendingRequests { get; set; } = new List<OutwardViewModel>(); }
 
-    public class PospondingChqViewModel { public int ChequeId { get; set; } public DateTime NewDate { get; set; } }
+    public class PospondingChqViewModel
+    {
+        public PospondingChequeItemViewModel NewCheque { get; set; } = new PospondingChequeItemViewModel();
+        public List<PospondingChequeItemViewModel> Cheques { get; set; } = new List<PospondingChequeItemViewModel>();
+    }
+
+    public class PospondingChequeItemViewModel
+    {
+        public int ChequeId { get; set; }
+        public string? ChequeNumber { get; set; }
+        public DateTime ChequeDate { get; set; }
+        public string? Beneficiary { get; set; }
+        public decimal Amount { get; set; }
+        public string? Reason { get; set; }
+    }
 
     public class RejectedOutRequestViewModel { public List<OutwardViewModel> RejectedRequests { get; set; } = new List<OutwardViewModel>(); }
 
@@ -236,5 +219,6 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public string? Column3 { get; set; }
     }
 }
+
 
 

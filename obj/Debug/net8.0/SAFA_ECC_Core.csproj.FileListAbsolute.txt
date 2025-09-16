@@ -6,3 +6,4 @@
 /home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/SAFA_ECC_Core.MvcApplicationPartsAssemblyInfo.cache
 /home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/SAFA_ECC_Core.RazorAssemblyInfo.cache
 /home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/SAFA_ECC_Core.RazorAssemblyInfo.cs
+/home/ubuntu/SAFA_ECC_Core_Clean/obj/Debug/net8.0/SAFA_ECC_Core.sourcelink.json
