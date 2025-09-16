@@ -34,7 +34,7 @@ namespace SAFA_ECC_Core_Clean.ViewModels
 
     public class E_ChannelsChqViewModel { }
     public class EmailDetailViewModel { public string? Subject { get; set; } public string? Sender { get; set; } public string? Recipient { get; set; } }
-    public class EmailViewModel { }
+    public class EmailViewModel { public string? ToEmail { get; set; } public string? Subject { get; set; } public string? Body { get; set; } public bool HighPriority { get; set; } }
     public class GET_RETURN_CHQ_BY_CLRCENTER_ViewModel 
     {
         public int? ClearingCenterId { get; set; }

@@ -182,6 +182,7 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public DateTime LastTransactionDate { get; set; }
         public List<TransactionReportItemViewModel>? Transactions { get; set; }
     }
+
 }
 
 

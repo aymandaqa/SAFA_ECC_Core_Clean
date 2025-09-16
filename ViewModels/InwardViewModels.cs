@@ -135,10 +135,10 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public DateTime EndDate { get; set; }
         public bool IsActive { get; set; }
     }
-    public class RejectChequeViewModel { public int ChequeId { get; set; } public string? ChequeNumber { get; set; } public string? Reason { get; set; } public string? AccountName { get; set; } public decimal Amount { get; set; } public string? RejectReason { get; set; } }
+
     public class ChequeViewerViewModel { public string? ChequeImageBase64 { get; set; } public string? ChequeNumber { get; set; } }
     public class FixedErrorViewModel { public int ErrorId { get; set; } public string? ErrorDescription { get; set; } }
-    public class StoppedChequeDetailsViewModel { public string? ChequeNumber { get; set; } public string? Reason { get; set; } }
+
     public class InwardCustomerDuesViewModel 
     {
         public string? CustomerName { get; set; }
@@ -188,19 +188,7 @@ namespace SAFA_ECC_Core_Clean.ViewModels
         public string? Value { get; set; }
     }
     public class InwardModule { public string? ModuleName { get; set; } }
-    public class PMA_DATAVerficationDetailsViewModel
-    {
-        public string? Details { get; set; }
-        public List<SharedViewModels.TableDataItem>? Items { get; set; }
-        public string? DetailField1 { get; set; }
-        public string? DetailField2 { get; set; }
-        public string? DetailField3 { get; set; }
-        public int ItemId { get; set; }
-        public string? ItemName { get; set; }
-        public string? VerificationStatus { get; set; }
-        public string? VerifierNotes { get; set; }
-        public List<SharedViewModels.ChangeLogItemViewModel>? ChangeLog { get; set; }
-    }
+
 
     public class IndextestViewModel
     {
@@ -211,27 +199,7 @@ namespace SAFA_ECC_Core_Clean.ViewModels
     }
 
 
-    public class PMADATAVerficationDetailsViewModel
-    {
-        public string? ReferenceNumber { get; set; }
-        public DateTime TransactionDate { get; set; }
-        public string? CustomerName { get; set; }
-        public string? CustomerId { get; set; }
-        public string? CustomerAddress { get; set; }
-        public string? BankName { get; set; }
-        public string? BranchName { get; set; }
-        public decimal ChequeAmount { get; set; }
-        public string? ChequeNumber { get; set; }
-        public string? Currency { get; set; }
-        public string? Status { get; set; }
-        public string? Details { get; set; }
-        public string? Field1 { get; set; } // Added based on build error
-        public string? Field2 { get; set; } // Added based on build error
-        public string? Notes { get; set; } // Added based on build error
-        public string? DetailField1 { get; set; } // Added based on build error
-        public string? DetailField2 { get; set; } // Added based on build error
-        public string? DetailField3 { get; set; } // Added based on build error
-    }
+
 }
 
 
