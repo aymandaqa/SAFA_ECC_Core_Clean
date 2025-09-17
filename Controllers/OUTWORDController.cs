@@ -124,3 +124,51 @@ namespace SAFA_ECC_Core_Clean.Controllers
             return await _outwordService.OUTWORD();
         }
 
+
+
+        public async Task<DataTable> Get_Post_Rest_Code(string CUSTOMER_ID, string ACCOUNT_NUMBER)
+        {
+            return await _outwordService.Get_Post_Rest_Code(CUSTOMER_ID, ACCOUNT_NUMBER);
+        }
+
+
+
+        public async Task<string> Get_Final_Posting_Restrection(int Customer_Post_Rest, int Acc_Post_Rest, int Language)
+        {
+            return await _outwordService.Get_Final_Posting_Restrection(Customer_Post_Rest, Acc_Post_Rest, Language);
+        }
+
+
+
+        public async Task<IActionResult> Pendding_OutWord_Request()
+        {
+            // The original VB.NET code had logic for session checks and permissions.
+            // In ASP.NET Core, session checks are typically handled by middleware or filters.
+            // Permissions are handled by authorization attributes.
+
+            // Call the service method to handle the business logic.
+            var result = await _outwordService.Pendding_OutWord_Request();
+
+            // Assuming the service returns an IActionResult, we can directly return it.
+            // If the service returns data, the controller would then pass it to a view.
+            return View(); // Or return result if it's a JSON result or similar
+        }
+
+
+
+        public async Task<IActionResult> Pendding_OutWord_Request_Auth()
+        {
+            var result = await _outwordService.Pendding_OutWord_Request_Auth();
+            // In a real application, you would pass the data from the service to the view.
+            return View(); // Or return result if it's a JSON result or similar
+        }
+
+
+
+        public async Task<IActionResult> getOutword_WF_Details()
+        {
+            var result = await _outwordService.getOutword_WF_Details();
+            // In a real application, you would pass the data from the service to the view.
+            return View(); // Or return result if it's a JSON result or similar
+        }
+

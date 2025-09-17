@@ -60,3 +60,28 @@ namespace SAFA_ECC_Core_Clean.Services
 
         Task<IActionResult> OUTWORD(Outward_Trans outwardTrans, string actionType);
 
+
+
+        Task<DataTable> Get_Post_Rest_Code(string CUSTOMER_ID, string ACCOUNT_NUMBER);
+
+
+
+        Task<string> Get_Final_Posting_Restrection(int Customer_Post_Rest, int Acc_Post_Rest, int Language);
+
+
+
+        Task<IActionResult> Pendding_OutWord_Request();
+
+
+
+        Task<IActionResult> Pendding_OutWord_Request_Auth();
+
+
+
+  
+        Task<IActionResult> getOutword_WF_Details();
+
+
+
+        Task<string> Get_OFS_HttpLink();
+
