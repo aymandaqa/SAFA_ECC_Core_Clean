@@ -596,3 +596,84 @@ namespace SAFA_ECC_Core_Clean.Controllers
             }
         }
 
+
+
+        public async Task<IActionResult> GetUserGroupPermission(string pageid, string applicationid, string userid)
+        {
+            int _step = 10000;
+            _step += 1700;
+            HttpContext.Session.SetString("permission_user_Group", ""); // Equivalent to Nothing
+            HttpContext.Session.SetString("AccessPage", "");
+            string _groupid = HttpContext.Session.GetString("groupid");
+
+            try
+            {
+                List<USER_PAGE_PERMISSIONS_Result> group_permission = new List<USER_PAGE_PERMISSIONS_Result>();
+                // Assuming SAFA_ECCEntities is replaced by _context
+                string pagename = "";
+                Menu_Items_Tbl Menu_Items = await _context.Menu_Items_Tbl.SingleOrDefaultAsync(c => c.Related_Page_ID == pageid);
+
+                if (Menu_Items != null)
+                {
+                    pagename = Menu_Items.SubMenu_Name_EN;
+                }
+
+                HttpContext.Session.SetString("pagename", pagename);
+
+                // This part needs to be converted from stored procedure call to EF Core query or raw SQL
+                // For now, it's a placeholder.
+                // group_permission = await _context.USER_PAGE_PERMISSIONS(applicationid, userid, pageid).ToListAsync();
+
+                _step += 10;
+                if (group_permission.Count > 0)
+                {
+                    Users_Tbl user = await _context.Users_Tbl.SingleOrDefaultAsync(x => x.User_ID == userid);
+                    _step += 10;
+                    if (user != null)
+                    {
+                        string page = "";
+                        App_Pages _PAGE = await _context.App_Pages.SingleOrDefaultAsync(x => x.Page_Id == pageid);
+
+                        if (_PAGE != null)
+                        {
+                            page = _PAGE.Other_Details;
+                        }
+
+                        foreach (var item in group_permission)
+                        {
+                            if (item.ACCESS == true)
+                            {
+                                // Assuming GroupType.Group_Status.AdminAuthorized and SystemAdmin are constants or enum values
+                                // Need to convert pageid to int for comparison
+                                int pageIdInt = int.Parse(pageid);
+
+                                if (pageIdInt >= 1300 && pageIdInt <= 1400 && _groupid == "AdminAuthorized") // Placeholder for GroupType.Group_Status.AdminAuthorized
+                                {
+                                    HttpContext.Session.SetString("AccessPage", "Access");
+                                }
+                                else if (pageIdInt >= 1 && pageIdInt <= 100 && _groupid == "SystemAdmin") // Placeholder for GroupType.Group_Status.SystemAdmin
+                                {
+                                    HttpContext.Session.SetString("AccessPage", "Access");
+                                }
+                                else if (!(pageIdInt >= 1 && pageIdInt <= 100) && !(pageIdInt >= 1300 && pageIdInt <= 1400))
+                                {
+                                    HttpContext.Session.SetString("AccessPage", "Access");
+                                }
+                                else
+                                {
+                                    HttpContext.Session.SetString("AccessPage", "NoAccess");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in getuser_group_permision: {Message}", ex.Message);
+                // _LogSystem.WriteLogg(_Logg_Message, _ApplicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, GetUserName(), GetUserName(), "", "", "");
+                // _LogSystem.WriteError(_Logg_Message, _step, _ApplicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, GetUserName(), GetUserName(), "", "", "");
+            }
+            return Ok(); // Or appropriate IActionResult
+        }
+
