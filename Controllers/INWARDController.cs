@@ -19,13 +19,15 @@ namespace SAFA_ECC_Core_Clean.Controllers
     {
         private readonly ILogger<INWARDController> _logger;
         private readonly ApplicationDbContext _context;
+        private readonly IInwardService _inwardService;
         private readonly string _applicationId = "1";
         private readonly string _connectionString;
 
-        public INWARDController(ILogger<INWARDController> logger, ApplicationDbContext context)
+        public INWARDController(ILogger<INWARDController> logger, ApplicationDbContext context, IInwardService inwardService)
         {
             _logger = logger;
             _context = context;
+            _inwardService = inwardService;
             _connectionString = ""; // ConfigurationManager.AppSettings("CONNECTION_STR_DNS") needs to be configured in appsettings.json
         }
 
@@ -137,139 +139,24 @@ namespace SAFA_ECC_Core_Clean.Controllers
 
         public async Task<IActionResult> InwardFinanicalWFDetailsPMADIS_NEW(string id)
         {
-            HttpContext.Session.SetString("ErrorMessage", "");
-
-            if (string.IsNullOrEmpty(GetUserName()))
+            var result = await _inwardService.InwardFinanicalWFDetailsONUS_NEW(id);
+            if (result.Value is IDictionary<string, object> data && data.TryGetValue("redirectTo", out var redirectTo))
             {
-                return RedirectToAction("Login", "Login");
+                return Redirect(redirectTo.ToString());
             }
-
-            string methodName = "InwardFinanicalWFDetailsPMADIS";
-            int userId = GetUserID();
-
-            try
-            {
-                var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
-                if (appPage == null) return NotFound(); // Or handle appropriately
-
-                int pageId = appPage.Page_Id;
-                int applicationId = appPage.Application_ID;
-
-                // Assuming getuser_group_permision is a helper function or service call
-                // await getuser_group_permision(pageId, applicationId, userId);
-
-                ViewBag.Title = appPage.ENG_DESC;
-                // ViewBag.Tree = GetAllCategoriesForTree(); // Needs implementation
-
-                var wf = await _context.INWARD_WF_Tbl.SingleOrDefaultAsync(z => z.Serial == id && z.Final_Status != "Accept");
-                if (wf == null) return RedirectToAction("InsufficientFunds", "INWARD");
-
-                var incObj = await _context.Inward_Trans.SingleOrDefaultAsync(y => y.Serial == id);
-                if (incObj == null) return RedirectToAction("InsufficientFunds", "INWARD");
-
-                // Simplified logic for VIP and GUAR_CUSTOMER, actual service calls needed
-                ViewBag.is_vip = (incObj.ClrCenter == "PMA" && incObj.VIP == true && GetBranchID() != "2") ? "YES" : "NO";
-                ViewBag.GUAR_CUSTOMER = "Not Available"; // Placeholder
-
-                // Account info service call placeholder
-                // var EccAccInfo_WebSvc = new ECC_CAP_Services.SAFA_T24_ECC_SVCSoapClient("SAFA_T24_ECC_SVCSoap");
-                // var Accobj = await EccAccInfo_WebSvc.ACCOUNT_INFOAsync(incObj.AltAccount, 1);
-                // inChq.BookedBalance = Accobj.BookedBalance;
-                // inChq.ClearBalance = Accobj.ClearBalance;
-                // inChq.AccountStatus = Accobj.AccountStatus;
-
-                var user = await _context.Users_Tbl.SingleOrDefaultAsync(c => c.User_Name == GetUserName());
-                string group = user?.Group_ID;
-
-                ViewBag.Reject = "False";
-                ViewBag.recomdationbtn = "True";
-
-                if (group == "AdminAuthorized" || GetBranchID() == "2") // Assuming GroupType.Group_Status.AdminAuthorized is a string
-                {
-                    ViewBag.Approve = "True";
-                    ViewBag.recomdationbtn = "False";
-                }
-                else
-                {
-                    // Userlevel logic needs to be converted from stored procedure to EF Core or raw SQL
-                    // var Userlevel = await _context.USER_Limits_Auth_Amount(userId, Tbl_id, "d", wf.Amount_JD).ToListAsync();
-                    ViewBag.recomdationbtn = "True";
-
-                    // AuthTrans_User_TBL logic
-                    var authTransUser = await _context.AuthTrans_User_TBL.SingleOrDefaultAsync(t => t.Auth_user_ID == userId && t.Trans_id == "5" && t.group_ID == user.Group_ID);
-                    if (authTransUser != null) { /* ... */ }
-                }
-
-                return View();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in InwardFinanicalWFDetailsPMADIS_NEW: {Message}", ex.Message);
-                HttpContext.Session.SetString("ErrorMessage", "An error occurred: " + ex.Message);
-                return View("Error"); // Or a specific error view
-            }
+            // Assuming the service returns a JsonResult that can be directly returned by the controller
+            return Json(result.Value);
         }
 
         public async Task<IActionResult> InwardFinanicalWFDetailsPMADIS_Auth(string id)
         {
-            HttpContext.Session.SetString("ErrorMessage", "");
-
-            if (string.IsNullOrEmpty(GetUserName()))
+            var result = await _inwardService.InwardFinanicalWFDetailsONUS_Auth(id);
+            if (result.Value is IDictionary<string, object> data && data.TryGetValue("redirectTo", out var redirectTo))
             {
-                return RedirectToAction("Login", "Login");
+                return Redirect(redirectTo.ToString());
             }
-
-            string methodName = "InwardFinanicalWFDetailsPMADIS";
-            int userId = GetUserID();
-
-            try
-            {
-                var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
-                if (appPage == null) return NotFound();
-
-                int pageId = appPage.Page_Id;
-                int applicationId = appPage.Application_ID;
-
-                // await getuser_group_permision(pageId, applicationId, userId);
-
-                ViewBag.Title = appPage.ENG_DESC;
-                // ViewBag.Tree = GetAllCategoriesForTree();
-
-                var wf = await _context.INWARD_WF_Tbl.SingleOrDefaultAsync(z => z.Serial == id && z.Final_Status != "Accept");
-                if (wf == null) return RedirectToAction("InsufficientFunds", "INWARD");
-
-                var incObj = await _context.Inward_Trans.SingleOrDefaultAsync(y => y.Serial == id);
-                if (incObj == null) return RedirectToAction("InsufficientFunds", "INWARD");
-
-                ViewBag.is_vip = (incObj.ClrCenter == "PMA" && incObj.VIP == true && GetBranchID() != "2") ? "YES" : "NO";
-                ViewBag.GUAR_CUSTOMER = "Not Available";
-
-                var user = await _context.Users_Tbl.SingleOrDefaultAsync(c => c.User_Name == GetUserName());
-                string group = user?.Group_ID;
-
-                ViewBag.Reject = "False";
-                ViewBag.recomdationbtn = "True";
-
-                if (group == "AdminAuthorized" || GetBranchID() == "2")
-                {
-                    ViewBag.Approve = "True";
-                    ViewBag.recomdationbtn = "False";
-                }
-                else
-                {
-                    ViewBag.recomdationbtn = "True";
-                    var authTransUser = await _context.AuthTrans_User_TBL.SingleOrDefaultAsync(t => t.Auth_user_ID == userId && t.Trans_id == "5" && t.group_ID == user.Group_ID);
-                    if (authTransUser != null) { /* ... */ }
-                }
-
-                return View();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in InwardFinanicalWFDetailsPMADIS_Auth: {Message}", ex.Message);
-                HttpContext.Session.SetString("ErrorMessage", "An error occurred: " + ex.Message);
-                return View("Error");
-            }
+            // Assuming the service returns a JsonResult that can be directly returned by the controller
+            return Json(result.Value);
         }
 
         public async Task<IActionResult> ReversePostingPMARAM(string id)
@@ -2213,4 +2100,1865 @@ namespace SAFA_ECC_Core_Clean.Controllers
 }
 
 
+
+
+
+        private async Task<string> Convert_currency_from_SYMBOL_ISO_to_NUMERIC_ISO(string Currency_Symbol)
+        {
+            string NUMERIC_ISO = "";
+            int _step = 90000;
+
+            try
+            {
+                _logger.LogInformation("Convert currency from SYMBOL_ISO to NUMERIC_ISO");
+
+                NUMERIC_ISO = (await _context.CURRENCY_TBL.SingleOrDefaultAsync(x => x.SYMBOL_ISO == Currency_Symbol))?.NUMERIC_ISO ?? "";
+                _step += 1;
+            }
+            catch (Exception ex)
+            {
+                string ex1 = "";
+                if (ex.InnerException != null && ex.InnerException.InnerException != null && ex.InnerException.InnerException.Message.Contains("See the inner exception for details"))
+                {
+                    ex1 = ex.InnerException.InnerException.Message;
+                }
+                else
+                {
+                    ex1 = ex.Message;
+                }
+
+                _logger.LogError(ex, "Error when Convert currency from SYMBOL_ISO to NUMERIC_ISO, Check Error Table for details. Error Message: {ErrorMessage}", ex1);
+            }
+
+            return NUMERIC_ISO;
+        }
+
+
+
+        public async Task<IActionResult> InwardFinanicalWFDetailsONUS_NEW(string id)
+        {
+            HttpContext.Session.SetString("ErrorMessage", "");
+            JsonResult _json = new JsonResult(new { });
+            string branch = HttpContext.Session.GetString("BranchID");
+
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string methodName = "InwardFinanicalWFDetailsONUS";
+            int userId = GetUserID();
+
+            try
+            {
+                var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
+                if (appPage == null) return NotFound();
+
+                int pageId = appPage.Page_Id;
+                int applicationId = appPage.Application_ID;
+
+                // Assuming getuser_group_permision is a helper function or service call
+                // await GetUserGroupPermission(pageId, applicationId, userId);
+
+                ViewBag.Title = appPage.ENG_DESC;
+                // ViewBag.Tree = GetAllCategoriesForTree(); // Needs implementation
+
+                var wf = await _context.INWARD_WF_Tbl.SingleOrDefaultAsync(z => z.Serial == id && z.Final_Status != "Accept" && z.Clr_Center == "Outward_ONUS");
+                if (wf == null) return RedirectToAction("InsufficientFunds", "INWARD");
+
+                var incObj = await _context.OnUs_Tbl.SingleOrDefaultAsync(y => y.Serial == id && (y.Posted == (int)AllEnums.Cheque_Status.New || y.Posted == (int)AllEnums.Cheque_Status.Posted));
+                if (incObj == null) return RedirectToAction("InsufficientFunds", "INWARD");
+
+                List<T24_CAB_OVRDRWN_GUAR> GUAR_CUSTOMER = new List<T24_CAB_OVRDRWN_GUAR>();
+                if (!string.IsNullOrEmpty(incObj.DrwCustomerID))
+                {
+                    GUAR_CUSTOMER = await _context.T24_CAB_OVRDRWN_GUAR.Where(i => i.GUAR_CUSTOMER == incObj.DrwCustomerID).ToListAsync();
+                }
+
+                ViewBag.GUAR_CUSTOMER = "";
+                if (GUAR_CUSTOMER.Count == 0)
+                {
+                    ViewBag.GUAR_CUSTOMER = "Not Available";
+                    // inChq.GUAR_CUSTOMER = "Not Available"; // inChq is not defined here
+                }
+                else
+                {
+                    // External service call placeholder
+                    // var EccAccInfo_WebSvc = new ECC_CAP_Services.SAFA_T24_ECC_SVCSoapClient("SAFA_T24_ECC_SVCSoap");
+                    // foreach (var item in GUAR_CUSTOMER)
+                    // {
+                    //     var GUAR_CUSTOMER_Accobj = await EccAccInfo_WebSvc.ACCOUNT_INFOAsync(item.ACCOUNT_NUMBER, 1);
+                    //     ViewBag.GUAR_CUSTOMER += item.ACCOUNT_NUMBER + "*" + GUAR_CUSTOMER_Accobj.ClearBalance + "*" + GUAR_CUSTOMER_Accobj.AccountCurrency + "|";
+                    //     // inChq.GUAR_CUSTOMER += item.ACCOUNT_NUMBER + "*" + GUAR_CUSTOMER_Accobj.ClearBalance + "*" + GUAR_CUSTOMER_Accobj.AccountCurrency + "|";
+                    // }
+                }
+
+                // Account info service call placeholder
+                // var Accobj = await EccAccInfo_WebSvc.ACCOUNT_INFOAsync(incObj.DecreptedDrwAcountNo, 1);
+                // ViewBag.BookedBalance = Accobj.BookedBalance;
+                // ViewBag.ClearBalance = Accobj.ClearBalance;
+                // ViewBag.AccountStatus = Accobj.AccountStatus;
+
+                var user = await _context.Users_Tbl.SingleOrDefaultAsync(c => c.User_Name == GetUserName());
+                string group = user?.Group_ID;
+
+                ViewBag.Reject = "False";
+                ViewBag.recomdationbtn = "True";
+
+                if (group == AllEnums.Group_Status.AdminAuthorized.ToString() || branch == "2")
+                {
+                    ViewBag.Approve = "True";
+                    ViewBag.recomdationbtn = "False";
+                    ViewBag.Reject = "True";
+                }
+                else
+                {
+                    // Userlevel logic needs to be converted from stored procedure to EF Core or raw SQL
+                    // var Userlevel = await _context.USER_Limits_Auth_Amount(userId, Tbl_id, "d", wf.Amount_JD).ToListAsync();
+                    ViewBag.recomdationbtn = "True";
+
+                    // AuthTrans_User_TBL logic
+                    var authTransUser = await _context.AuthTrans_User_TBL.SingleOrDefaultAsync(t => t.Auth_user_ID == userId && t.Trans_id == "6" && t.group_ID == user.Group_ID);
+                    if (authTransUser != null)
+                    {
+                        if (authTransUser.Auth_level2 == true)
+                        {
+                            ViewBag.Approve = "True";
+                            ViewBag.Reject = "True";
+                            ViewBag.recomdationbtn = "False";
+                        }
+                        if (authTransUser.Auth_level1 == true)
+                        {
+                            ViewBag.Approve = "False";
+                            ViewBag.Reject = "False";
+                            ViewBag.recomdationbtn = "True";
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.recomdationbtn = "True";
+                    }
+                }
+
+                // Currency conversion logic
+                // List<CURRENCY_TBL> Currency = await _context.CURRENCY_TBL.ToListAsync();
+                // for (int j = 0; j < Currency.Count; j++)
+                // {
+                //     if (incObj.Currency == "1" || incObj.Currency == "2" || incObj.Currency == "3" || incObj.Currency == "5")
+                //     {
+                //         if (Convert.ToInt32(incObj.Currency) == Currency[j].ID)
+                //         {
+                //             incObj.Currency = Currency[j].SYMBOL_ISO;
+                //             break;
+                //         }
+                //     }
+                // }
+                // ViewBag.data = Currency;
+
+                incObj.Amount = decimal.Round(incObj.Amount, 2, MidpointRounding.AwayFromZero);
+                if (incObj.Status == "S")
+                {
+                    incObj.Status = "Success";
+                }
+                if (incObj.Status == "F")
+                {
+                    incObj.Status = "Faild";
+                }
+
+                // Assuming onusChqs is a ViewModel or similar structure
+                // onusChqs inChq = new onusChqs { onus = incObj };
+
+                _json.Data = new { list = incObj, Sta = "S" }; // Simplified for now
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in InwardFinanicalWFDetailsONUS_NEW: {Message}", ex.Message);
+                HttpContext.Session.SetString("ErrorMessage", "An error occurred: " + ex.Message);
+                _json.Data = new { list = (object)null, Sta = "F" };
+            }
+
+            return Json(_json.Data);
+        }
+
+        public async Task<DataTable> Getpage(string page)
+        {
+            // This method requires a SqlAccess class or direct ADO.NET/EF Core raw SQL execution.
+            // Placeholder for now.
+            try
+            {
+                // Example using raw SQL (needs adjustment for actual stored proc call)
+                // using (SqlConnection conn = new SqlConnection(_connectionString))
+                // {
+                //     await conn.OpenAsync();
+                //     using (SqlCommand cmd = new SqlCommand("SELECT [Page_Name_EN] , [Other_Details] FROM [DBO].[App_Pages] WHERE [Page_Id] = @PageId", conn))
+                //     {
+                //         cmd.Parameters.AddWithValue("@PageId", page);
+                //         SqlDataAdapter da = new SqlDataAdapter(cmd);
+                //         DataTable dt = new DataTable();
+                //         da.Fill(dt);
+                //         return dt;
+                //     }
+                // }
+                return new DataTable(); // Placeholder
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in Getpage: {Message}", ex.Message);
+                return new DataTable();
+            }
+        }
+
+        public async Task<bool> GetPermission(string id, string _page, string _groupid)
+        {
+            try
+            {
+                List<Users_Permissions> usersPermissionpage = new List<Users_Permissions>();
+                List<Groups_Permissions> groupPermissionpage = new List<Groups_Permissions>();
+
+                groupPermissionpage = await _context.Groups_Permissions.Where(x => x.Group_Id == _groupid && x.Page_Id == _page && x.Application_ID == 1 && x.Access == true).ToListAsync();
+
+                if (groupPermissionpage.Count == 0)
+                {
+                    if (_page == "0") // Assuming _page is string, convert to int if needed
+                    {
+                        usersPermissionpage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == _page && x.Application_ID == 1).ToListAsync();
+                        return true;
+                    }
+                    else
+                    {
+                        usersPermissionpage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == _page && x.Value == true && x.Application_ID == 1 && x.ActionID == 6).ToListAsync();
+                    }
+
+                    if (usersPermissionpage.Count == 0)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        // Logic for page ranges and group types
+                        if ((Convert.ToInt32(_page) >= 1300 && Convert.ToInt32(_page) <= 1400 && _groupid == AllEnums.Group_Status.AdminAuthorized.ToString()) ||
+                            (Convert.ToInt32(_page) >= 1 && Convert.ToInt32(_page) <= 100 && _groupid == AllEnums.Group_Status.SystemAdmin.ToString()) ||
+                            (!(Convert.ToInt32(_page) >= 1 && Convert.ToInt32(_page) <= 100) && !(Convert.ToInt32(_page) >= 1300 && Convert.ToInt32(_page) <= 1400)))
+                        {
+                            return true;
+                        }
+
+                        usersPermissionpage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == _page && x.Value == false && x.Application_ID == 1 && x.ActionID == 6).ToListAsync();
+                        if (usersPermissionpage.Count > 0)
+                        {
+                            return false;
+                        }
+                    }
+                }
+                else
+                {
+                    if (_page == "0")
+                    {
+                        usersPermissionpage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == _page && x.Application_ID == 1).ToListAsync();
+                        return true;
+                    }
+                    else
+                    {
+                        usersPermissionpage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == _page && x.Application_ID == 1 && x.ActionID == 6).ToListAsync();
+                        if (usersPermissionpage.Count == 0)
+                        {
+                            return true;
+                        }
+
+                        usersPermissionpage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == _page && x.Value == true && x.Application_ID == 1).ToListAsync();
+                        if (usersPermissionpage.Count > 0)
+                        {
+                            if ((Convert.ToInt32(_page) >= 1300 && Convert.ToInt32(_page) <= 1400 && _groupid == AllEnums.Group_Status.AdminAuthorized.ToString()) ||
+                                (Convert.ToInt32(_page) >= 1 && Convert.ToInt32(_page) <= 100 && _groupid == AllEnums.Group_Status.SystemAdmin.ToString()) ||
+                                (!(Convert.ToInt32(_page) >= 1 && Convert.ToInt32(_page) <= 100) && !(Convert.ToInt32(_page) >= 1300 && Convert.ToInt32(_page) <= 1400)))
+                            {
+                                return true;
+                            }
+                        }
+
+                        usersPermissionpage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == _page && x.Value == false && x.Application_ID == 1 && x.ActionID == 6).ToListAsync();
+                        if (usersPermissionpage.Count > 0)
+                        {
+                            return false;
+                        }
+                    }
+                }
+                return false; // Default return
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetPermission: {Message}", ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<bool> GetPermission1(string id, string _page, string _groupid)
+        {
+            try
+            {
+                List<Users_Permissions> usersPermissionpage = new List<Users_Permissions>();
+                List<Groups_Permissions> groupPermissionpage = new List<Groups_Permissions>();
+
+                groupPermissionpage = await _context.Groups_Permissions.Where(x => x.Group_Id == _groupid && x.Page_Id == _page && (x.Add == true || x.Delete == true || x.Access == true || x.Reverse == true || x.Update == true || x.Post == true) && x.Application_ID == 1 && x.Access == true).ToListAsync();
+
+                if (groupPermissionpage.Count == 0)
+                {
+                    if (_page == "0")
+                    {
+                        usersPermissionpage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == _page && x.Application_ID == 1).ToListAsync();
+                    }
+                    else
+                    {
+                        usersPermissionpage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == _page && x.Value == true && x.Application_ID == 1 && x.ActionID == 6).ToListAsync();
+                    }
+
+                    if (usersPermissionpage.Count == 0)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        if ((Convert.ToInt32(_page) >= 1300 && Convert.ToInt32(_page) <= 1400 && _groupid == AllEnums.Group_Status.AdminAuthorized.ToString()) ||
+                            (Convert.ToInt32(_page) >= 1 && Convert.ToInt32(_page) <= 100 && _groupid == AllEnums.Group_Status.SystemAdmin.ToString()) ||
+                            (!(Convert.ToInt32(_page) >= 1 && Convert.ToInt32(_page) <= 100) && !(Convert.ToInt32(_page) >= 1300 && Convert.ToInt32(_page) <= 1400)))
+                        {
+                            return true;
+                        }
+                    }
+                }
+                else
+                {
+                    if (_page == "0")
+                    {
+                        usersPermissionpage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == _page && x.Application_ID == 1).ToListAsync();
+                        return true;
+                    }
+                    else
+                    {
+                        usersPermissionpage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == _page && x.Application_ID == 1 && x.ActionID == 6).ToListAsync();
+                        if (usersPermissionpage.Count == 0)
+                        {
+                            return true;
+                        }
+
+                        usersPermissionpage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == _page && x.Value == true && x.Application_ID == 1).ToListAsync();
+                        if (usersPermissionpage.Count > 0)
+                        {
+                            if ((Convert.ToInt32(_page) >= 1300 && Convert.ToInt32(_page) <= 1400 && _groupid == AllEnums.Group_Status.AdminAuthorized.ToString()) ||
+                                (Convert.ToInt32(_page) >= 1 && Convert.ToInt32(_page) <= 100 && _groupid == AllEnums.Group_Status.SystemAdmin.ToString()) ||
+                                (!(Convert.ToInt32(_page) >= 1 && Convert.ToInt32(_page) <= 100) && !(Convert.ToInt32(_page) >= 1300 && Convert.ToInt32(_page) <= 1400)))
+                            {
+                                return true;
+                            }
+                        }
+
+                        usersPermissionpage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == _page && x.Value == false && x.Application_ID == 1 && x.ActionID == 6).ToListAsync();
+                        if (usersPermissionpage.Count > 0)
+                        {
+                            return false;
+                        }
+                    }
+                }
+                return false; // Default return
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetPermission1: {Message}", ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<bool> Ge_t(string x)
+        {
+            try
+            {
+                var page = await _context.Menu_Items_Tbl.Where(i => i.Parent_ID == x).ToListAsync();
+                return page.Count > 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in Ge_t: {Message}", ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<string> GetAllCategoriesForTree()
+        {
+            List<Category> categories = new List<Category>();
+            // Assuming HomeBAL().GetAllCategories() returns a DataTable or similar structure
+            // This needs to be replaced with EF Core queries or a service call.
+            // For now, returning an empty string or handling as needed.
+            try
+            {
+                // Example of how to get categories using EF Core (assuming Category is an entity)
+                var dbCategories = await _context.Categories.ToListAsync();
+                string groupId = HttpContext.Session.GetString("groupid");
+
+                foreach (var row in dbCategories)
+                {
+                    // This logic needs to be carefully translated, especially the UserType comparison
+                    // and the Parent_ID handling.
+                    // Assuming UserType is a property in Category or related entity.
+                    // if (groupId >= "3") // Assuming groupId is string, comparison needs to be numeric if it represents an ID
+                    // {
+                    //     if (row.UserType == "ALL" || row.UserType == "Auth")
+                    //     {
+                    //         categories.Add(new Category
+                    //         {
+                    //             Related_Page_ID = row.Related_Page_ID,
+                    //             SubMenu_ID = row.SubMenu_ID,
+                    //             SubMenu_Name_EN = row.SubMenu_Name_EN,
+                    //             Parent_ID = (row.Parent_ID != 0) ? (int?)row.Parent_ID : null
+                    //         });
+                    //     }
+                    // }
+                    // else
+                    // {
+                    //     if (row.UserType == "ALL" || row.UserType == "NotAuth")
+                    //     {
+                    //         categories.Add(new Category
+                    //         {
+                    //             Related_Page_ID = row.Related_Page_ID,
+                    //             SubMenu_ID = row.SubMenu_ID,
+                    //             SubMenu_Name_EN = row.SubMenu_Name_EN,
+                    //             Parent_ID = (row.Parent_ID != 0) ? (int?)row.Parent_ID : null
+                    //         });
+                    //     }
+                    // }
+                }
+
+                // var headerTree = FillRecursive(categories, null);
+                // string root_li = string.Empty;
+                // string down1_names = string.Empty;
+                // string down2_names = string.Empty;
+                // string down3_names = string.Empty;
+                // bool page_permission;
+
+                // The tree generation logic is complex and involves recursive calls and string concatenation for HTML.
+                // This needs to be refactored into proper ViewComponents or TagHelpers in ASP.NET Core MVC.
+                // For now, returning an empty string.
+
+                return "";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetAllCategoriesForTree: {Message}", ex.Message);
+                return "";
+            }
+        }
+
+
+
+        public async Task<IActionResult> InwardFinanicalWFDetailsONUS_NEW(string id)
+        {
+            HttpContext.Session.SetString("ErrorMessage", "");
+            JsonResult _json = new JsonResult(new { });
+            string branch = HttpContext.Session.GetString("BranchID");
+
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string methodName = "InwardFinanicalWFDetailsONUS";
+            int userId = GetUserID();
+
+            try
+            {
+                var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
+                if (appPage == null) return NotFound();
+
+                int pageId = appPage.Page_Id;
+                int applicationId = appPage.Application_ID;
+
+                // Assuming getuser_group_permision is a helper function or service call
+                // await GetUserGroupPermission(pageId, applicationId, userId);
+
+                ViewBag.Title = appPage.ENG_DESC;
+                // ViewBag.Tree = GetAllCategoriesForTree(); // Needs implementation
+
+                var wf = await _context.INWARD_WF_Tbl.SingleOrDefaultAsync(z => z.Serial == id && z.Final_Status != "Accept" && z.Clr_Center == "Outward_ONUS");
+                if (wf == null) return RedirectToAction("InsufficientFunds", "INWARD");
+
+                var incObj = await _context.OnUs_Tbl.SingleOrDefaultAsync(y => y.Serial == id && (y.Posted == (int)AllEnums.Cheque_Status.New || y.Posted == (int)AllEnums.Cheque_Status.Posted));
+                if (incObj == null) return RedirectToAction("InsufficientFunds", "INWARD");
+
+                List<T24_CAB_OVRDRWN_GUAR> GUAR_CUSTOMER = new List<T24_CAB_OVRDRWN_GUAR>();
+                if (!string.IsNullOrEmpty(incObj.DrwCustomerID))
+                {
+                    GUAR_CUSTOMER = await _context.T24_CAB_OVRDRWN_GUAR.Where(i => i.GUAR_CUSTOMER == incObj.DrwCustomerID).ToListAsync();
+                }
+
+                ViewBag.GUAR_CUSTOMER = "";
+                if (GUAR_CUSTOMER.Count == 0)
+                {
+                    ViewBag.GUAR_CUSTOMER = "Not Available";
+                    // inChq.GUAR_CUSTOMER = "Not Available"; // inChq is not defined here
+                }
+                else
+                {
+                    // External service call placeholder
+                    // var EccAccInfo_WebSvc = new ECC_CAP_Services.SAFA_T24_ECC_SVCSoapClient("SAFA_T24_ECC_SVCSoap");
+                    // foreach (var item in GUAR_CUSTOMER)
+                    // {
+                    //     var GUAR_CUSTOMER_Accobj = await EccAccInfo_WebSvc.ACCOUNT_INFOAsync(item.ACCOUNT_NUMBER, 1);
+                    //     ViewBag.GUAR_CUSTOMER += item.ACCOUNT_NUMBER + "*" + GUAR_CUSTOMER_Accobj.ClearBalance + "*" + GUAR_CUSTOMER_Accobj.AccountCurrency + "|";
+                    //     // inChq.GUAR_CUSTOMER += item.ACCOUNT_NUMBER + "*" + GUAR_CUSTOMER_Accobj.ClearBalance + "*" + GUAR_CUSTOMER_Accobj.AccountCurrency + "|";
+                    // }
+                }
+
+                // Account info service call placeholder
+                // var Accobj = await EccAccInfo_WebSvc.ACCOUNT_INFOAsync(incObj.DecreptedDrwAcountNo, 1);
+                // ViewBag.BookedBalance = Accobj.BookedBalance;
+                // ViewBag.ClearBalance = Accobj.ClearBalance;
+                // ViewBag.AccountStatus = Accobj.AccountStatus;
+
+                var user = await _context.Users_Tbl.SingleOrDefaultAsync(c => c.User_Name == GetUserName());
+                string group = user?.Group_ID;
+
+                ViewBag.Reject = "False";
+                ViewBag.recomdationbtn = "True";
+
+                if (group == AllEnums.Group_Status.AdminAuthorized.ToString() || branch == "2")
+                {
+                    ViewBag.Approve = "True";
+                    ViewBag.recomdationbtn = "False";
+                    ViewBag.Reject = "True";
+                }
+                else
+                {
+                    // Userlevel logic needs to be converted from stored procedure to EF Core or raw SQL
+                    // var Userlevel = await _context.USER_Limits_Auth_Amount(userId, Tbl_id, "d", wf.Amount_JD).ToListAsync();
+                    ViewBag.recomdationbtn = "True";
+
+                    // AuthTrans_User_TBL logic
+                    var authTransUser = await _context.AuthTrans_User_TBL.SingleOrDefaultAsync(t => t.Auth_user_ID == userId && t.Trans_id == "6" && t.group_ID == user.Group_ID);
+                    if (authTransUser != null)
+                    {
+                        if (authTransUser.Auth_level2 == true)
+                        {
+                            ViewBag.Approve = "True";
+                            ViewBag.Reject = "True";
+                            ViewBag.recomdationbtn = "False";
+                        }
+                        if (authTransUser.Auth_level1 == true)
+                        {
+                            ViewBag.Approve = "False";
+                            ViewBag.Reject = "False";
+                            ViewBag.recomdationbtn = "True";
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.recomdationbtn = "True";
+                    }
+                }
+
+                // Currency conversion logic
+                // List<CURRENCY_TBL> Currency = await _context.CURRENCY_TBL.ToListAsync();
+                // for (int j = 0; j < Currency.Count; j++)
+                // {
+                //     if (incObj.Currency == "1" || incObj.Currency == "2" || incObj.Currency == "3" || incObj.Currency == "5")
+                //     {
+                //         if (Convert.ToInt32(incObj.Currency) == Currency[j].ID)
+                //         {
+                //             incObj.Currency = Currency[j].SYMBOL_ISO;
+                //             break;
+                //         }
+                //     }
+                // }
+                // ViewBag.data = Currency;
+
+                incObj.Amount = decimal.Round(incObj.Amount, 2, MidpointRounding.AwayFromZero);
+                if (incObj.Status == "S")
+                {
+                    incObj.Status = "Success";
+                }
+                if (incObj.Status == "F")
+                {
+                    incObj.Status = "Faild";
+                }
+
+                // Assuming onusChqs is a ViewModel or similar structure
+                // onusChqs inChq = new onusChqs { onus = incObj };
+
+                _json.Data = new { list = incObj, Sta = "S" }; // Simplified for now
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in InwardFinanicalWFDetailsONUS_NEW: {Message}", ex.Message);
+                HttpContext.Session.SetString("ErrorMessage", "An error occurred: " + ex.Message);
+                _json.Data = new { list = (object)null, Sta = "F" };
+            }
+
+            return Json(_json.Data);
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> getSearchListInitalAccept_reject(string Branchs, string STATUS, string ChequeSource, string FAmount, string TAmount, string Chequeno, string DrwAcc, string Authorize, string Currency, string vip)
+        {
+            var result = await _inwardService.getSearchListInitalAccept_reject(Branchs, STATUS, ChequeSource, FAmount, TAmount, Chequeno, DrwAcc, Authorize, Currency, vip);
+            if (result.Value is IDictionary<string, object> data && data.TryGetValue("redirectTo", out var redirectTo))
+            {
+                return Redirect(redirectTo.ToString());
+            }
+            return Json(result.Value);
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> VIEW_WF(string serial, string clrcanter)
+        {
+            var result = await _inwardService.VIEW_WF(serial, clrcanter);
+            if (result.Value is IDictionary<string, object> data && data.TryGetValue("redirectTo", out var redirectTo))
+            {
+                return Redirect(redirectTo.ToString());
+            }
+            return Json(result.Value);
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> save_Fix_Ret_CHQ(string serial, string RC, string clecenter, string BnfBranch, string ChequeType)
+        {
+            var result = await _inwardService.save_Fix_Ret_CHQ(serial, RC, clecenter, BnfBranch, ChequeType);
+            if (result.Value is IDictionary<string, object> data && data.TryGetValue("redirectTo", out var redirectTo))
+            {
+                return Redirect(redirectTo.ToString());
+            }
+            return Json(result.Value);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> getSearchList(string Branchs, string STATUS, string FromDate, string ToDate, string RSF, string trans,
+            string FromReturnedDate, string ToReturnedDate, string BenAccNo,
+            string FromBank, string ToBank,
+            string Currency, string ChequeSource, string Amount, string DRWAccNo, string ChequeNo, string FromTransDate, string ToTransDatet, string tot, string vip)
+        {
+            var result = await _inwardService.getSearchList(Branchs, STATUS, FromDate, ToDate, RSF, trans, FromReturnedDate, ToReturnedDate, BenAccNo, FromBank, ToBank, Currency, ChequeSource, Amount, DRWAccNo, ChequeNo, FromTransDate, ToTransDatet, tot, vip);
+            if (result.Value is IDictionary<string, object> data && data.TryGetValue("redirectTo", out var redirectTo))
+            {
+                return Redirect(redirectTo.ToString());
+            }
+            return Json(result.Value);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> getSearchList(string Branchs, string STATUS, string FromDate, string ToDate, string RSF, string trans,
+            string FromReturnedDate, string ToReturnedDate, string BenAccNo,
+            string FromBank, string ToBank,
+            string Currency, string ChequeSource, string Amount, string DRWAccNo, string ChequeNo, string FromTransDate, string ToTransDatet, string tot, string vip)
+        {
+            var result = await _inwardService.getSearchList(Branchs, STATUS, FromDate, ToDate, RSF, trans, FromReturnedDate, ToReturnedDate, BenAccNo, FromBank, ToBank, Currency, ChequeSource, Amount, DRWAccNo, ChequeNo, FromTransDate, ToTransDatet, tot, vip);
+            if (result.Value is IDictionary<string, object> data && data.TryGetValue("redirectTo", out var redirectTo))
+            {
+                return Redirect(redirectTo.ToString());
+            }
+            return Json(result.Value);
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> returnsuspen(string chqseq, string clr_center, string Account, string retuen_code, string serial)
+        {
+            var result = await _inwardService.returnsuspen(chqseq, clr_center, Account, retuen_code, serial);
+            if (result.Value is IDictionary<string, object> data && data.TryGetValue("redirectTo", out var redirectTo))
+            {
+                return Redirect(redirectTo.ToString());
+            }
+            return Json(result.Value);
+        }
+
+
+
+        [HttpGet]
+        public async Task<string> GetCustomerDues(string Customer_id)
+        {
+            return await _inwardService.GetCustomerDues(Customer_id);
+        }
+
+
+
+        [HttpGet]
+        public async Task<string> EVALUATE_AMOUNT_IN_JOD(string CURANCY, double AMOUNT)
+        {
+            return await _inwardService.EVALUATE_AMOUNT_IN_JOD(CURANCY, AMOUNT);
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> VerifyAllDiscountCHQ([FromBody] List<string> Serials)
+        {
+            var result = await _inwardService.VerifyAllDiscountCHQ(Serials);
+            if (result.Value is IDictionary<string, object> data && data.TryGetValue("redirectTo", out var redirectTo))
+            {
+                return Redirect(redirectTo.ToString());
+            }
+            return Json(result.Value);
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> POSTCheques_ONUS(string Serials)
+        {
+            var result = await _inwardService.POSTCheques_ONUS(Serials);
+            if (!result)
+            {
+                // Handle error or redirection if needed
+                return BadRequest(new { message = "Failed to post ONUS cheques." });
+            }
+            return Ok(new { message = "ONUS cheques posted successfully." });
+        }
+
+
+
+        public async Task<IActionResult> InsufficientFunds()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            ViewBag.ErrorMessage = "";
+            ViewBag.Tree = _inwardService.GetAllCategoriesForTree(); // Assuming this is a helper method in the service or a shared utility
+
+            var model = await _inwardService.GetInsufficientFundsData(
+                _inwardService.GetUserName(),
+                _inwardService.GetBranchID(), // Assuming GetBranchID is available in service
+                _inwardService.GetCompanyID() // Assuming GetCompanyID is available in service
+            );
+
+            ViewBag.Clearing_Center = _inwardService.bind_chq_source(); // Assuming bind_chq_source is available in service
+            ViewBag.Branches = model.Branches;
+            ViewBag.CustomerType = _inwardService.BindCustomerType(_inwardService.GetBranchID()); // Assuming BindCustomerType is available in service
+            ViewBag.CURRENCY = model.Currencies;
+
+            // Logic for AdminAuthorized and GroupType needs to be handled in the service or a separate authorization service
+            // For now, setting a placeholder
+            ViewBag.AdminAuthorized = "No";
+
+            return View(model);
+        }
+
+
+
+        public async Task<IActionResult> InwardFinanicalWFDetailsONUS(string id)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            ViewBag.ErrorMessage = "";
+            ViewBag.Tree = _inwardService.GetAllCategoriesForTree(); // Assuming this is a helper method in the service or a shared utility
+
+            var model = await _inwardService.GetInwardFinanicalWFDetailsONUSData(
+                id,
+                _inwardService.GetUserName(),
+                _inwardService.GetBranchID(),
+                _inwardService.GetCompanyID()
+            );
+
+            if (model == null)
+            {
+                return RedirectToAction("InsufficientFunds", "INWARD");
+            }
+
+            ViewBag.BookedBalance = model.BookedBalance;
+            ViewBag.ClearBalance = model.ClearBalance;
+            ViewBag.AccountStatus = model.AccountStatus;
+            ViewBag.GUAR_CUSTOMER = model.GuarranteedCustomerAccounts;
+            ViewBag.Reject = model.CanReject ? "True" : "False";
+            ViewBag.Approve = model.CanApprove ? "True" : "False";
+            ViewBag.recomdationbtn = model.ShowRecommendationButton ? "True" : "False";
+            ViewBag.Title = model.Title;
+            ViewBag.data = model.Currencies;
+            ViewBag.is_vip = model.IsVIP ? "YES" : "NO";
+
+            return View(model.InwardCheque);
+        }
+
+
+
+        public async Task<IActionResult> InwardFinanicalWFDetailsPMADIS(string id)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            ViewBag.ErrorMessage = "";
+            ViewBag.Tree = _inwardService.GetAllCategoriesForTree();
+
+            var model = await _inwardService.GetInwardFinanicalWFDetailsPMADISData(
+                id,
+                _inwardService.GetUserName(),
+                _inwardService.GetBranchID(),
+                _inwardService.GetCompanyID()
+            );
+
+            if (model == null)
+            {
+                return RedirectToAction("InsufficientFunds", "INWARD");
+            }
+
+            ViewBag.BookedBalance = model.BookedBalance;
+            ViewBag.ClearBalance = model.ClearBalance;
+            ViewBag.AccountStatus = model.AccountStatus;
+            ViewBag.GUAR_CUSTOMER = model.GuarranteedCustomerAccounts;
+            ViewBag.Reject = model.CanReject ? "True" : "False";
+            ViewBag.Approve = model.CanApprove ? "True" : "False";
+            ViewBag.recomdationbtn = model.ShowRecommendationButton ? "True" : "False";
+            ViewBag.Title = model.Title;
+            ViewBag.data = model.Currencies;
+            ViewBag.is_vip = model.IsVIP ? "YES" : "NO";
+
+            return View(model.InwardCheque);
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> POSTCheques(string Serials)
+        {
+            var result = await _inwardService.POSTCheques(Serials);
+            if (!result)
+            {
+                return BadRequest(new { message = "Failed to post cheques." });
+            }
+            return Ok(new { message = "Cheques posted successfully." });
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> GetMagicscreenList(string ClrCenter, string STATUS, string TransDate, string chqNo, string DRWACCNO)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            // Assuming getlockedpage is handled by a filter or middleware, or its logic is moved to the service
+            // _inwardService.getlockedpage(Session.GetString("page_id")); // This needs to be adapted
+
+            var result = await _inwardService.GetMagicscreenList(
+                ClrCenter, STATUS, TransDate, chqNo, DRWACCNO,
+                _inwardService.GetUserName(),
+                _inwardService.GetCompanyID(),
+                _inwardService.GetPageID() // Assuming GetPageID is available in service
+            );
+
+            return result;
+        }
+
+
+
+        [HttpPost]
+        public async Task<JsonResult> ReturnMajicScreen(string serial, string clrcenter, string RC, string patch, string STATUS)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            var result = await _inwardService.ReturnMajicScreen(
+                serial, clrcenter, RC, patch, STATUS,
+                _inwardService.GetUserName(),
+                _inwardService.GetUserID()
+            );
+
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> updatereturncheq(string TDate)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            var result = await _inwardService.UpdateReturnCheque(TDate, _inwardService.GetUserName());
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> getchqstatus()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            var result = await _inwardService.GetChqStatus(_inwardService.GetUserName(), _inwardService.GetUserID());
+
+            if (result is OkObjectResult okResult && okResult.Value is InwardService.GetChqStatusViewModel model)
+            {
+                ViewBag.Title = model.Title;
+                ViewBag.Tree = model.Tree;
+                // Additional ViewBag assignments if needed from the service
+            }
+            else if (result is BadRequestObjectResult badRequestResult)
+            {
+                // Handle error, e.g., log it and show an error view
+                ViewBag.ErrorMessage = (badRequestResult.Value as dynamic)?.ErrorMessage ?? "An unknown error occurred.";
+                return View("Error");
+            }
+            else if (result is RedirectToActionResult redirectResult)
+            {
+                return redirectResult;
+            }
+
+            // Assuming the view does not need a specific model, or the model is passed via ViewBag
+            return View();
+        }
+
+
+
+        public async Task<IActionResult> Resend_INW_file()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+            // The service method currently returns an IActionResult, which can be directly returned.
+            // If the service were to return a ViewModel, we would pass it to the View.
+            return await _inwardService.ResendInwFile();
+        }
+
+
+
+        public async Task<IActionResult> T24_JOB()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            var result = await _inwardService.T24Job(_inwardService.GetUserName(), _inwardService.GetUserID());
+
+            if (result is OkObjectResult okResult && okResult.Value is InwardService.T24JobViewModel model)
+            {
+                ViewBag.Title = model.Title;
+                ViewBag.Tree = model.Tree;
+            }
+            else if (result is BadRequestObjectResult badRequestResult)
+            {
+                ViewBag.ErrorMessage = (badRequestResult.Value as dynamic)?.ErrorMessage ?? "An unknown error occurred.";
+                return View("Error");
+            }
+            else if (result is RedirectToActionResult redirectResult)
+            {
+                return redirectResult;
+            }
+
+            return View();
+        }
+
+
+
+        public async Task<IActionResult> ReturnStoppedCheques()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            var result = await _inwardService.ReturnStoppedCheques(
+                _inwardService.GetUserName(),
+                _inwardService.GetUserID(),
+                _inwardService.GetBranchID()
+            );
+
+            if (result is OkObjectResult okResult && okResult.Value is InwardService.ReturnStoppedChequesViewModel model)
+            {
+                ViewBag.Title = model.Title;
+                ViewBag.Tree = model.Tree;
+            }
+            else if (result is BadRequestObjectResult badRequestResult)
+            {
+                ViewBag.ErrorMessage = (badRequestResult.Value as dynamic)?.ErrorMessage ?? "An unknown error occurred.";
+                return View("Error");
+            }
+            else if (result is RedirectToActionResult redirectResult)
+            {
+                return redirectResult;
+            }
+
+            return View();
+        }
+
+
+
+        public async Task<IActionResult> T24_JOB()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            var result = await _inwardService.T24Job(_inwardService.GetUserName(), _inwardService.GetUserID());
+
+            if (result is OkObjectResult okResult && okResult.Value is InwardService.T24JobViewModel model)
+            {
+                ViewBag.Title = model.Title;
+                ViewBag.Tree = model.Tree;
+            }
+            else if (result is BadRequestObjectResult badRequestResult)
+            {
+                ViewBag.ErrorMessage = (badRequestResult.Value as dynamic)?.ErrorMessage ?? "An unknown error occurred.";
+                return View("Error");
+            }
+            else if (result is RedirectToActionResult redirectResult)
+            {
+                return redirectResult;
+            }
+
+            return View();
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> getSearchWFStage(string ChqNo, string DrwAcc, string FromDate, string ToDate)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            var result = await _inwardService.GetSearchWFStage(
+                ChqNo, DrwAcc, FromDate, ToDate,
+                _inwardService.GetUserName(),
+                _inwardService.GetPageID()
+            );
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> ReturnInwardStoppedCheque_Reverse(int id, string Retcode)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            var result = await _inwardService.ReturnInwardStoppedCheque_Reverse(
+                id, Retcode,
+                _inwardService.GetUserName()
+            );
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> ReverseAllINHOUSE()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            var result = await _inwardService.ReverseAllINHOUSE(_inwardService.GetUserName());
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> ReverseAllPMA()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            var result = await _inwardService.ReverseAllPMA(_inwardService.GetUserName());
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> ReverseAllDISCOUNT()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            var result = await _inwardService.ReverseAllDISCOUNT(_inwardService.GetUserName());
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> ReverseAllPDC()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            var result = await _inwardService.ReverseAllPDC(_inwardService.GetUserName());
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> Reversevip()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            var result = await _inwardService.Reversevip(_inwardService.GetUserName());
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> ReversePMAINWARAD(string TDate1)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            var result = await _inwardService.ReversePMAINWARAD(TDate1, _inwardService.GetUserName());
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> ReversePMAINWARAD(string TDate1)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            var result = await _inwardService.ReversePMAINWARAD(TDate1, _inwardService.GetUserName());
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> ReversePMAOUTWARD()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            var result = await _inwardService.ReversePMAOUTWARD(_inwardService.GetUserName());
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> Insufficient_Funds()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            var result = await _inwardService.Insufficient_Funds(_inwardService.GetUserName());
+            return result;
+        }
+
+
+
+        [HttpPost]
+        public async Task<JsonResult> ReverseAllINHOUSE_PDC()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+            var result = await _inwardService.ReverseAllINHOUSE_PDC(_inwardService.GetUserName());
+            return result;
+        }
+
+
+
+        [HttpPost]
+        public async Task<JsonResult> ReverseAllINHOUSE_PDC()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+            var result = await _inwardService.ReverseAllINHOUSE_PDC(_inwardService.GetUserName());
+            return result;
+        }
+
+
+
+        [HttpPost]
+        public async Task<JsonResult> ReverseAllDISCOUNT()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+            var result = await _inwardService.ReverseAllDISCOUNT(_inwardService.GetUserName());
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<ActionResult> Fix_Ret_CHQ()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string methodName = ControllerContext.ActionDescriptor.ActionName;
+            // Assuming GetMethodName, getuser_group_permision, GetAllCategoriesForTree, FillClearCenter are available or will be moved to service
+            // For now, these will be placeholders or need to be implemented.
+
+            // Example of how to get permission (assuming a service method for it)
+            // bool hasPermission = await _inwardService.getuser_group_permision(pageid, applicationid, userid);
+
+            ViewBag.Tree = await _inwardService.GetAllCategoriesForTree(); // Assuming this method is in the service
+            // FillClearCenter(); // This needs to be implemented or moved to service if it populates ViewBag
+
+            var Currencylst = await _context.CURRENCY_TBL.ToListAsync(); // Assuming _context is available in controller or injected
+            ViewBag.CURRENCY = Currencylst;
+
+            return View();
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> PrintRemove(string Branchs, string Currency, string ChequeSource, string Amount, string DRWAccNo, string ChequeNo, string vip)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            string userName = _inwardService.GetUserName();
+            string pageId = _inwardService.GetPageId(); // Assuming GetPageId() exists in service or can be passed from session
+            string groupId = _inwardService.GetGroupId(); // Assuming GetGroupId() exists in service or can be passed from session
+
+            var result = await _inwardService.PrintRemove(Branchs, Currency, ChequeSource, Amount, DRWAccNo, ChequeNo, vip, userName, pageId, groupId);
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> getSearchList_WF_fixederror(string Branchs, string Currency, string ChequeSource, string Amount, string DRWAccNo, string ChequeNo, string vip)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            string userName = _inwardService.GetUserName();
+            string groupId = _inwardService.GetGroupId(); // Assuming GetGroupId() exists in service or can be passed from session
+
+            var result = await _inwardService.getSearchList_WF_fixederror(Branchs, Currency, ChequeSource, Amount, DRWAccNo, ChequeNo, vip, userName, groupId);
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> GetAcctWF(string Branchs, string Currency, string ChequeSource, string Amount, string DRWAccNo, string ChequeNo, string vip)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            string userName = _inwardService.GetUserName();
+            string comId = _inwardService.GetCompanyId(); // Assuming GetCompanyId() exists in service or can be passed from session
+
+            var result = await _inwardService.GetAcctWF(Branchs, Currency, ChequeSource, Amount, DRWAccNo, ChequeNo, vip, userName, comId);
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> getSearchList_WF(string Branchs, string Currency, string ChequeSource, string Amount, string DRWAccNo, string ChequeNo, string WASPDC, string vip, string CustomerType)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            string userName = _inwardService.GetUserName();
+            string pageId = _inwardService.GetPageId(); // Assuming GetPageId() exists in service or can be passed from session
+            string comId = _inwardService.GetComID(); // Assuming GetComID() exists in service or can be passed from session
+
+            var result = await _inwardService.getSearchList_WF(Branchs, Currency, ChequeSource, Amount, DRWAccNo, ChequeNo, WASPDC, vip, CustomerType, userName, pageId, comId);
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> getSearchList_WF(string Branchs, string Currency, string ChequeSource, string Amount, string DRWAccNo, string ChequeNo, string WASPDC, string vip, string CustomerType)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            string userName = _inwardService.GetUserName();
+            string pageId = _inwardService.GetPageId(); // Assuming GetPageId() exists in service or can be passed from session
+            string comId = _inwardService.GetComID(); // Assuming GetComID() exists in service or can be passed from session
+
+            var result = await _inwardService.getSearchList_WF(Branchs, Currency, ChequeSource, Amount, DRWAccNo, ChequeNo, WASPDC, vip, CustomerType, userName, pageId, comId);
+            return result;
+        }
+
+
+
+        public async Task<IActionResult> Reject_CHQ()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string methodName = ControllerContext.ActionDescriptor.ActionName;
+            int pageid = 0;
+            int applicationid = 0;
+            int userid = _inwardService.GetUserID();
+
+            var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
+            if (appPage != null)
+            {
+                pageid = appPage.Page_Id;
+                applicationid = appPage.Application_ID;
+                ViewBag.Title = appPage.ENG_DESC;
+            }
+
+            HttpContext.Session.SetString("page_id", pageid.ToString());
+
+            ViewBag.Tree = await _inwardService.GetAllCategoriesForTree();
+
+            // Call the service to handle any core logic for Reject_CHQ
+            await _inwardService.Reject_CHQ(_inwardService.GetUserName(), pageid.ToString(), _inwardService.GetGroupId());
+
+            // Handle permissions
+            // This part needs to be properly implemented based on the original VB.NET logic
+            // For now, assuming GetUserGroupPermission handles setting session variables or returning access status
+            await GetUserGroupPermission(pageid, applicationid, userid);
+
+            if (HttpContext.Session.GetString("AccessPage") == "NoAccess")
+            {
+                return RedirectToAction("block", "Login");
+            }
+
+            try
+            {
+                // Populate ViewBag data
+                var cheqStatuslst = await _context.CHEQUE_STATUS_ENU
+                    .Where(x => x.ID == (int)AllEnums.Cheque_Status.Posted ||
+                                x.ID == (int)AllEnums.Cheque_Status.Verified ||
+                                x.ID == (int)AllEnums.Cheque_Status.WithDrawed ||
+                                x.ID == (int)AllEnums.Cheque_Status.New ||
+                                x.ID == (int)AllEnums.Cheque_Status.Settled)
+                    .ToListAsync();
+                ViewBag.CHEQUE_STATUS = cheqStatuslst;
+
+                var branchlst = await _context.Companies_Tbl.Where(o => o.Company_Type != "4").ToListAsync();
+                foreach (var item in branchlst)
+                {
+                    if (item.Company_Code != null && item.Company_Code.Length >= 5)
+                    {
+                        item.Company_Code = item.Company_Code.Substring(5);
+                    }
+                }
+                ViewBag.Branches = branchlst;
+
+                var clearinglst = await _context.ClearingCenters.ToListAsync();
+                ViewBag.Clearing_Center = clearinglst;
+
+                var currencylst = await _context.CURRENCY_TBL.ToListAsync();
+                ViewBag.CURRENCY = currencylst;
+
+                // Call bindchqsource and bind_chq_source if they are still needed for ViewBag
+                // bindchqsource(); // This needs to be implemented in C# if it populates ViewBag
+                // bind_chq_source(); // This needs to be implemented in C# if it populates ViewBag
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in Reject_CHQ action: {Message}", ex.Message);
+            }
+
+            return View();
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> get_Rjected_SearchList(string Branchs, string chqsource, string FromDate, string FromTransDate, string ToTransDatet, string ToDate, string FromInputDate, string ToInputDate, string FromReturnedDate, string ToReturnedDate, string BenAccNo, string AccType, string FromBank, string ToBank, string Currency, string ChequeSource, string Amount, string DRWAccNo, string ChequeNo)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = "/Login/Login" });
+            }
+
+            string userName = _inwardService.GetUserName();
+
+            var result = await _inwardService.get_Rjected_SearchList(Branchs, chqsource, FromDate, FromTransDate, ToTransDatet, ToDate, FromInputDate, ToInputDate, FromReturnedDate, ToReturnedDate, BenAccNo, AccType, FromBank, ToBank, Currency, ChequeSource, Amount, DRWAccNo, ChequeNo, userName);
+            return result;
+        }
+
+
+
+        public async Task<IActionResult> ViewDetailsOutward(int id)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string methodName = ControllerContext.ActionDescriptor.ActionName;
+            int pageid = 0;
+            int applicationid = 0;
+            int userid = _inwardService.GetUserID();
+
+            var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
+            if (appPage != null)
+            {
+                pageid = appPage.Page_Id;
+                applicationid = appPage.Application_ID;
+                ViewBag.Title = appPage.ENG_DESC;
+            }
+
+            // Handle permissions
+            await GetUserGroupPermission(pageid, applicationid, userid);
+            if (HttpContext.Session.GetString("AccessPage") == "NoAccess")
+            {
+                return RedirectToAction("block", "Login");
+            }
+
+            ViewBag.Tree = await _inwardService.GetAllCategoriesForTree();
+
+            var inChq = await _inwardService.ViewDetailsOutward(id, _inwardService.GetUserName(), pageid.ToString(), applicationid.ToString(), userid);
+
+            if (inChq == null)
+            {
+                return RedirectToAction("Reject_CHQ", "INWARD"); // Redirect to an appropriate error page or list
+            }
+
+            ViewBag.data = await _context.CURRENCY_TBL.ToListAsync(); // Populate currency data for the view
+
+            return View(inChq);
+        }
+
+
+
+        public async Task<IActionResult> ViewDetailsinwarad(int id)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string methodName = ControllerContext.ActionDescriptor.ActionName;
+            int pageid = 0;
+            int applicationid = 0;
+            int userid = _inwardService.GetUserID();
+
+            var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
+            if (appPage != null)
+            {
+                pageid = appPage.Page_Id;
+                applicationid = appPage.Application_ID;
+                ViewBag.Title = appPage.ENG_DESC;
+            }
+
+            // Handle permissions
+            await GetUserGroupPermission(pageid, applicationid, userid);
+            if (HttpContext.Session.GetString("AccessPage") == "NoAccess")
+            {
+                return RedirectToAction("block", "Login");
+            }
+
+            ViewBag.Tree = await _inwardService.GetAllCategoriesForTree();
+
+            var inChq = await _inwardService.ViewDetailsinwarad(id, _inwardService.GetUserName(), pageid.ToString(), applicationid.ToString(), userid);
+
+            if (inChq == null)
+            {
+                return RedirectToAction("Reject_CHQ", "INWARD"); // Redirect to an appropriate error page or list
+            }
+
+            ViewBag.data = await _context.CURRENCY_TBL.ToListAsync(); // Populate currency data for the view
+
+            return View(inChq);
+        }
+
+
+
+        [HttpGet]
+        public async Task<ActionResult> Updatedata(string Serial, string BenName, string BenfAccBranch, string DrwChqNo, string DrwBankNo, string DrwBranchNo, string BenfBnk, string TBL_NAME)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string userName = _inwardService.GetUserName();
+            var result = await _inwardService.Updatedata(Serial, BenName, BenfAccBranch, DrwChqNo, DrwBankNo, DrwBranchNo, BenfBnk, TBL_NAME, userName);
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<ActionResult> fixtimeout(string serial, string clecanter)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string userName = _inwardService.GetUserName();
+            var result = await _inwardService.fixtimeout(serial, clecanter, userName);
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<ActionResult> Reposttimeout(string serial, string clecanter)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string userName = _inwardService.GetUserName();
+            int userId = _inwardService.GetUserID();
+
+            // Note: The actual implementation of external ECC service calls for cheque reversal
+            // is pending in InwardService.cs. This controller action currently calls a placeholder.
+            var result = await _inwardService.Reposttimeout(serial, clecanter, userName, userId);
+            return result;
+        }
+
+
+
+        public async Task<IActionResult> EmailList()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string methodName = ControllerContext.ActionDescriptor.ActionName;
+            int pageid = 0;
+            int applicationid = 0;
+            int userid = _inwardService.GetUserID();
+
+            var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
+            if (appPage != null)
+            {
+                pageid = appPage.Page_Id;
+                applicationid = appPage.Application_ID;
+                ViewBag.Title = appPage.ENG_DESC;
+            }
+
+            await GetUserGroupPermission(pageid, applicationid, userid);
+            if (HttpContext.Session.GetString("AccessPage") == "NoAccess")
+            {
+                return RedirectToAction("block", "Login");
+            }
+
+            ViewBag.Tree = await _inwardService.GetAllCategoriesForTree();
+            _inwardService.binduserEmail(); // Assuming this populates ViewBag.TObinduserEmail
+            _inwardService.bind_userEmail(); // Assuming this populates ViewBag.CCbinduserEmail
+
+            var emailList = await _inwardService.GetEmailList(_inwardService.GetUserName(), userid);
+            return View(emailList);
+        }
+
+
+
+        public async Task<IActionResult> ADDEmail()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string methodName = ControllerContext.ActionDescriptor.ActionName;
+            int pageid = 0;
+            int applicationid = 0;
+            int userid = _inwardService.GetUserID();
+
+            var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
+            if (appPage != null)
+            {
+                pageid = appPage.Page_Id;
+                applicationid = appPage.Application_ID;
+                ViewBag.Title = appPage.ENG_DESC;
+            }
+
+            await GetUserGroupPermission(pageid, applicationid, userid);
+            if (HttpContext.Session.GetString("AccessPage") == "NoAccess")
+            {
+                return RedirectToAction("block", "Login");
+            }
+
+            ViewBag.Tree = await _inwardService.GetAllCategoriesForTree();
+            _inwardService.binduserEmail(); // Populates ViewBag.TObinduserEmail
+            _inwardService.bind_userEmail(); // Populates ViewBag.CCbinduserEmail
+
+            _inwardService.ADDEmail(); // Call the service method (which currently does nothing but could prepare data)
+
+            return View();
+        }
+
+
+
+        public async Task<IActionResult> INWTIMEOUT()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string methodName = ControllerContext.ActionDescriptor.ActionName;
+            int pageid = 0;
+            int applicationid = 0;
+            int userid = _inwardService.GetUserID();
+
+            var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
+            if (appPage != null)
+            {
+                pageid = appPage.Page_Id;
+                applicationid = appPage.Application_ID;
+                ViewBag.Title = appPage.ENG_DESC;
+            }
+
+            await GetUserGroupPermission(pageid, applicationid, userid);
+            if (HttpContext.Session.GetString("AccessPage") == "NoAccess")
+            {
+                return RedirectToAction("block", "Login");
+            }
+
+            ViewBag.Tree = await _inwardService.GetAllCategoriesForTree();
+            _inwardService.binduserEmail(); // Populates ViewBag.TObinduserEmail
+            _inwardService.bind_userEmail(); // Populates ViewBag.CCbinduserEmail
+
+            _inwardService.INWTIMEOUT(); // Call the service method (which currently does nothing but could prepare data)
+
+            return View();
+        }
+
+
+
+        [HttpGet]
+        public async Task<ActionResult> Save_Email(string name, string subject, string body, string toemail, string ccemail)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string userName = _inwardService.GetUserName();
+            var result = await _inwardService.Save_Email(name, subject, body, toemail, ccemail, userName);
+            return result;
+        }
+
+
+
+        [HttpPost]
+        public async Task<ActionResult> ReturnChqTBL([FromBody] Inward_Trans inwardTrans)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string userName = _inwardService.GetUserName();
+            bool result = await _inwardService.ReturnChqTBL(inwardTrans, userName);
+
+            if (result)
+            {
+                return Json(new { Data = "ReturnChqTBL Done Successfully" });
+            }
+            else
+            {
+                return Json(new { Data = "Oops ! , Something Wrong" });
+            }
+        }
+
+
+
+        [HttpPost]
+        public async Task<ActionResult> GenerateDiscountCommissionFile()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            bool result = await _inwardService.GenerateDiscountCommissionFile();
+
+            if (result)
+            {
+                return Json(new { Data = "File Generated Successfully" });
+            }
+            else
+            {
+                return Json(new { Data = "Oops ! , Something Wrong" });
+            }
+        }
+
+
+
+        public async Task<IActionResult> Print_CHQ_QR()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string userName = _inwardService.GetUserName();
+            var (chequeDetails, counts) = await _inwardService.Print_CHQ_QR(userName);
+
+            ViewBag.ChequeDetails = chequeDetails;
+            ViewBag.counts = counts;
+
+            return View();
+        }
+
+
+
+        [HttpGet]
+        public async Task<ActionResult> printchqViwer(string id)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            var inChq = await _inwardService.PrintChqViewer(id);
+
+            if (inChq.inw != null)
+            {
+                return Json(new { ErrorMsg = "", lstINW = inChq });
+            }
+            else
+            {
+                return Json(new { ErrorMsg = "", lstINW = inChq });
+            }
+        }
+
+
+
+        public async Task<IActionResult> VIPCHQ()
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string methodName = ControllerContext.ActionDescriptor.ActionName;
+            int pageid = 0;
+            int applicationid = 0;
+            int userid = _inwardService.GetUserID();
+
+            var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
+            if (appPage != null)
+            {
+                pageid = appPage.Page_Id;
+                applicationid = appPage.Application_ID;
+            }
+
+            await GetUserGroupPermission(pageid, applicationid, userid);
+            if (HttpContext.Session.GetString("AccessPage") == "NoAccess")
+            {
+                return RedirectToAction("block", "Login");
+            }
+
+            var viewModel = await _inwardService.VIPCHQ(_inwardService.GetUserName(), userid);
+
+            ViewBag.Title = viewModel.Title;
+            ViewBag.Tree = viewModel.Tree;
+            ViewBag.BRANCH = viewModel.Branches;
+            ViewBag.Ret_Desc = viewModel.ReturnDescriptions;
+
+            return View();
+        }
+
+
+
+        [HttpGet]
+        public async Task<JsonResult> FINDVIPCHQ(string BRANCH)
+        {
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = Url.Action("Login", "Login") });
+            }
+
+            var (lstPstINW, pmaRectCode) = await _inwardService.FINDVIPCHQ(BRANCH, _inwardService.GetUserName());
+
+            return Json(new { ErrorMsg = "", lstPDC = lstPstINW, lstPMA = pmaRectCode });
+        }
+
+
+
+        [HttpPost]
+        public async Task<JsonResult> Returnvipchq(string serial, string RC)
+        {
+            HttpContext.Session.SetString("ErrorMessage", "");
+            if (string.IsNullOrEmpty(_inwardService.GetUserName()))
+            {
+                return Json(new { redirectTo = Url.Action("Login", "Login") });
+            }
+
+            string userName = _inwardService.GetUserName();
+            int userId = _inwardService.GetUserID();
+
+            string resultMessage = await _inwardService.Returnvipchq(serial, RC, userName, userId);
+
+            if (!string.IsNullOrEmpty(resultMessage))
+            {
+                HttpContext.Session.SetString("ErrorMessage", resultMessage);
+            }
+
+            return Json(new { Data = resultMessage });
+        }
 
