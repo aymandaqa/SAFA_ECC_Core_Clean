@@ -1320,3 +1320,429 @@ namespace SAFA_ECC_Core_Clean.Controllers
             }
         }
 
+
+
+        public async Task<IActionResult> PMA_DATAVerficationDetails(int id)
+        {
+            HttpContext.Session.SetString("ErrorMessage", "");
+
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string branch = GetBranchID();
+            int _step = 90000 + 1500;
+
+            ViewBag.Branch_codee = branch;
+            string methodName = GetMethodName();
+            _step += 1;
+
+            int userId = GetUserID();
+
+            try
+            {
+                var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
+                if (appPage == null) return NotFound();
+
+                int pageId = appPage.Page_Id;
+                int applicationId = appPage.Application_ID;
+
+                // Assuming getuser_group_permision is a helper function or service call
+                // await GetUserGroupPermission(pageId, applicationId, userId);
+
+                if (HttpContext.Session.GetString("AccessPage") == "NoAccess")
+                {
+                    return RedirectToAction("block", "Login");
+                }
+                _step += 1;
+
+                ViewBag.Title = appPage.ENG_DESC;
+                _step += 1;
+                ViewBag.Tree = GetAllCategoriesForTree();
+                _step += 1;
+
+                List<string> CHQList = new List<string>();
+                int NextChq = 0;
+
+                if (!id.ToString().Contains(":"))
+                {
+                    string searchListNote = "PMA" + GetUserID();
+                    var serialList = await _context.Serial_List.FirstOrDefaultAsync(d => d.Note == searchListNote);
+
+                    if (serialList != null)
+                    {
+                        string List = serialList.Serials;
+                        string[] array_list = List.Split(';');
+
+                        if (array_list.Length != 1)
+                        {
+                            if (id == 0)
+                            {
+                                return Content("<body><script type='text/javascript'>window.close();</script></body> ");
+                            }
+
+                            foreach (var item in array_list)
+                            {
+                                if (!string.IsNullOrEmpty(item)) CHQList.Add(item.Trim());
+                            }
+
+                            try
+                            {
+                                int index_of = CHQList.IndexOf(id.ToString());
+                                if (index_of >= 0 && index_of + 1 < CHQList.Count)
+                                {
+                                    NextChq = Convert.ToInt32(CHQList[index_of + 1]);
+                                }
+                                ViewBag.NextChq = NextChq;
+                                ViewBag.CHQList = CHQList;
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex, "Error processing CHQList in PMA_DATAVerficationDetails: {Message}", ex.Message);
+                                ViewBag.NextChq = 0;
+                                ViewBag.CHQList = 0;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in PMA_DATAVerficationDetails initial setup: {Message}", ex.Message);
+                ViewBag.NextChq = 0;
+                ViewBag.CHQList = 0;
+            }
+
+            INChqs inChq = new INChqs();
+            INWARD_IMAGES Img = new INWARD_IMAGES();
+            Inward_Trans incObj = new Inward_Trans();
+            List<CURRENCY_TBL> Currency = new List<CURRENCY_TBL>();
+
+            try
+            {
+                _logger.LogInformation("Show Cheque to verify it from Inward_Trans table ");
+
+                incObj = await _context.Inward_Trans.SingleOrDefaultAsync(y => y.Serial == id.ToString());
+                _step += 1;
+
+                if (incObj.ClrCenter == "PMA")
+                {
+                    if (incObj.VIP == true && branch != "2")
+                    {
+                        ViewBag.is_vip = "Yes";
+                    }
+                }
+
+                Currency = await _context.CURRENCY_TBL.ToListAsync();
+                _step += 1;
+
+                if (incObj == null)
+                {
+                    return Content("<body><script type='text/javascript'>window.close();</script></body> ");
+                }
+                _step += 1;
+
+                Return_Codes_Tbl Ret_Code = new Return_Codes_Tbl();
+                string Ret = "";
+
+                // Assuming getfinalonuscode is a helper function or service call
+                // Ret = getfinalonuscode(incObj.ReturnCode, incObj.ReturnCodeFinancail, incObj.ClrCenter);
+
+                if (!string.IsNullOrEmpty(incObj.ReturnCode) || incObj.ReturnCode != null)
+                {
+                    Ret = incObj.ReturnCode.Trim();
+
+                    if (Ret == "")
+                    {
+                        if (!string.IsNullOrEmpty(incObj.ReturnCodeFinancail))
+                        {
+                            Ret = incObj.ReturnCodeFinancail.Trim();
+                            Ret_Code = await _context.Return_Codes_Tbl.SingleOrDefaultAsync(z => z.ReturnCode == Ret && z.ClrCenter == "PMA");
+                        }
+                    }
+                    else
+                    {
+                        Ret_Code = await _context.Return_Codes_Tbl.SingleOrDefaultAsync(z => z.ReturnCode == Ret && z.ClrCenter == "PMA");
+                    }
+                    ViewBag.RCDescription_AR = Ret_Code;
+                }
+
+                foreach (var cur in Currency)
+                {
+                    if (incObj.Currency == "1" || incObj.Currency == "2" || incObj.Currency == "3" || incObj.Currency == "5")
+                    {
+                        if (Convert.ToInt32(incObj.Currency) == cur.ID)
+                        {
+                            incObj.Currency = cur.SYMBOL_ISO;
+                            break;
+                        }
+                    }
+                }
+                _step += 1;
+
+                ViewBag.data = Currency;
+                _step += 1;
+
+                Img = await _context.INWARD_IMAGES.FirstOrDefaultAsync(y => y.Serial == incObj.Serial);
+                _step += 1;
+
+                incObj.Amount = Math.Round(incObj.Amount, (incObj.Currency == "JOD" ? 3 : 2), MidpointRounding.AwayFromZero);
+                _step += 1;
+
+                inChq.inw = incObj;
+                _step += 1;
+                inChq.Imgs = Img;
+
+                List<Return_Codes_Tbl> Ret_Desc_list = new List<Return_Codes_Tbl>();
+                string clr_center = incObj.ClrCenter;
+                Ret_Desc_list = await _context.Return_Codes_Tbl.Where(i => i.ClrCenter == clr_center).ToListAsync();
+                _step += 1;
+                ViewBag.Ret_Desc = Ret_Desc_list;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in PMA_DATAVerficationDetails: {Message}", ex.Message);
+                HttpContext.Session.SetString("ErrorMessage", "An error occurred: " + ex.Message);
+                return View("Error");
+            }
+
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+            return View(inChq);
+        }
+
+        private string GetMethodName()
+        {
+            // This method needs to be implemented to get the current action method name
+            // For now, returning a placeholder
+            return ControllerContext.RouteData.Values["action"].ToString();
+        }
+
+        // Helper class for Next_Chq, if not already defined
+        public class Next_Chq
+        {
+            public List<string> CHQ_List { get; set; } = new List<string>();
+            public int serial { get; set; }
+        }
+
+        // Helper class for onusChqs, if not already defined
+        public class onusChqs
+        {
+            public OnUs_Tbl onus { get; set; }
+            public OnUs_Imgs Imgs { get; set; }
+        }
+
+        // Helper class for INChqs, if not already defined
+        public class INChqs
+        {
+            public Inward_Trans inw { get; set; }
+            public INWARD_IMAGES Imgs { get; set; }
+        }
+
+        // Helper class for Category, if not already defined
+        public class Category
+        {
+            public int SubMenu_ID { get; set; }
+            public int? Parent_ID { get; set; }
+            public string SubMenu_Name_EN { get; set; }
+            public int Related_Page_ID { get; set; }
+        }
+
+        // Helper class for TreeNode, if not already defined
+        public class TreeNode
+        {
+            public string SubMenu_Name_EN { get; set; }
+            public int SubMenu_ID { get; set; }
+            public int Related_Page_ID { get; set; }
+            public List<TreeNode> Children { get; set; }
+        }
+
+        // Helper class for OnUs_Tbl, if not already defined
+        public class OnUs_Tbl
+        {
+            public string Serial { get; set; }
+            public string ReturnCode { get; set; }
+            public string ReturnCodeFinancail { get; set; }
+            public string ClrCenter { get; set; }
+            public bool VIP { get; set; }
+            public string Currency { get; set; }
+            public decimal Amount { get; set; }
+            public bool Was_PDC { get; set; }
+            public string PDC_Serial { get; set; }
+            public string ChqSequance { get; set; }
+            public string AltAccount { get; set; }
+        }
+
+        // Helper class for OnUs_Imgs, if not already defined
+        public class OnUs_Imgs
+        {
+            public string Serial { get; set; }
+            public byte[] FrontImg { get; set; }
+            public byte[] RearImg { get; set; }
+            public byte[] UVImage { get; set; }
+        }
+
+        // Helper class for Return_Codes_Tbl, if not already defined
+        public class Return_Codes_Tbl
+        {
+            public string ReturnCode { get; set; }
+            public string ClrCenter { get; set; }
+            public string RCDescription_AR { get; set; }
+        }
+
+        // Helper class for Serial_List, if not already defined
+        public class Serial_List
+        {
+            public string Note { get; set; }
+            public string Serials { get; set; }
+        }
+
+        // Helper class for INWARD_IMAGES, if not already defined
+        public class INWARD_IMAGES
+        {
+            public string Serial { get; set; }
+        }
+
+        // Helper class for Inward_Trans, if not already defined
+        public class Inward_Trans
+        {
+            public string Serial { get; set; }
+            public string ClrCenter { get; set; }
+            public bool VIP { get; set; }
+            public string Currency { get; set; }
+            public decimal Amount { get; set; }
+            public int posted { get; set; }
+            public string ReturnCode { get; set; }
+            public string ReturnCodeFinancail { get; set; }
+            public string ChqSequance { get; set; }
+            public string AltAccount { get; set; }
+        }
+
+        // Helper class for INWARD_WF_Tbl, if not already defined
+        public class INWARD_WF_Tbl
+        {
+            public string Serial { get; set; }
+            public string Final_Status { get; set; }
+            public string WF_Level_Desc { get; set; }
+            public DateTime WF_Level_Date { get; set; }
+            public string WF_Level_User { get; set; }
+            public decimal Amount_JD { get; set; }
+        }
+
+        // Helper class for App_Pages, if not already defined
+        public class App_Pages
+        {
+            public int Page_Id { get; set; }
+            public string Page_Name_EN { get; set; }
+            public int Application_ID { get; set; }
+            public string ENG_DESC { get; set; }
+        }
+
+        // Helper class for Users_Tbl, if not already defined
+        public class Users_Tbl
+        {
+            public string User_Name { get; set; }
+            public string Group_ID { get; set; }
+        }
+
+        // Helper class for AuthTrans_User_TBL, if not already defined
+        public class AuthTrans_User_TBL
+        {
+            public int Auth_user_ID { get; set; }
+            public string Trans_id { get; set; }
+            public string group_ID { get; set; }
+        }
+
+        // Helper class for Legal_Document_Type_Tbl, if not already defined
+        public class Legal_Document_Type_Tbl
+        {
+            public int ID { get; set; }
+            public string Legal_Doc_Name_EN { get; set; }
+        }
+
+        // Helper class for Cheque_Images_Link_Tbl, if not already defined
+        public class Cheque_Images_Link_Tbl
+        {
+            public string Serial { get; set; }
+            public string Cheque_ype { get; set; }
+            public string ImageSerial { get; set; }
+            public string ChqSequance { get; set; }
+            public DateTime TransDate { get; set; }
+        }
+
+        // Helper class for ApplicationDbContext, if not already defined
+        public class ApplicationDbContext : DbContext
+        {
+            public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+            public DbSet<INWARD_WF_Tbl> INWARD_WF_Tbl { get; set; }
+            public DbSet<Inward_Trans> Inward_Trans { get; set; }
+            public DbSet<App_Pages> App_Pages { get; set; }
+            public DbSet<Users_Tbl> Users_Tbl { get; set; }
+            public DbSet<AuthTrans_User_TBL> AuthTrans_User_TBL { get; set; }
+            public DbSet<Category> Categories { get; set; }
+            public DbSet<Return_Codes_Tbl> Return_Codes_Tbl { get; set; }
+            public DbSet<CURRENCY_TBL> CURRENCY_TBL { get; set; }
+            public DbSet<OnUs_Tbl> OnUs_Tbl { get; set; }
+            public DbSet<OnUs_Imgs> OnUs_Imgs { get; set; }
+            public DbSet<Serial_List> Serial_List { get; set; }
+            public DbSet<INWARD_IMAGES> INWARD_IMAGES { get; set; }
+            public DbSet<Legal_Document_Type_Tbl> Legal_Document_Type_Tbl { get; set; }
+            public DbSet<Cheque_Images_Link_Tbl> Cheque_Images_Link_Tbl { get; set; }
+            public DbSet<Companies_Tbl> Companies_Tbl { get; set; }
+            public DbSet<ClearingCenter> ClearingCenters { get; set; }
+            public DbSet<CHEQUE_STATUS_ENU> CHEQUE_STATUS_ENU { get; set; }
+        }
+
+        // Helper class for Companies_Tbl, if not already defined
+        public class Companies_Tbl
+        {
+            public string Company_Type { get; set; }
+            public string Company_Code { get; set; }
+        }
+
+        // Helper class for ClearingCenter, if not already defined
+        public class ClearingCenter
+        {
+            public string Id { get; set; }
+        }
+
+        // Helper class for CHEQUE_STATUS_ENU, if not already defined
+        public class CHEQUE_STATUS_ENU
+        {
+            // Define properties as per your database schema
+        }
+
+    }
+}
+
+
+
+        public string Decrypt_CAB_Account_No(string accountNo, string chqNo)
+        {
+            try
+            {
+                _logger.LogInformation("Decrypt CAB_Account Number using SQL Function -Decrypt_CAB_Acc_No-");
+
+                // This part needs proper ADO.NET implementation or EF Core raw SQL query
+                // For now, a placeholder for direct SQL execution
+                using (SqlConnection conn = new SqlConnection(_connectionString))
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand($"SELECT dbo.Decrypt_CAB_Acc_No('{accountNo}','{chqNo}')", conn))
+                    {
+                        var result = cmd.ExecuteScalar();
+                        return result?.ToString();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error when Decrypt CAB_Account Number using SQL Function -Decrypt_CAB_Acc_No-: {Message}", ex.Message);
+                // _LogSystem.WriteError(...);
+                return null;
+            }
+        }
+
