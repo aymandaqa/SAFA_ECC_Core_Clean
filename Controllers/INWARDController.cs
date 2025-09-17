@@ -753,3 +753,87 @@ namespace SAFA_ECC_Core_Clean.Controllers
         }
 
 
+
+
+        [HttpPost]
+        public async Task<IActionResult> InwordDateVerfication(string AccNo)
+        {
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+            HttpContext.Session.SetString("ErrorMessage", "");
+            int _step = 90000;
+            _step += 1;
+
+            // Session.Add("access", Nothing); // This seems to be a VB.NET specific session management, needs review
+
+            string methodName = GetMethodName(); // Assuming GetMethodName() is implemented elsewhere
+            _step += 1;
+            HttpContext.Session.Remove("locked");
+            HttpContext.Session.Remove("loked_user");
+
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("methodName")))
+            {
+                HttpContext.Session.SetString("methodName", methodName);
+            }
+
+            // Group_Types_Tbl group_name = new Group_Types_Tbl(); // Not used
+            int applicationId;
+            int userId = GetUserID();
+            // SAFA_ECCEntities _CAB = new SAFA_ECCEntities(); // Replaced by _context
+            int pageId;
+            try
+            {
+                // This try-catch block seems to be inverted in the original VB.NET code.
+                // The catch block contains logic that should be in the try block.
+                // Assuming the intent is to get pageId and applicationId, then check permissions.
+                var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
+                if (appPage == null) return NotFound(); // Or handle appropriately
+
+                pageId = appPage.Page_Id;
+                _step += 1;
+                applicationId = appPage.Application_ID;
+                _step += 1;
+
+                // Assuming getuser_group_permision is a helper function or service call
+                // await getuser_group_permision(pageId.ToString(), applicationId.ToString(), userId.ToString());
+                // For now, calling the C# version directly
+                await GetUserGroupPermission(pageId, applicationId, userId);
+
+                if (HttpContext.Session.GetString("AccessPage") == "NoAccess")
+                {
+                    return RedirectToAction("block", "Login");
+                }
+                _step += 1;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in InwordDateVerfication (AccNo): {Message}", ex.Message);
+                HttpContext.Session.SetString("ErrorMessage", "An error occurred: " + ex.Message);
+                return View("Error"); // Or a specific error view
+            }
+
+            return View(); // Placeholder, actual view needs to be determined
+        }
+
+        public async Task<IActionResult> InwordDateVerfication()
+        {
+            HttpContext.Session.SetString("ErrorMessage", "");
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+            // Session.Add("access", Nothing); // Needs review
+
+            // The rest of the logic for this overload needs to be extracted and converted.
+            // For now, returning a placeholder view.
+            return View();
+        }
+
+        // Helper to get method name (similar to VB.NET's GetMethodName)
+        private string GetMethodName()
+        {
+            return ControllerContext.RouteData.Values["action"].ToString();
+        }
+
