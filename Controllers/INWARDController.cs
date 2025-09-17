@@ -1147,3 +1147,176 @@ namespace SAFA_ECC_Core_Clean.Controllers
             return ControllerContext.ActionDescriptor.ActionName;
         }
 
+
+
+        public async Task<IActionResult> PMADATAVerficationDetails_OnUS(int id)
+        {
+            HttpContext.Session.SetString("ErrorMessage", "");
+
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string methodName = GetMethodName();
+            int userId = GetUserID();
+
+            try
+            {
+                var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
+                if (appPage == null) return NotFound();
+
+                int pageId = appPage.Page_Id;
+                int applicationId = appPage.Application_ID;
+
+                // Assuming getuser_group_permision is a helper function or service call
+                // await getuser_group_permision(pageId, applicationId, userId);
+
+                string title = (await _context.App_Pages.SingleOrDefaultAsync(c => c.Page_Id == pageId))?.ENG_DESC;
+                ViewBag.Title = title;
+                ViewBag.Tree = GetAllCategoriesForTree();
+
+                List<string> chqList = new List<string>();
+                int nextChq = 0;
+
+                if (!id.ToString().Contains(":"))
+                {
+                    string searchListNote = "INHOUSE" + HttpContext.Session.GetString("ID");
+                    var serialList = await _context.Serial_List.FirstOrDefaultAsync(d => d.Note == searchListNote);
+
+                    if (serialList != null && !string.IsNullOrEmpty(serialList.Serials))
+                    {
+                        string[] arrayList = serialList.Serials.Split(';');
+                        if (arrayList.Length > 1)
+                        {
+                            if (id == 0)
+                            {
+                                return Content("<body><script type='text/javascript'>window.close();</script></body>");
+                            }
+
+                            foreach (var item in arrayList)
+                            {
+                                if (!string.IsNullOrEmpty(item))
+                                {
+                                    chqList.Add(item.Trim());
+                                }
+                            }
+
+                            try
+                            {
+                                int indexOf = chqList.IndexOf(id.ToString());
+                                if (indexOf != -1 && indexOf + 1 < chqList.Count)
+                                {
+                                    nextChq = Convert.ToInt32(chqList[indexOf + 1]);
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                // Log exception if needed
+                            }
+                        }
+                    }
+                }
+
+                ViewBag.NextChq = nextChq;
+                ViewBag.CHQList = chqList;
+
+                HttpContext.Session.SetString("IMGERROR", "");
+
+                OnusChqs inChq = new OnusChqs();
+                OnUs_Imgs img = null;
+                OnUs_Tbl incObj = null;
+                List<CURRENCY_TBL> currency = null;
+
+                incObj = await _context.OnUs_Tbl.SingleOrDefaultAsync(y => y.Serial == id);
+                currency = await _context.CURRENCY_TBL.ToListAsync();
+
+                if (incObj == null)
+                {
+                    return Content("<body><script type='text/javascript'>window.close();</script></body>");
+                }
+
+                string retCodeStr = incObj.ReturnCode;
+                Return_Codes_Tbl retCode = null;
+
+                if (!string.IsNullOrEmpty(retCodeStr))
+                {
+                    retCodeStr = retCodeStr.Trim();
+                    if (string.IsNullOrEmpty(retCodeStr))
+                    {
+                        retCodeStr = incObj.ReturnCodeFinancail?.Trim();
+                        if (!string.IsNullOrEmpty(retCodeStr))
+                        {
+                            retCode = await _context.Return_Codes_Tbl.SingleOrDefaultAsync(z => z.ReturnCode == retCodeStr && z.ClrCenter == "PMA");
+                        }
+                    }
+                    else
+                    {
+                        retCode = await _context.Return_Codes_Tbl.SingleOrDefaultAsync(z => z.ReturnCode == retCodeStr && z.ClrCenter == "PMA");
+                    }
+                }
+                ViewBag.RCDescription_AR = retCode;
+
+                foreach (var curr in currency)
+                {
+                    if (incObj.Currency == "1" || incObj.Currency == "2" || incObj.Currency == "3" || incObj.Currency == "5")
+                    {
+                        if (Convert.ToInt32(incObj.Currency) == curr.ID)
+                        {
+                            incObj.Currency = curr.SYMBOL_ISO;
+                            break;
+                        }
+                    }
+                }
+
+                ViewBag.data = currency;
+                img = await _context.OnUs_Imgs.FirstOrDefaultAsync(y => y.Serial == incObj.Serial);
+
+                if (img == null)
+                {
+                    try
+                    {
+                        Cheque_Images_Link_Tbl onusImgLink = await _context.Cheque_Images_Link_Tbl.SingleOrDefaultAsync(v => v.Serial == incObj.Serial && v.Cheque_ype == "OnUs");
+                        if (onusImgLink == null)
+                        {
+                            Cheque_Images_Link_Tbl postImgLink = await _context.Cheque_Images_Link_Tbl.SingleOrDefaultAsync(v => v.Serial == incObj.PDC_Serial && v.Cheque_ype == "PDC");
+                            if (postImgLink != null)
+                            {
+                                onusImgLink = new Cheque_Images_Link_Tbl
+                                {
+                                    Serial = incObj.Serial,
+                                    Cheque_ype = "OnUs",
+                                    ImageSerial = postImgLink.ImageSerial,
+                                    ChqSequance = incObj.ChqSequance,
+                                    TransDate = DateTime.Now
+                                };
+                                _context.Cheque_Images_Link_Tbl.Add(onusImgLink);
+                                await _context.SaveChangesAsync();
+                            }
+                        }
+                    }
+                    catch (Exception ex) { _logger.LogError(ex, "Error handling missing image for OnUs cheque."); }
+                }
+
+                incObj.Amount = Decimal.Round(incObj.Amount, 2, MidpointRounding.AwayFromZero);
+                inChq.onus = incObj;
+                inChq.Imgs = img;
+
+                List<Return_Codes_Tbl> retDescList = await _context.Return_Codes_Tbl.Where(i => i.ClrCenter == "PMA").ToListAsync();
+                ViewBag.Ret_Desc = retDescList;
+
+                if (inChq.onus.Was_PDC == true)
+                {
+                    ViewBag.WAS_PDC = "WAS_PDC";
+                }
+
+                return View(inChq);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in PMADATAVerficationDetails_OnUS: {Message}", ex.Message);
+                HttpContext.Session.SetString("ErrorMessage", "An error occurred: " + ex.Message);
+                return View("Error");
+            }
+        }
+
