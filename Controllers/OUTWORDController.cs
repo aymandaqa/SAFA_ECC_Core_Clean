@@ -84,3 +84,43 @@ namespace SAFA_ECC_Core_Clean.Controllers
             return await _outwordService.Rejected_Out_Request();
         }
 
+
+
+        public async Task<IActionResult> RepresnetDisDetails(string id)
+        {
+            ViewBag.Tree = await _outwordService.GetAllCategoriesForTree();
+            return await _outwordService.RepresnetDisDetails(id);
+        }
+
+
+
+        public async Task<IActionResult> RepresnetDisDetails(string id)
+        {
+            ViewBag.Tree = await _outwordService.GetAllCategoriesForTree();
+            return await _outwordService.RepresnetDisDetails(id);
+        }
+
+
+
+        public async Task<IActionResult> GetOutwordPDC()
+        {
+            ViewBag.Tree = await _outwordService.GetAllCategoriesForTree();
+            return await _outwordService.GetOutwordPDC();
+        }
+
+
+
+        public async Task<IActionResult> Out_VerficationDetails(string id)
+        {
+            ViewBag.Tree = await _outwordService.GetAllCategoriesForTree();
+            return await _outwordService.Out_VerficationDetails(id);
+        }
+
+
+
+        public async Task<IActionResult> OUTWORD()
+        {
+            ViewBag.Tree = await _outwordService.GetAllCategoriesForTree();
+            return await _outwordService.OUTWORD();
+        }
+

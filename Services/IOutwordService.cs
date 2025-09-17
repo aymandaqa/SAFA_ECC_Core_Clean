@@ -40,3 +40,23 @@ namespace SAFA_ECC_Core_Clean.Services
 
 
         Task<IActionResult> RepresnetDisDetails(string id);
+
+
+        Task<IActionResult> GetOutwordPDC();
+
+
+
+        Task<IActionResult> Out_VerficationDetails(string id);
+
+
+
+        Task<IActionResult> OutwordDateVerfication(string id);
+
+
+
+        Task<IActionResult> OUTWORD();
+
+
+
+        Task<IActionResult> OUTWORD(Outward_Trans outwardTrans, string actionType);
+
