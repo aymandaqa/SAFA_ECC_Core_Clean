@@ -532,3 +532,31 @@ namespace SAFA_ECC_Core_Clean.Controllers
             return false;
         }
 
+
+
+        public bool Ge_t(string x)
+        {
+            int _step = 90000;
+            _step += 400;
+            try
+            {
+                var page = _context.Menu_Items_Tbl.Where(i => i.Parent_ID == x).ToList();
+                _step += 10;
+                if (page.Count > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in Ge_t: {Message}", ex.Message);
+                // _LogSystem.WriteLogg(_Logg_Message, _ApplicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, GetUserName(), GetUserName(), "", "", "");
+                // _LogSystem.WriteTraceLogg(_Logg_Message, _ApplicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, GetUserName(), GetUserName(), "", "", "");
+                return false; // Or handle as appropriate
+            }
+        }
+
