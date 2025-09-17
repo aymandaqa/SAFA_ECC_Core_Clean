@@ -1,307 +1,543 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SAFA_ECC_Core_Clean.Data;
-using SAFA_ECC_Core_Clean.Models;
-using SAFA_ECC_Core_Clean.ViewModels.InwardViewModels;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
-using System.Text;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using SAFA_ECC_Core_Clean.Data;
+using SAFA_ECC_Core_Clean.Models;
+using SAFA_ECC_Core_Clean.ViewModels.InwardViewModels;
+using Microsoft.EntityFrameworkCore;
+using System.Net.Http;
+using System.Text;
+using System.Xml.Linq;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace SAFA_ECC_Core_Clean.Controllers
 {
-    [Authorize]
     public class INWARDController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<INWARDController> _logger;
-        // Assuming these are external services or helper classes, mock them for now
-        // private readonly All_CLASSES.AllStoredProcesures _LogSystem;
-        // private readonly ECC_CAP_Services.SAFA_T24_ECC_SVCSoapClient _EccAccInfo_WebSvc;
-        // private readonly ECC_Handler_SVC.InwardHandlingSVCSoapClient _WebSvc;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public INWARDController(ApplicationDbContext context, ILogger<INWARDController> logger)
+        public INWARDController(ApplicationDbContext context, ILogger<INWARDController> logger, IHttpClientFactory httpClientFactory)
         {
             _context = context;
             _logger = logger;
-            // Initialize mock services if needed
-            // _LogSystem = new All_CLASSES.AllStoredProcesures(true, true, true, "", "", "", "");
-            // _EccAccInfo_WebSvc = new ECC_CAP_Services.SAFA_T24_ECC_SVCSoapClient("SAFA_T24_ECC_SVCSoap");
-            // _WebSvc = new ECC_Handler_SVC.InwardHandlingSVCSoapClient("InwardHandlingSVCSoap");
+            _httpClientFactory = httpClientFactory;
         }
 
-        private string GetUserName() => User.FindFirstValue(ClaimTypes.Name);
-        private string GetBranchID() => User.FindFirstValue("BranchID"); // Assuming custom claim
-        private string GetComID() => User.FindFirstValue("ComID"); // Assuming custom claim
-        private int GetUserID() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)); // Assuming User ID is stored in NameIdentifier
+        // Helper methods for session (to be replaced with proper identity management)
+        private string GetUserName() => HttpContext.Session.GetString("UserName") ?? "Unknown";
+        private string GetBranchID() => HttpContext.Session.GetString("BranchID") ?? "0";
+        private string GetComID() => HttpContext.Session.GetString("ComID") ?? "0";
+        private int GetUserID() => HttpContext.Session.GetInt32("ID") ?? 0;
 
-        // Helper for permission check (simplified for now)
-        private async Task<bool> HasPermission(string actionName)
+        // Dummy method for getuser_group_permision - needs actual implementation
+        private void getuser_group_permision(int pageId, int applicationId, int userId)
         {
-            // Implement actual permission logic based on your application's requirements
-            // For now, assume all authenticated users have access
-            return User.Identity.IsAuthenticated;
+            // Implement actual permission check here
+            _logger.LogInformation($"Permission check for UserID: {userId}, PageID: {pageId}, ApplicationID: {applicationId}");
+            // For now, assume access
+            // HttpContext.Session.SetString("AccessPage", "Access");
         }
 
-        // GET: INWARD/Index
+        // Dummy method for GetAllCategoriesForTree - needs actual implementation
+        private List<TreeNode> GetAllCategoriesForTree()
+        {
+            // Implement actual tree data retrieval
+            return new List<TreeNode>();
+        }
+
         public IActionResult Index()
         {
             return View();
         }
 
-        // GET: INWARD/Indextest
         public IActionResult Indextest(string id)
         {
             return View();
         }
 
-        // GET: INWARD/Reject_CHQ
-        public async Task<IActionResult> Reject_CHQ(string chequeId)
-        {
-            if (!await HasPermission("Reject_CHQ"))
-                return Forbid();
-
-            var model = new RejectChequeViewModel();
-            // Mock data retrieval for demonstration
-            if (!string.IsNullOrEmpty(chequeId))
-            {
-                // In a real app, fetch cheque details from DB/service
-                model.ChequeId = chequeId;
-                model.ChequeNumber = "123456";
-                model.Amount = 1500.00m;
-                model.RejectionReason = "";
-            }
-            return View(model);
-        }
-
-        // POST: INWARD/Reject_CHQ
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reject_CHQ(RejectChequeViewModel model)
-        {
-            if (!await HasPermission("Reject_CHQ"))
-                return Forbid();
-
-            if (ModelState.IsValid)
-            {
-                // Simulate saving rejection details
-                _logger.LogInformation($"Cheque {model.ChequeId} rejected with reason: {model.RejectionReason}");
-                TempData["SuccessMessage"] = "تم رفض الشيك بنجاح.";
-                return RedirectToAction(nameof(Index));
-            }
-            TempData["ErrorMessage"] = "حدث خطأ أثناء رفض الشيك.";
-            return View(model);
-        }
-
-        // GET: INWARD/ReturnOnUsStoppedChequeDetails
-        public async Task<IActionResult> ReturnOnUsStoppedChequeDetails(string chequeId)
-        {
-            if (!await HasPermission("ReturnOnUsStoppedChequeDetails"))
-                return Forbid();
-
-            var model = new ReturnOnUsStoppedChequeDetailsViewModel();
-            if (!string.IsNullOrEmpty(chequeId))
-            {
-                // Mock data retrieval
-                model.ChequeId = chequeId;
-                model.AccountNumber = "987654321";
-                model.ChequeNumber = "654321";
-                model.Amount = 2500.00m;
-                model.BeneficiaryName = "Ahmed Ali";
-                model.StopReason = "Lost Cheque";
-            }
-            return View(model);
-        }
-
-        // Function InwardFinanicalWFDetailsPMADIS
         public async Task<IActionResult> InwardFinanicalWFDetailsPMADIS(string id)
+        {
+            HttpContext.Session.SetString("ErrorMessage", "");
+
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string methodName = "InwardFinanicalWFDetailsPMADIS";
+            int userId = GetUserID();
+
+            var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
+            if (appPage == null)
+            {
+                _logger.LogError($"App_Page not found for method: {methodName}");
+                return RedirectToAction("Error", "Home"); // Or handle appropriately
+            }
+
+            int pageId = appPage.Page_Id;
+            int applicationId = appPage.Application_ID;
+
+            getuser_group_permision(pageId, applicationId, userId);
+
+            ViewBag.Title = appPage.ENG_DESC;
+            ViewBag.Tree = GetAllCategoriesForTree();
+
+            var viewModel = new InwardFinanicalWFDetailsPMADISViewModel();
+            string branch = GetBranchID();
+            string com = GetComID();
+
+            try
+            {
+                _logger.LogInformation($"Show Cheque InwardFinanicalWFDetailsPMADIS it from Inward_Trans table for user: {GetUserName()}");
+
+                var wf = await _context.INWARD_WF_Tbl.SingleOrDefaultAsync(z => z.Serial == id && z.Final_Status != "Accept");
+                if (wf == null)
+                {
+                    _logger.LogWarning($"INWARD_WF_Tbl not found or already accepted for Serial: {id}");
+                    return RedirectToAction("Error", "Home"); // Or handle appropriately
+                }
+
+                var incObj = await _context.Inward_Trans.SingleOrDefaultAsync(y => y.Serial == id);
+                if (incObj == null)
+                {
+                    return RedirectToAction("InsufficientFunds", "INWARD");
+                }
+
+                if (incObj.ClrCenter == "PMA" && incObj.VIP == true && branch != "2")
+                {
+                    ViewBag.is_vip = "YES";
+                    viewModel.IsVIP = "YES";
+                }
+
+                var guarCustomers = await _context.T24_CAB_OVRDRWN_GUAR
+                                                .Where(i => i.GUAR_CUSTOMER == incObj.ISSAccount)
+                                                .ToListAsync();
+
+                if (guarCustomers.Any())
+                {
+                    // Assuming EccAccInfo_WebSvc is a service client for T24_ECC_SVCSoapClient
+                    // This part needs actual service integration
+                    // For now, mocking the data
+                    string guarCustomerInfo = "";
+                    foreach (var item in guarCustomers)
+                    {
+                        // Mocking service call
+                        // var GUAR_CUSTOMER_Accobj = await EccAccInfo_WebSvc.ACCOUNT_INFO(item.ACCOUNT_NUMBER, 1);
+                        // guarCustomerInfo += $"{item.ACCOUNT_NUMBER}*{GUAR_CUSTOMER_Accobj.ClearBalance}*{GUAR_CUSTOMER_Accobj.AccountCurrency}|";
+                        guarCustomerInfo += $"{item.ACCOUNT_NUMBER}*MockBalance*MockCurrency|";
+                    }
+                    ViewBag.GUAR_CUSTOMER = guarCustomerInfo;
+                    viewModel.GUAR_CUSTOMER = guarCustomerInfo;
+                }
+                else
+                {
+                    ViewBag.GUAR_CUSTOMER = "Not Available";
+                    viewModel.GUAR_CUSTOMER = "Not Available";
+                }
+
+                // Mocking service call for Accobj
+                // var Accobj = await EccAccInfo_WebSvc.ACCOUNT_INFO(incObj.AltAccount, 1);
+                viewModel.BookedBalance = "MockBookedBalance";
+                viewModel.ClearBalance = "MockClearBalance";
+                viewModel.AccountStatus = "MockAccountStatus";
+
+                string userName = GetUserName();
+                var user = await _context.Users_Tbl.SingleOrDefaultAsync(c => c.User_Name == userName);
+                string group = user?.Group_ID.ToString() ?? "";
+
+                ViewBag.Reject = "False";
+                viewModel.Reject = "False";
+                ViewBag.recomdationbtn = "True";
+                viewModel.Recom = "True";
+
+                if (group == GroupType.Group_Status.AdminAuthorized.ToString() || branch == "2")
+                {
+                    ViewBag.Approve = "True";
+                    viewModel.Approve = "True";
+                    ViewBag.recomdationbtn = "False";
+                    viewModel.Recom = "False";
+                }
+                else
+                {
+                    var transaction = await _context.Transaction_TBL.SingleOrDefaultAsync(z => z.Transaction_Name == wf.Clr_Center);
+                    if (transaction != null)
+                    {
+                        // This part needs actual stored procedure or function mapping
+                        // var userLevels = await _context.USER_Limits_Auth_Amount(userId, transaction.Transaction_ID, "d", wf.Amount_JD).ToListAsync();
+                        // For now, assuming default behavior
+                    }
+
+                    ViewBag.recomdationbtn = "True";
+                    viewModel.Recom = "True";
+
+                    string user_name_wf = wf.Level1_status ?? "";
+                    string user_name_site = GetUserName();
+
+                    var authTransUser = await _context.AuthTrans_User_TBL
+                        .SingleOrDefaultAsync(t => t.Auth_user_ID == userId && t.Trans_id == (incObj.ClrCenter == "PMA" ? "5" : "6") && t.group_ID == user.Group_ID);
+
+                    if (authTransUser != null)
+                    {
+                        if (wf.Level1_status == null || wf.Level1_status.Contains(user_name_site))
+                        {
+                            ViewBag.Approve = "True";
+                            viewModel.Approve = "True";
+                        }
+                        else
+                        {
+                            ViewBag.Approve = "False";
+                            viewModel.Approve = "False";
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.Approve = "False";
+                        viewModel.Approve = "False";
+                    }
+                }
+
+                viewModel.Serial = incObj.Serial;
+                viewModel.TransDate = incObj.TransDate;
+                viewModel.ChqSequance = incObj.ChqSequance;
+                viewModel.Amount = incObj.Amount;
+                viewModel.ClrCenter = incObj.ClrCenter;
+                viewModel.DrwAccNo = incObj.DrwAccNo;
+                viewModel.DrwChqNo = incObj.DrwChqNo;
+                viewModel.DrwBank = incObj.DrwBank;
+                viewModel.ISSAccount = incObj.ISSAccount;
+                viewModel.AltAccount = incObj.AltAccount;
+                viewModel.CustomerName = incObj.CustomerName;
+                viewModel.CustomerName2 = incObj.CustomerName2;
+                viewModel.ErrorDescription = incObj.ErrorDescription;
+                viewModel.ReturnCode = incObj.ReturnCode;
+                viewModel.T24Response = incObj.T24Response;
+                viewModel.VerifyStatus = incObj.verifyStatus;
+                viewModel.FirstLevelStatus = incObj.FirstLevelStatus;
+                viewModel.FirstLevelUser = incObj.FirstLevelUser;
+                viewModel.FirstLevelDate = incObj.FirstLevelDate;
+                viewModel.SecoundLevelStatus = incObj.SecoundLevelStatus;
+                viewModel.SecoundLevelUser = incObj.SecoundLevelUser;
+                viewModel.SecoundLevelDate = incObj.SecoundLevelDate;
+                viewModel.History = incObj.History;
+                viewModel.VIP = incObj.VIP;
+                viewModel.BranchID = incObj.BranchID;
+                viewModel.FinalRetCode = incObj.FinalRetCode;
+                viewModel.Rejected = incObj.Rejected;
+                viewModel.VerifiedTechnically = incObj.VerifiedTechnically;
+                viewModel.ReturnDate = incObj.ReturnDate;
+                viewModel.Posted = incObj.Posted;
+                viewModel.WFLevel = wf.WF_LEVEL;
+
+                // Populate other ViewModel properties from incObj and wf
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in InwardFinanicalWFDetailsPMADIS for Serial: {id}");
+                HttpContext.Session.SetString("ErrorMessage", ex.Message);
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> InwardFinanicalWFDetailsPMADIS_Auth(InwardFinanicalWFDetailsPMADIS_AuthViewModel model)
         {
             if (string.IsNullOrEmpty(GetUserName()))
             {
                 return RedirectToAction("Login", "Login");
             }
 
-            // Session.Item("ErrorMessage") = ""; // Handled by TempData or similar in ASP.NET Core
-            // Dim _json As New JsonResult; _json.Data = ""; // Not directly applicable in MVC Core Action
-
-            string methodName = "InwardFinanicalWFDetailsPMADIS";
+            string methodName = "InwardFinanicalWFDetailsPMADIS_Auth";
             int userId = GetUserID();
-            string userName = GetUserName();
-            string branchId = GetBranchID();
-            string comId = GetComID();
+
+            var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
+            if (appPage == null)
+            {
+                _logger.LogError($"App_Page not found for method: {methodName}");
+                return Json(new { success = false, message = "Configuration error." });
+            }
+
+            int pageId = appPage.Page_Id;
+            int applicationId = appPage.Application_ID;
+
+            getuser_group_permision(pageId, applicationId, userId);
 
             try
             {
-                _logger.LogInformation($"Show Cheque InwardFinanicalWFDetailsPMADIS from Inward_Trans table for ID: {id}");
+                _logger.LogInformation($"InwardFinanicalWFDetailsPMADIS_Auth called for Serial: {model.Serial} with Status: {model.Status} and ReturnCode: {model.ReturnCode}");
 
-                var wf = await _context.INWARD_WF_Tbl.SingleOrDefaultAsync(z => z.Serial == id && z.Final_Status != "Accept");
-                var incObj = await _context.Inward_Trans.SingleOrDefaultAsync(y => y.Serial == id);
-
-                if (incObj == null)
+                var inward = await _context.Inward_Trans.SingleOrDefaultAsync(i => i.Serial == model.Serial);
+                if (inward == null)
                 {
-                    return RedirectToAction("InsufficientFunds", "INWARD");
+                    return Json(new { success = false, message = "Inward transaction not found." });
                 }
 
-                var model = new InwardFinanicalWFDetailsPMADISViewModel
+                var wf = await _context.INWARD_WF_Tbl.SingleOrDefaultAsync(w => w.Serial == model.Serial && w.Final_Status != "Accept");
+                if (wf == null)
                 {
-                    Serial = incObj.Serial,
-                    ClrCenter = incObj.ClrCenter,
-                    VIP = incObj.VIP,
-                    Amount = incObj.Amount,
-                    ISSAccount = incObj.ISSAccount,
-                    AltAccount = incObj.AltAccount,
-                    // Populate other properties from incObj and wf
+                    return Json(new { success = false, message = "Workflow entry not found or already accepted." });
+                }
+
+                var wfHistory = new WFHistory
+                {
+                    ChqSequance = inward.ChqSequance,
+                    Serial = inward.Serial,
+                    TransDate = inward.TransDate,
+                    ClrCenter = inward.ClrCenter,
+                    DrwChqNo = inward.DrwChqNo,
+                    DrwAccNo = inward.DrwAccNo,
+                    Amount = inward.Amount
                 };
 
-                if (incObj.ClrCenter == "PMA" && incObj.VIP == true && branchId != "2")
+                if (wf.WF_LEVEL == 1)
                 {
-                    model.IsVIP = "YES";
+                    if (model.Status == 0) // Reject
+                    {
+                        inward.ReturnCode = model.ReturnCode;
+                        inward.verifyStatus = 0;
+                        inward.FirstLevelDate = DateTime.Now;
+                        inward.FirstLevelStatus = "Reject";
+                        inward.FirstLevelUser = GetUserName();
+                        inward.History += $"VerifiedTechnically rejected , By : {GetUserName()} At: {DateTime.Now}";
+                        wfHistory.ID_WFStatus = WFHistory.WF_Status.InitialTechnicalRejection;
+                        wfHistory.Status = $"InitialTechnicalRejection , By :{GetUserName()} With Return code ={model.ReturnCode} At: {DateTime.Now}";
+                    }
+                    else // Accept
+                    {
+                        inward.History += $"VerifiedTechnically Accepted , By : {GetUserName()} At: {DateTime.Now}";
+                        inward.verifyStatus = 1;
+                        inward.FirstLevelDate = DateTime.Now;
+                        inward.FirstLevelStatus += " | Accept";
+                        inward.FirstLevelUser += " |" + GetUserName();
+                        inward.FinalRetCode = ""; // Original VB.NET had this empty
+                        wfHistory.ID_WFStatus = WFHistory.WF_Status.TechnicallyAccepted;
+                        wfHistory.Status = $"VerifiedTechnically Accepted By :{GetUserName()} At: {DateTime.Now}";
+                    }
+                    _context.WFHistories.Add(wfHistory);
+                    await _context.SaveChangesAsync();
+                }
+                else if (wf.WF_LEVEL == 2)
+                {
+                    if (model.Status == 0) // Reject
+                    {
+                        inward.ReturnCode = model.ReturnCode;
+                        inward.Rejected = 1;
+                        inward.verifyStatus = 0;
+                        inward.VerifiedTechnically = 1;
+                        inward.History += $"VerifiedTechnically Rejected Finally , By : {GetUserName()} At: {DateTime.Now}";
+                        inward.SecoundLevelDate = DateTime.Now;
+                        inward.SecoundLevelStatus += " | Reject";
+                        inward.SecoundLevelUser += " | " + GetUserName();
+                        wfHistory.ID_WFStatus = WFHistory.WF_Status.FinalTechnicalRejection;
+                        wfHistory.Status = $"FinalTechnicalRejection , By : {GetUserName()} With Return code ={model.ReturnCode} At: {DateTime.Now}";
+                    }
+                    else // Accept
+                    {
+                        inward.History += $"VerifiedTechnically Accepted Finally , By : {GetUserName()} At: {DateTime.Now}";
+                        inward.verifyStatus = 1;
+                        inward.SecoundLevelDate = DateTime.Now;
+                        inward.SecoundLevelStatus += " | Accept";
+                        inward.SecoundLevelUser += " | " + GetUserName();
+                        inward.FinalRetCode = ""; // Original VB.NET had this empty
+                        wfHistory.ID_WFStatus = WFHistory.WF_Status.TechnicallyAccepted;
+                        wfHistory.Status = $"VerifiedTechnically Accepted By :{GetUserName()} At: {DateTime.Now}";
+                    }
+                    _context.WFHistories.Add(wfHistory);
+                    await _context.SaveChangesAsync();
+
+                    // SMS Logic (needs actual implementation)
+                    // if (SMS_STATUS == "LIVE") { ... }
                 }
 
-                // Mocking external service calls
-                // var EccAccInfo_WebSvc = new ECC_CAP_Services.SAFA_T24_ECC_SVCSoapClient("SAFA_T24_ECC_SVCSoap");
-                // var Accobj = EccAccInfo_WebSvc.ACCOUNT_INFO(incObj.AltAccount, 1);
-                // model.BookedBalance = Accobj.BookedBalance;
-                // model.ClearBalance = Accobj.ClearBalance;
-                // model.AccountStatus = Accobj.AccountStatus;
+                await _context.SaveChangesAsync();
 
-                // Mocking GUAR_CUSTOMER logic
-                // var GUAR_CUSTOMER = await _context.T24_CAB_OVRDRWN_GUAR.Where(i => i.GUAR_CUSTOMER == incObj.ISSAccount).ToListAsync();
-                // if (GUAR_CUSTOMER.Count == 0)
-                // { model.GUAR_CUSTOMER_Info = "Not Available"; }
-                // else
-                // { /* Populate GUAR_CUSTOMER_Info */ }
-
-                var userGroup = await _context.Users_Tbl.Where(u => u.UserName == userName).Select(u => u.Group_ID).FirstOrDefaultAsync();
-
-                model.Reject = "False";
-                model.Recom = "True";
-
-                // Assuming GroupType.Group_Status.AdminAuthorized is an enum or constant
-                // For now, hardcode or define constants for GroupType values
-                const int AdminAuthorizedGroup = 4; // Example value
-
-                if (userGroup == AdminAuthorizedGroup || branchId == "2")
-                {
-                    model.Approve = "True";
-                    model.Recom = "False";
-                }
-                else
-                {
-                    // Mocking Userlevel and AuthTrans_User_TBL logic
-                    // var Tbl_id = await _context.Transaction_TBL.Where(z => z.Transaction_Name == wf.Clr_Center).Select(z => z.Transaction_ID).FirstOrDefaultAsync();
-                    // var Userlevel = await _context.USER_Limits_Auth_Amount(userId, Tbl_id, "d", wf.Amount_JD).ToListAsync();
-                    // model.Recom = "True";
-
-                    // var x = await _context.AuthTrans_User_TBL.SingleOrDefaultAsync(t => t.Auth_user_ID == userId && t.Trans_id == "5" && t.group_ID == userGroup);
-                    // model.IsAuthorized = (x != null && x.Value == true);
-                }
-
-                // More complex logic for different levels and statuses would go here
-
-                return View(model);
+                return Json(new { success = true, message = "Operation completed successfully." });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error in InwardFinanicalWFDetailsPMADIS for ID: {id}. Error: {ex.Message}");
-                // Handle error, maybe redirect to an error page or show a message
-                return RedirectToAction("Error", "Home");
+                _logger.LogError(ex, $"Error in InwardFinanicalWFDetailsPMADIS_Auth for Serial: {model.Serial}");
+                return Json(new { success = false, message = ex.Message });
             }
         }
 
-        // Function InwardFinanicalWFDetailsPMADIS_Auth
-        public async Task<JsonResult> InwardFinanicalWFDetailsPMADIS_Auth(string id, string Status, string app, string page)
+        [HttpPost]
+        public async Task<IActionResult> ReversePostingPMARAM(string id, string MQ_MSG)
         {
-            var jsonResult = new JsonResult(new { success = false, message = "" });
-            int groupId = 0;
-            int appId = 0;
-            int pageId = 0;
-            if (!int.TryParse(id, out groupId) || !int.TryParse(app, out appId) || !int.TryParse(page, out pageId))
+            if (string.IsNullOrEmpty(GetUserName()))
             {
-                jsonResult = new JsonResult(new { success = false, message = "Invalid input parameters." });
-                return jsonResult;
+                return RedirectToAction("Login", "Login");
             }
+
+            string u = "";
+            var _json = new JsonResult(new { retsrep = u });
+            int _step = 90000;
+
             try
             {
-                _logger.LogInformation($"Start with InwardFinanicalWFDetailsPMADIS_Auth for GroupID: {groupId}, Status: {Status}");
-                var groupPermissionAuth = await _context.Groups_Permissions_Auth
-                    .SingleOrDefaultAsync(x => x.Application_ID == appId && x.Group_Id == groupId && x.Page_Id == pageId);
-                if (groupPermissionAuth != null)
+                _logger.LogInformation($"ReversePostingPMARAM called for Serial: {id} with MQ_MSG: {MQ_MSG}");
+
+                var inward = await _context.Inward_Trans.SingleOrDefaultAsync(i => i.Serial == id);
+                if (inward == null)
                 {
-                    var groupPermission = await _context.Groups_Permissions
-                        .SingleOrDefaultAsync(x => x.Application_ID == appId && x.Group_Id == groupId && x.Page_Id == pageId);
-                    if (Status == "1") // Accept
-                    {
-                        if (groupPermission == null)
-                        {
-                            groupPermission = new Groups_Permissions
-                            {
-                                Group_Id = groupPermissionAuth.Group_Id,
-                                Application_ID = groupPermissionAuth.Application_ID,
-                                Page_Id = groupPermissionAuth.Page_Id,
-                                Add = groupPermissionAuth.Add,
-                                Reverse = groupPermissionAuth.Reverse,
-                                Post = groupPermissionAuth.Post,
-                                Delete = groupPermissionAuth.Delete,
-                                Update = groupPermissionAuth.Update,
-                                Access = groupPermissionAuth.Access,
-                                // Assuming 'Reverse' in VB was meant for a boolean flag, mapping to 'Reverse' in C# model
-                                Reverse = groupPermissionAuth.Reverse 
-                            };
-                            _context.Groups_Permissions.Add(groupPermission);
-                        }
-                        else
-                        {
-                            groupPermission.Add = groupPermissionAuth.Add;
-                            groupPermission.Reverse = groupPermissionAuth.Reverse;
-                            groupPermission.Post = groupPermissionAuth.Post;
-                            groupPermission.Delete = groupPermissionAuth.Delete;
-                            groupPermission.Update = groupPermissionAuth.Update;
-                            groupPermission.Access = groupPermissionAuth.Access;
-                            groupPermission.Reverse = groupPermissionAuth.Reverse;
-                        }
-                        groupPermissionAuth.status = "Accept";
-                    }
-                    else // Reject
-                    {
-                        groupPermissionAuth.status = "Reject";
-                    }
+                    _logger.LogWarning($"Inward_Trans not found for Serial: {id}");
+                    return Json(new { retsrep = "Error: Inward transaction not found." });
+                }
+
+                _step += 1;
+
+                // Assuming ECC_Handler_SVC.InwardHandlingSVCSoapClient and HandelResponseONUS are external service calls
+                // This part needs actual service integration
+                // For now, mocking the response
+                // var WebSvc = new ECC_Handler_SVC.InwardHandlingSVCSoapClient("InwardHandlingSVCSoap");
+                // var obj_ = WebSvc.HandelResponseONUS(inward.ChqSequance, inward.ClrCenter, "ReversePosting", "", inward.Serial, GetUserID().ToString());
+
+                // Mocking successful response for now
+                bool serviceCallSuccess = true; 
+
+                if (serviceCallSuccess)
+                {
+                    inward.Posted = 0;
+                    inward.History += $"ReversePostingPMARAM  Done By {GetUserName()} FROM VIP CHQ AT {DateTime.Now}";
                     await _context.SaveChangesAsync();
-                    // Log History
-                    var history = new Groups_Permissions_History
+
+                    var wfHistory = new WFHistory
                     {
-                        Group_Id = groupPermissionAuth.Group_Id,
-                        Application_ID = groupPermissionAuth.Application_ID,
-                        Page_Id = groupPermissionAuth.Page_Id,
-                        Add = groupPermissionAuth.Add,
-                        Reverse = groupPermissionAuth.Reverse,
-                        Post = groupPermissionAuth.Post,
-                        Delete = groupPermissionAuth.Delete,
-                        Update = groupPermissionAuth.Update,
-                        Access = groupPermissionAuth.Access,
-                        Reverse = groupPermissionAuth.Reverse,
-                        UserName = GetUserName(),
-                        Updatedate = DateTime.Now
+                        ChqSequance = inward.ChqSequance,
+                        Serial = inward.Serial,
+                        TransDate = inward.TransDate,
+                        ID_WFStatus = WFHistory.WF_Status.NeedManualFix, // Assuming this status for reverse posting
+                        Status = $"ReversePostingPMARAM Done By {GetUserName()} AT {DateTime.Now}",
+                        ClrCenter = inward.ClrCenter,
+                        DrwChqNo = inward.DrwChqNo,
+                        DrwAccNo = inward.DrwAccNo,
+                        Amount = inward.Amount
                     };
-                    _context.Groups_Permissions_History.Add(history);
+                    _context.WFHistories.Add(wfHistory);
                     await _context.SaveChangesAsync();
-                    jsonResult = new JsonResult(new { success = true, message = "Operation successful." });
+
+                    u = "ReversePostingPMARAM Done";
                 }
                 else
                 {
-                    jsonResult = new JsonResult(new { success = false, message = "Group permission authorization record not found." });
+                    inward.ErrorDescription = "ReversePostingPMARAM Falid";
+                    inward.T24Response = "ReversePostingPMARAM Falid";
+                    inward.ReturnDate = DateTime.Now;
+                    inward.History += $"ReversePostingPMARAM  Falid  By{GetUserName()} FROM VIP CHQ AT {DateTime.Now}";
+                    await _context.SaveChangesAsync();
+                    u = "ReversePostingPMARAM Falid";
                 }
+            }
+            catch (DbUpdateException dbEx)
+            {
+                _logger.LogError(dbEx, $"Database update error in ReversePostingPMARAM for Serial: {id}");
+                // Handle specific database validation errors if needed
+                u = "Error: Database update failed.";
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error in InwardFinanicalWFDetailsPMADIS_Auth for GroupID: {groupId}. Error: {ex.Message}");
-                jsonResult = new JsonResult(new { success = false, message = "An error occurred during the operation." });
+                string errorMessage = ex.Message;
+                if (ex.InnerException != null)
+                {
+                    errorMessage = ex.InnerException.Message;
+                }
+                _logger.LogError(ex, $"Error in ReversePostingPMARAM for Serial: {id}. Details: {errorMessage}");
+                u = $"Error: {errorMessage}";
             }
-            return jsonResult;
+
+            _json = Json(new { retsrep = u });
+            return _json;
         }
     }
+
+    // Enums and helper classes (from VB.NET) - these should ideally be in separate files/namespaces
+    public class GroupType
+    {
+        public enum Group_Status
+        {
+            Inquiry = 1,
+            Inputter = 2,
+            Authorized = 4,
+            SystemAdmin = 13,
+            ItGroup = 14,
+            AdminAuthorized = 17
+        }
+    }
+
+    public class WFHistory
+    {
+        public enum WF_Status
+        {
+            UnderTechnicalVerification = 1,
+            TechnicallyAccepted = 2,
+            InitialTechnicalRejection = 3,
+            FinalTechnicalRejection = 4,
+            [End] = 5,
+            NeedManualFix = 6,
+            ManuallyFixed = 7,
+            NotFixed = 8,
+            ProticionAccountFlag = 9,
+            ChequeAlreadyStopped = 10,
+            UnderCreditApproval = 11,
+            CreditApproved = 12,
+            CreditDeclined = 13,
+            CustomerDisesed = 14,
+            CustomerDisesedDeclined = 15,
+            CustomerDisesedApproved = 16
+        }
+
+        public string ChqSequance { get; set; }
+        public string Serial { get; set; }
+        public DateTime? TransDate { get; set; }
+        public WF_Status ID_WFStatus { get; set; }
+        public string Status { get; set; }
+        public string ClrCenter { get; set; }
+        public string DrwChqNo { get; set; }
+        public string DrwAccNo { get; set; }
+        public decimal? Amount { get; set; }
+    }
+
+    public class TreeNode
+    {
+        public string SubMenu_Name_EN { get; set; }
+        public int SubMenu_ID { get; set; }
+        public int Related_Page_ID { get; set; }
+        public List<TreeNode> Children { get; set; }
+    }
+
+    public class Category
+    {
+        public int SubMenu_ID { get; set; }
+        public int? Parent_ID { get; set; }
+        public string SubMenu_Name_EN { get; set; }
+        public int Related_Page_ID { get; set; }
+    }
+
+    public class GET_RETURN_CHQ
+    {
+        public string clrcenter { get; set; } = "";
+        public int count { get; set; }
+        public DateTime valuedate { get; set; }
+        public string branch { get; set; } = "";
+        public string currancy { get; set; } = "";
+    }
+
+    public class INChqs
+    {
+        public string GUAR_CUSTOMER { get; set; }
+        public string BookedBalance { get; set; }
+        public string ClearBalance { get; set; }
+        public string AccountStatus { get; set; }
+        public string Reject { get; set; }
+        public string Recom { get; set; }
+        public string Approve { get; set; }
+    }
+
 }
 
