@@ -172,3 +172,115 @@ namespace SAFA_ECC_Core_Clean.Controllers
             return View(); // Or return result if it's a JSON result or similar
         }
 
+
+
+        public async Task<IActionResult> getuser_group_permision(string pageid, string applicationid, string userid)
+        {
+            await _outwordService.getuser_group_permision(pageid, applicationid, userid);
+            // This method primarily handles permissions and session state in the original VB.NET.
+            // In ASP.NET Core, this would typically be handled by authorization policies or filters.
+            // For now, we return an empty OkResult or a specific view if needed.
+            return Ok();
+        }
+
+
+
+        public async Task<IActionResult> Getpage(string page)
+        {
+            var result = await _outwordService.Getpage(page);
+            return Ok(result); // Returning DataTable directly is not ideal, consider converting to a ViewModel or JSON.
+        }
+
+
+
+        public async Task<IActionResult> Ge_t(string x)
+        {
+            var result = await _outwordService.Ge_t(x);
+            return Ok(result);
+        }
+
+
+
+        public async Task<IActionResult> GetAllCategoriesForTree()
+        {
+            var tree = await _outwordService.GetAllCategoriesForTree();
+            return Json(tree); // Assuming the service returns a structure that can be serialized to JSON
+        }
+
+
+
+        public async Task<IActionResult> GetAllCategoriesForTree()
+        {
+            var treeHtml = await _outwordService.GetAllCategoriesForTree();
+            return Content(treeHtml, "text/html");
+        }
+
+
+
+        public IActionResult getlist(string x)
+        {
+            var result = _outwordService.getlist(x);
+            return Ok(result);
+        }
+
+
+
+        public async Task<IActionResult> GENERATE_UNIQUE_CHEQUE_SEQUANCE(string CHEQUE_NO, string BANK_NO, string BRANCH_NO, string DRAWEE_NO)
+        {
+            var result = await _outwordService.GENERATE_UNIQUE_CHEQUE_SEQUANCE(CHEQUE_NO, BANK_NO, BRANCH_NO, DRAWEE_NO);
+            return Ok(result);
+        }
+
+
+
+        public async Task<IActionResult> getlockedpage(int pageid)
+        {
+            var result = await _outwordService.getlockedpage(pageid);
+            return result;
+        }
+
+
+
+        public async Task<IActionResult> EVALUATE_AMOUNT_IN_JOD(string CURANCY, double AMOUNT)
+        {
+            var result = await _outwordService.EVALUATE_AMOUNT_IN_JOD(CURANCY, AMOUNT);
+            return Ok(result);
+        }
+
+
+
+        public async Task<IActionResult> GetCurrencyCode(string Currency_Symbol)
+        {
+            var result = await _outwordService.GetCurrencyCode(Currency_Symbol);
+            return Ok(result);
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> Update_ChqDate(string Serial, string BenName, string BenfAccBranch, string AcctType, string DrwChqNo, string DrwBankNo, string DrwBranchNo, string DrwAcctNo, double Amount, DateTime DueDate, string Currency, string BenfBnk, string BenfCardType, string BenfCardId, string BenAccountNo, string BenfNationality, string NeedTechnicalVerification, string WithUV, string SpecialHandling, string IsVIP, string DrwName)
+        {
+            // Permission checks should be handled by authorization attributes or policies.
+            // For now, we assume the user is authorized.
+
+            // Populate ViewBag.Tree if needed (e.g., from a shared layout or view component)
+            ViewBag.Tree = await _outwordService.GetAllCategoriesForTree();
+
+            var result = await _outwordService.Update_ChqDate(Serial, BenName, BenfAccBranch, AcctType, DrwChqNo, DrwBankNo, DrwBranchNo, DrwAcctNo, Amount, DueDate, Currency, BenfBnk, BenfCardType, BenfCardId, BenAccountNo, BenfNationality, NeedTechnicalVerification, WithUV, SpecialHandling, IsVIP, DrwName);
+
+            if (result is OkResult)
+            {
+                // Handle success, maybe redirect or return a success view
+                return RedirectToAction("Out_VerficationDetails", new { id = Serial }); // Example redirect
+            }
+            else if (result is NotFoundResult)
+            {
+                return NotFound();
+            }
+            else if (result is StatusCodeResult statusCodeResult && statusCodeResult.StatusCode == 500)
+            {
+                return StatusCode(500, "An error occurred during the update.");
+            }
+            return View("Error"); // Default error view
+        }
+

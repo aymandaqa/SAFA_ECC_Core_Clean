@@ -85,3 +85,47 @@ namespace SAFA_ECC_Core_Clean.Services
 
         Task<string> Get_OFS_HttpLink();
 
+
+
+        List<TreeNode> FillRecursive(List<Category> flatObjects, int? parentId = null);
+
+
+
+        Task getuser_group_permision(string pageid, string applicationid, string userid);
+
+
+
+        Task<DataTable> Getpage(string page);
+
+
+
+        Task<bool> Ge_t(string x);
+
+
+
+        Task<string> GetAllCategoriesForTree();
+
+
+
+        string getlist(string x);
+
+
+
+        Task<string> GENERATE_UNIQUE_CHEQUE_SEQUANCE(string CHEQUE_NO, string BANK_NO, string BRANCH_NO, string DRAWEE_NO);
+
+
+
+        Task<IActionResult> getlockedpage(int pageid);
+
+
+
+        Task<string> EVALUATE_AMOUNT_IN_JOD(string CURANCY, double AMOUNT);
+
+
+
+        Task<string> GetCurrencyCode(string Currency_Symbol);
+
+
+
+        Task<IActionResult> Update_ChqDate(string Serial, string BenName, string BenfAccBranch, string AcctType, string DrwChqNo, string DrwBankNo, string DrwBranchNo, string DrwAcctNo, double Amount, DateTime DueDate, string Currency, string BenfBnk, string BenfCardType, string BenfCardId, string BenAccountNo, string BenfNationality, string NeedTechnicalVerification, string WithUV, string SpecialHandling, string IsVIP, string DrwName);
+

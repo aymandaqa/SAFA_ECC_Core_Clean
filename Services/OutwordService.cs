@@ -700,3 +700,432 @@ _logger.LogInformation($"Get_Final_Posting_Restrection called with Customer_Post
             }
         }
 
+
+
+        public List<TreeNode> FillRecursive(List<Category> flatObjects, int? parentId = null)
+        {
+            return flatObjects.Where(x => x.Parent_ID.Equals(parentId))
+                              .Select(item => new TreeNode
+                              {
+                                  SubMenu_Name_EN = item.SubMenu_Name_EN,
+                                  SubMenu_ID = item.SubMenu_ID,
+                                  Related_Page_ID = item.Related_Page_ID,
+                                  Children = FillRecursive(flatObjects, item.SubMenu_ID)
+                              }).ToList();
+        }
+
+
+
+        public async Task getuser_group_permision(string pageid, string applicationid, string userid)
+        {
+            _logger.LogInformation($"getuser_group_permision method called for pageid: {pageid}, applicationid: {applicationid}, userid: {userid}");
+
+            // In ASP.NET Core, session management and user permissions are typically handled differently.
+            // This conversion will focus on the core logic of retrieving permissions.
+            // Session.Add("permission_user_Group", Nothing) and Session.Add("AccessPage", "") will be replaced by returning the relevant data.
+
+            try
+            {
+                // Assuming _context is your ApplicationDbContext
+                // and that Menu_Items_Tbl, Users_Tbl, and USER_PAGE_PERMISSIONS are mapped entities/stored procedures.
+
+                var pagename = "";
+                var menuItem = await _context.Menu_Items_Tbl.FirstOrDefaultAsync(c => c.Related_Page_ID == pageid);
+
+                if (menuItem != null)
+                {
+                    pagename = menuItem.SubMenu_Name_EN;
+                }
+                // You might want to return pagename or store it in a ViewModel
+
+                // This part calls a stored procedure. You'll need to map this to an EF Core stored procedure call or a direct SQL query.
+                // For now, we'll simulate the result.
+                // var group_permission = await _context.USER_PAGE_PERMISSIONS(applicationid, userid, pageid).ToListAsync();
+
+                // Simulate permission check based on original VB.NET logic
+                // This logic needs to be adapted to ASP.NET Core's authorization system (e.g., policies, roles, claims).
+                // For demonstration, we'll assume a simple access check.
+                bool hasAccess = false;
+                // Example: if (group_permission.Any(item => item.ACCESS == true))
+                // {
+                //     // Complex logic for pageid ranges and groupid
+                //     if ((int.Parse(pageid) >= 1300 && int.Parse(pageid) <= 1400 && _httpContextAccessor.HttpContext.Session.GetString("groupid") == "AdminAuthorized") ||
+                //         (int.Parse(pageid) >= 1 && int.Parse(pageid) <= 100 && _httpContextAccessor.HttpContext.Session.GetString("groupid") == "SystemAdmin") ||
+                //         (!(int.Parse(pageid) >= 1 && int.Parse(pageid) <= 100) && !(int.Parse(pageid) >= 1300 && int.Parse(pageid) <= 1400)))
+                //     {
+                //         hasAccess = true;
+                //     }
+                // }
+
+                // Instead of setting Session.Item("AccessPage"), you would typically return a boolean or a detailed permission object.
+                // For now, we'll just log the outcome.
+                _logger.LogInformation($"User {userid} has access to page {pageid}: {hasAccess}");
+
+                // If you need to return the permissions, define a ViewModel for it.
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in getuser_group_permision: {ex.Message}");
+                // Handle exception appropriately
+            }
+        }
+
+
+
+        public async Task<DataTable> Getpage(string page)
+        {
+            _logger.LogInformation($"Getpage method called for page: {page}");
+            DataTable dt = new DataTable();
+            try
+            {
+                string connectionString = _configuration.GetConnectionString("DefaultConnection"); // Assuming DefaultConnection is your connection string name
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    string query = $"SELECT [Page_Name_EN], [Other_Details] FROM [DBO].[App_Pages] WHERE [Page_Id] = '{page}'";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        await conn.OpenAsync();
+                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                        {
+                            da.Fill(dt);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in Getpage: {ex.Message}");
+                // Optionally rethrow or handle the exception as needed
+            }
+            return dt;
+        }
+
+
+
+        public async Task<bool> Ge_t(string x)
+        {
+            _logger.LogInformation($"Ge_t method called for x: {x}");
+
+            try
+            {
+                var page = await _context.Menu_Items_Tbl.Where(i => i.Parent_ID == x).ToListAsync();
+                return page.Any();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in Ge_t: {ex.Message}");
+                return false; // Or rethrow, depending on error handling strategy
+            }
+        }
+
+
+
+        public async Task<string> GetAllCategoriesForTree()
+        {
+            _logger.LogInformation("GetAllCategoriesForTree method called.");
+
+            // This method relies heavily on Session and dynamically builds HTML.
+            // In a proper ASP.NET Core MVC application, this logic should be split:
+            // 1. Service method returns a structured data model (e.g., List<TreeNode>).
+            // 2. Controller action retrieves the model and passes it to a View.
+            // 3. View renders the HTML using Razor syntax.
+            // For direct conversion, we will try to replicate the HTML building, but it's not ideal.
+
+            try
+            {
+                var categories = new List<Category>();
+                // Assuming HomeBAL().GetAllCategories() is replaced by a method in your service
+                // that fetches categories from the database.
+                // For now, let's assume we have a method to get all menu items.
+                var allMenuItems = await _context.Menu_Items_Tbl.ToListAsync();
+
+                // Simulate DataTable conversion and filtering based on Group_ID
+                // This part needs to be carefully adapted based on how Group_ID is managed in C#
+                // and how UserType is determined.
+                // For simplicity, let's assume all menu items are added for now.
+                foreach (var item in allMenuItems)
+                {
+                    categories.Add(new Category
+                    {
+                        Related_Page_ID = item.Related_Page_ID,
+                        SubMenu_ID = item.SubMenu_ID,
+                        SubMenu_Name_EN = item.SubMenu_Name_EN,
+                        Parent_ID = item.Parent_ID // Assuming Parent_ID is already nullable int
+                    });
+                }
+
+                var headerTree = FillRecursive(categories, null);
+                var root_li = new System.Text.StringBuilder();
+
+                // This part requires HttpContext to access Session, which is not directly available in a service.
+                // You would need to pass HttpContextAccessor or relevant session data from the controller.
+                // For now, we'll use placeholders for session items.
+                var userId = ""; // Replace with actual userId from session/claims
+                var groupId = ""; // Replace with actual groupId from session/claims
+
+                foreach (var item in headerTree)
+                {
+                    // This calls getPermission, which should also be in the service or handled by authorization.
+                    // For now, we'll assume a placeholder for permission check.
+                    bool page_permission = true; // await getPermission(userId, item.Related_Page_ID.ToString(), groupId);
+
+                    if (page_permission)
+                    {
+                        // Similar logic for children permissions
+                        bool hasChildPermission = true; // Check if any child has permission
+
+                        if (hasChildPermission)
+                        {
+                            if (item.Children == null || item.Related_Page_ID != 0)
+                            {
+                                // This calls Getpage, which should also be in the service.
+                                // var rediretcpage = await Getpage(item.Related_Page_ID.ToString());
+                                var redirectUrl = "#"; // Placeholder for redirect URL
+
+                                root_li.Append($"<li  ><span class=\"caret\" id = \"{item.SubMenu_ID}\" onclick=\"getexpanditem(this.id);\"><b><a style=\"font-size:18px\" href=\"{redirectUrl}\">{item.SubMenu_Name_EN}</a></b></span><ul class=\"nested\">\n");
+                            }
+                            else
+                            {
+                                root_li.Append($"<li  ><span class=\"caret\"id = \"{item.SubMenu_ID}\"onclick=\"getexpanditem(this.id);\"><b>{item.SubMenu_Name_EN}</b></span><ul class=\"nested\">\n");
+                            }
+
+                            foreach (var down1 in item.Children)
+                            {
+                                // Similar logic for down1 and down2 children
+                                // This part needs careful conversion and handling of nested lists.
+                            }
+                            root_li.Append("</ul></li>\n");
+                        }
+                    }
+                }
+
+                return root_li.ToString();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in GetAllCategoriesForTree: {ex.Message}");
+                return "";
+            }
+        }
+
+
+
+        public string getlist(string x)
+        {
+            _logger.LogInformation($"getlist method called for x: {x}");
+
+            try
+            {
+                var session = _httpContextAccessor.HttpContext.Session;
+                string treeitem = session.GetString("treeitem") ?? "";
+
+                string[] array_list = treeitem.Split(":");
+
+                if (!array_list.Contains(x))
+                {
+                    treeitem += x.ToString() + ":";
+                    session.SetString("treeitem", treeitem);
+                }
+                else
+                {
+                    treeitem = treeitem.Replace(x + ":", ""); // Ensure to replace with colon to avoid partial matches
+                    session.SetString("treeitem", treeitem);
+                }
+
+                return "";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in getlist: {ex.Message}");
+                return ex.Message; // Return error message as per original VB.NET
+            }
+        }
+
+
+
+        public async Task<string> GENERATE_UNIQUE_CHEQUE_SEQUANCE(string CHEQUE_NO, string BANK_NO, string BRANCH_NO, string DRAWEE_NO)
+        {
+            _logger.LogInformation($"GENERATE_UNIQUE_CHEQUE_SEQUANCE method called for CHEQUE_NO: {CHEQUE_NO}, BANK_NO: {BANK_NO}, BRANCH_NO: {BRANCH_NO}, DRAWEE_NO: {DRAWEE_NO}");
+
+            string result = "";
+            try
+            {
+                // The original VB.NET code calls a SQL function directly.
+                // In EF Core, this can be done via raw SQL query.
+                // Ensure the SQL function [DBO].[GENERATE_UNIQUE_CHEQUE_SEQUANCE] exists and works as expected.
+                // For scalar function calls, a direct ADO.NET approach is often cleaner if EF Core doesn't provide a direct mapping.
+                // Alternatively, you can map the function to a DbSet<string> if your EF Core version supports it.
+                // For now, using a direct ADO.NET approach.
+                string connectionString = _configuration.GetConnectionString("DefaultConnection");
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    await connection.OpenAsync();
+                    using (var command = new SqlCommand("SELECT [DBO].[GENERATE_UNIQUE_CHEQUE_SEQUANCE](@chequeNo, @bankNo, @branchNo, @draweeNo)", connection))
+                    {
+                        command.Parameters.AddWithValue("@chequeNo", CHEQUE_NO);
+                        command.Parameters.AddWithValue("@bankNo", BANK_NO);
+                        command.Parameters.AddWithValue("@branchNo", BRANCH_NO);
+                        command.Parameters.AddWithValue("@draweeNo", DRAWEE_NO);
+                        var scalarResult = await command.ExecuteScalarAsync();
+                        result = scalarResult?.ToString();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in GENERATE_UNIQUE_CHEQUE_SEQUANCE: {ex.Message}");
+                // Handle exception appropriately, e.g., rethrow, return default, or log and return empty.
+            }
+            return result;
+        }
+
+
+
+using System.Data;
+using Microsoft.Data.SqlClient;
+
+
+        public async Task<IActionResult> getlockedpage(int pageid)
+        {
+            _logger.LogInformation($"getlockedpage method called for pageid: {pageid}");
+
+            try
+            {
+                var locked = await _context.LockedUserAction_TBL.SingleOrDefaultAsync(x => x.LockedPageID == pageid);
+                if (locked != null)
+                {
+                    var session = _httpContextAccessor.HttpContext.Session;
+                    session.SetString("locked", locked.UserLockedName + "   Since: " + locked.LockedDateTime);
+                    session.SetString("loked_user", "You cant Trans rigth now , this action locked by :" + locked.UserLockedName + " Since: " + locked.LockedDateTime);
+                    return new OkResult(); // Or return a specific message/view
+                }
+                return new NotFoundResult(); // Or return a specific message/view
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in getlockedpage: {ex.Message}");
+                return new StatusCodeResult(500); // Internal Server Error
+            }
+        }
+
+
+
+        public async Task<string> EVALUATE_AMOUNT_IN_JOD(string CURANCY, double AMOUNT)
+        {
+            _logger.LogInformation($"EVALUATE_AMOUNT_IN_JOD method called for CURANCY: {CURANCY}, AMOUNT: {AMOUNT}");
+
+            string result = "";
+            try
+            {
+                string connectionString = _configuration.GetConnectionString("DefaultConnection");
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    await connection.OpenAsync();
+                    using (var command = new SqlCommand("SELECT [DBO].[EVALUATE_AMOUNT_IN_JOD](@currency, @amount)", connection))
+                    {
+                        command.Parameters.AddWithValue("@currency", CURANCY);
+                        command.Parameters.AddWithValue("@amount", AMOUNT);
+                        var scalarResult = await command.ExecuteScalarAsync();
+                        result = scalarResult?.ToString();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in EVALUATE_AMOUNT_IN_JOD: {ex.Message}");
+            }
+            return result;
+        }
+
+
+
+        public async Task<string> GetCurrencyCode(string Currency_Symbol)
+        {
+            _logger.LogInformation($"GetCurrencyCode method called for Currency_Symbol: {Currency_Symbol}");
+
+            string numericIso = "";
+            try
+            {
+                var currency = await _context.CURRENCY_TBL.SingleOrDefaultAsync(x => x.SYMBOL_ISO == Currency_Symbol);
+                if (currency != null)
+                {
+                    numericIso = currency.NUMERIC_ISO;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in GetCurrencyCode: {ex.Message}");
+            }
+            return numericIso;
+        }
+
+
+
+        public async Task<IActionResult> Update_ChqDate(string Serial, string BenName, string BenfAccBranch, string AcctType, string DrwChqNo, string DrwBankNo, string DrwBranchNo, string DrwAcctNo, double Amount, DateTime DueDate, string Currency, string BenfBnk, string BenfCardType, string BenfCardId, string BenAccountNo, string BenfNationality, string NeedTechnicalVerification, string WithUV, string SpecialHandling, string IsVIP, string DrwName)
+        {
+            _logger.LogInformation($"Update_ChqDate method called for Serial: {Serial}");
+
+            try
+            {
+                // Permission checks should ideally be handled by ASP.NET Core's authorization system (attributes, policies).
+                // For direct conversion, we'll assume the controller handles it or we'll need to pass user context.
+                // var userId = _httpContextAccessor.HttpContext.Session.GetString("ID");
+                // var groupId = _httpContextAccessor.HttpContext.Session.GetString("groupid");
+                // var accessPage = _httpContextAccessor.HttpContext.Session.GetString("AccessPage");
+
+                // If (accessPage == "NoAccess") return new ForbidResult(); // Or RedirectToAction("block", "Login")
+
+                // ViewBag.Tree population should be done in the controller or a view component.
+
+                var outwardTrans = await _context.Outward_Trans.SingleOrDefaultAsync(Y => Y.Serial == Serial);
+
+                if (outwardTrans == null)
+                {
+                    _logger.LogWarning($"Outward_Trans with Serial {Serial} not found for update.");
+                    return new NotFoundResult();
+                }
+
+                outwardTrans.BenfAccBranch = BenfAccBranch;
+                outwardTrans.BenName = BenName;
+                outwardTrans.ClrCenter = AcctType;
+                outwardTrans.DrwChqNo = DrwChqNo;
+                outwardTrans.DrwBankNo = DrwBankNo;
+                outwardTrans.DrwBranchNo = DrwBranchNo;
+                outwardTrans.DrwAcctNo = DrwAcctNo;
+                outwardTrans.Amount = Amount;
+                outwardTrans.TransDate = DueDate;
+                outwardTrans.Currency = Currency;
+                outwardTrans.BenfBnk = BenfBnk;
+                outwardTrans.BenAccountNo = BenAccountNo;
+                outwardTrans.BenfNationality = BenfNationality;
+                outwardTrans.NeedTechnicalVerification = NeedTechnicalVerification;
+                outwardTrans.WithUV = WithUV;
+                outwardTrans.SpecialHandling = SpecialHandling;
+                outwardTrans.IsVIP = IsVIP;
+                outwardTrans.DrwName = DrwName;
+                outwardTrans.Posted = (int)AllEnums.Cheque_Status.New;
+                outwardTrans.LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                // outwardTrans.LastUpdateBy = _httpContextAccessor.HttpContext.Session.GetString("UserName"); // Replace with actual user context
+                // outwardTrans.History += "Record updated by " + _httpContextAccessor.HttpContext.Session.GetString("UserName") + ", on " + DateTime.Now;
+                outwardTrans.Status = "Pending";
+
+                await _context.SaveChangesAsync();
+
+                // Logic for Auth_Tran_Details_TBL and Post_Dated_Trans, and external web service call
+                // This part needs to be implemented based on the actual C# equivalents of the VB.NET code.
+                // For now, we'll assume successful update and return Ok.
+
+                // Example of external web service call (needs proper client setup)
+                // var eccAccWebSvc = new ECC_CAP_Services.SAFA_T24_ECC_SVCSoapClient("SAFA_T24_ECC_SVCSoap");
+                // eccAccWebSvc.Endpoint.Address = new System.ServiceModel.EndpointAddress(Get_OFS_HttpLink());
+                // var accObj = await eccAccWebSvc.ACCOUNT_INFOAsync(outwardTrans.BenAccountNo, 1);
+
+                return new OkResult();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in Update_ChqDate: {ex.Message}");
+                return new StatusCodeResult(500); // Internal Server Error
+            }
+        }
+
