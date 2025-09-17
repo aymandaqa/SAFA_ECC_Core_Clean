@@ -145,3 +145,51 @@ namespace SAFA_ECC_Core_Clean.Services
 
         Task<IActionResult> getSearchListPDC(string Branchs, string STATUS, string BenAccNo, string AccType, string FromBank, string ToBank, string Currency, string ChequeSource, string Amount, string DRWAccNo, string ChequeNo, string waspdc);
 
+
+
+        Task<IActionResult> getSearchList(string Currency, string ChequeSource, string WASPDC, string Branchs, string order, string inputerr, string ChequeStatus, string vip);
+
+
+
+        Task<IActionResult> returndiscountchq();
+
+
+
+        Task<IActionResult> GetTotalPerAccountAndBnk(string ChqSrc, string Cur, string Branchs, string WASPDC, string order, string inputerr);
+
+
+
+        Task<IActionResult> PresentmentDIS_Or_PDC_return(Outward_Trans _out_, string CHQ);
+
+
+
+        Task<IActionResult> PresentmentDIS_Or_PDC_return_Auth(Outward_Trans _out_, string CHQ);
+
+
+
+        Task<bool> PresentmentDIS_Or_PDC_timeout(Outward_Trans _out_, string CHQ);
+
+
+
+        Task<bool> PresentmentDIS_Or_PDC_old(Outward_Trans_Discount_Old _out_, string CHQ);
+
+
+
+        Task<bool> PresentmentPMA_OR_PDC(Outward_Trans _out_, string CHQ);
+
+
+
+        Task<IActionResult> Update_oUTWORD_Details(string id);
+
+
+
+        Task<bool> PresentmentPMA_OR_PDC_timout(Outward_Trans _out_, string CHQ);
+
+
+
+        Task<string> getDocType(int id);
+
+
+
+        Task<IActionResult> Deleteoutchq();
+

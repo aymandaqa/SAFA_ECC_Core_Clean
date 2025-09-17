@@ -350,3 +350,84 @@ namespace SAFA_ECC_Core_Clean.Controllers
             return result;
         }
 
+
+
+        public async Task<IActionResult> getSearchList(string Currency, string ChequeSource, string WASPDC, string Branchs, string order, string inputerr, string ChequeStatus, string vip)
+        {
+            var result = await _outwordService.getSearchList(Currency, ChequeSource, WASPDC, Branchs, order, inputerr, ChequeStatus, vip);
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetTotalPerAccountAndBnk(string ChqSrc, string Cur, string Branchs, string WASPDC, string order, string inputerr)
+        {
+            var result = await _outwordService.GetTotalPerAccountAndBnk(ChqSrc, Cur, Branchs, WASPDC, order, inputerr);
+            return result;
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> PresentmentDIS_Or_PDC_return([FromBody] Outward_Trans _out_, string CHQ)
+        {
+            var result = await _outwordService.PresentmentDIS_Or_PDC_return(_out_, CHQ);
+            return result;
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> PresentmentDIS_Or_PDC_timeout([FromBody] Outward_Trans _out_, string CHQ)
+        {
+            var result = await _outwordService.PresentmentDIS_Or_PDC_timeout(_out_, CHQ);
+            return Ok(result);
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> PresentmentPMA_OR_PDC([FromBody] Outward_Trans _out_, string CHQ)
+        {
+            var result = await _outwordService.PresentmentPMA_OR_PDC(_out_, CHQ);
+            return Ok(result);
+        }
+
+
+
+        public async Task<IActionResult> Update_oUTWORD_Details(string id)
+        {
+            ViewBag.Tree = await _outwordService.GetAllCategoriesForTree();
+            var outChqs = await _outwordService.Update_oUTWORD_Details(id);
+
+            if (outChqs == null)
+            {
+                // Handle case where outChqs is null, e.g., redirect to an error page or another action
+                return RedirectToAction("update_Post_Outword", "OUTWORD");
+            }
+
+            return View(outChqs);
+        }
+
+
+
+        public async Task<string> getDocType(int id)
+        {
+            return await _outwordService.getDocType(id);
+        }
+
+
+
+        public async Task<IActionResult> Deleteoutchq()
+        {
+            ViewBag.Tree = await _outwordService.GetAllCategoriesForTree();
+            var result = await _outwordService.Deleteoutchq();
+            // Assuming the service returns an OkObjectResult with the list of Outward_Trans
+            if (result is OkObjectResult okResult && okResult.Value is List<Outward_Trans> outList)
+            {
+                return View(outList);
+            }
+            return View(new List<Outward_Trans>()); // Return an empty list if no data or error
+        }
+
