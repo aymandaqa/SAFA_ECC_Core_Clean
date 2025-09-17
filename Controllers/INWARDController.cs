@@ -1019,3 +1019,40 @@ namespace SAFA_ECC_Core_Clean.Controllers
                 return View("Error");
             }
         }
+
+
+
+        public async Task<IActionResult> Inward_DateVerficationDetails(int id)
+        {
+            int _step = 91100;
+            HttpContext.Session.SetString("ErrorMessage", "");
+
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string branchCode = GetBranchID();
+            ViewBag.Branch_codee = branchCode;
+            List<string> chqList = new List<string>();
+
+            try
+            {
+                if (!id.ToString().Contains(":"))
+                {
+                    // This part needs proper implementation based on the original VB.NET logic
+                    // It seems to be handling a list of cheque sequences or a single ID
+                    // Placeholder for now
+                    _logger.LogInformation("Inward_DateVerficationDetails called with ID: {Id}", id);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in Inward_DateVerficationDetails: {Message}", ex.Message);
+                HttpContext.Session.SetString("ErrorMessage", "An error occurred: " + ex.Message);
+                return View("Error");
+            }
+
+            return View(); // Or return a specific view with data
+        }
+
