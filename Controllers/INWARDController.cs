@@ -677,3 +677,79 @@ namespace SAFA_ECC_Core_Clean.Controllers
             return Ok(); // Or appropriate IActionResult
         }
 
+
+
+
+        public async Task<IActionResult> Pendding_ONUS_Request()
+        {
+            int _step = 90000;
+            _step += 800;
+            HttpContext.Session.SetString("ErrorMessage", "");
+
+            _logger.LogInformation("start Pendding_ONUS_Request /INWARDController");
+            // _LogSystem.WriteTraceLogg(_Logg_Message, _ApplicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, GetUserName(), GetUserName(), "", "", "");
+
+            // ViewBag.Tree = GetAllCategoriesForTree(); // This needs to be an async call if GetAllCategoriesForTree is async
+
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            try
+            {
+                _logger.LogInformation("Pendding_ONUS_Request /INWARDController / INWARDController");
+                // _LogSystem.WriteTraceLogg(_Logg_Message, _ApplicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, GetUserName(), GetUserName(), "", "", "");
+
+                string methodName = "Pendding_ONUS_Request"; // Assuming GetMethodName() returns the current action name
+                _step += 1;
+                HttpContext.Session.SetString("methodName", methodName);
+
+                int pageid;
+                int applicationid;
+                int userid = GetUserID();
+
+                var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
+                if (appPage == null) return NotFound();
+
+                pageid = appPage.Page_Id;
+                _step += 1;
+
+                HttpContext.Session.SetInt32("page_id", pageid);
+
+                string title = appPage.ENG_DESC;
+                _step += 1;
+
+                ViewBag.Title = title;
+                applicationid = appPage.Application_ID;
+                _step += 1;
+
+                // Assuming getuser_group_permision is now GetUserGroupPermission and is async
+                await GetUserGroupPermission(pageid, applicationid, userid);
+
+                if (HttpContext.Session.GetString("AccessPage") == "NoAccess")
+                {
+                    return RedirectToAction("block", "Login");
+                }
+                _step += 1;
+
+                // Logic for Auth_request and TBL needs to be converted
+                // Dim Auth_request As New List(Of Auth_Tran_Details_TBL)
+                // Dim TBL As New List(Of Auth_Tran_Details_TBL)
+
+                // Placeholder for actual data retrieval
+                var authRequests = await _context.Auth_Tran_Details_TBL
+                                                 .Where(a => a.Status == "Pending" && a.Trans_id == "1") // Assuming Trans_id for ONUS Request is "1"
+                                                 .ToListAsync();
+
+                return View(authRequests);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in Pendding_ONUS_Request: {Message}", ex.Message);
+                HttpContext.Session.SetString("ErrorMessage", "An error occurred: " + ex.Message);
+                return View("Error");
+            }
+        }
+
+
