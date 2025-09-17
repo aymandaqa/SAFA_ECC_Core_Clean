@@ -1056,3 +1056,24 @@ namespace SAFA_ECC_Core_Clean.Controllers
             return View(); // Or return a specific view with data
         }
 
+
+
+
+
+        public async Task<string> GetDocType(int id)
+        {
+            string result = "";
+            try
+            {
+                _logger.LogInformation("Start getDocType");
+                result = (await _context.Legal_Document_Type_Tbl.SingleOrDefaultAsync(x => x.ID == id))?.Legal_Doc_Name_EN;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error when getDocType: {Message}", ex.Message);
+                // _LogSystem.WriteLogg and WriteError equivalents are already handled by _logger
+            }
+            return result;
+        }
+
