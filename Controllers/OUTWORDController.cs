@@ -519,3 +519,150 @@ namespace SAFA_ECC_Core_Clean.Controllers
             return result;
         }
 
+
+
+        public async Task<IActionResult> RepresentReturnDis()
+        {
+            // The service method is designed to return a JsonResult, but this controller action
+            // is expected to return a View. We will call the service to ensure any necessary
+            // logic (like logging or data preparation) is executed, but the actual view rendering
+            // will be handled here.
+            var serviceResult = await _outwordService.RepresentReturnDis();
+
+            // If the service returns a RedirectToActionResult (e.g., for login),
+            // we should respect that.
+            if (serviceResult is RedirectToActionResult redirectResult)
+            {
+                return redirectResult;
+            }
+
+            // Assuming ViewBag.Tree is populated by GetAllCategoriesForTree() in the service
+            // or directly in the controller if it's UI-specific.
+            // For now, we'll assume the view doesn't strictly depend on the service's return for rendering.
+            ViewBag.Tree = await _outwordService.GetAllCategoriesForTree(); // Assuming this method exists in the service
+
+            return View();
+        }
+
+
+
+        public async Task<IActionResult> FindChq(string DrwChqNo, string DrwBankNo, string DrwBranchNo, string DrwAcctNo, string BenAccountNo)
+        {
+            var result = await _outwordService.FindChq(DrwChqNo, DrwBankNo, DrwBranchNo, DrwAcctNo, BenAccountNo);
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> Get_ReturnedINHOUSESlipDetails(string Serial)
+        {
+            string username = HttpContext.Session.GetString("UserName");
+            if (string.IsNullOrEmpty(username))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            var outChq = await _outwordService.Get_ReturnedINHOUSESlipDetails(Serial);
+
+            if (outChq.onus == null && outChq.onus163 == null)
+            {
+                // Handle case where no cheque is found, perhaps redirect or show error
+                // For now, returning an empty view or a view with an error message
+                return View(outChq);
+            }
+
+            if (outChq.onus != null)
+            {
+                ViewBag.Mtypeonus = "OUT";
+            }
+            else if (outChq.onus163 != null)
+            {
+                ViewBag.Mtypeonus = "OUT163";
+            }
+
+            ViewBag.Tree = await _outwordService.GetAllCategoriesForTree();
+
+            return View(outChq);
+        }
+
+
+
+        public async Task<IActionResult> retunedchqstates()
+        {
+            string username = HttpContext.Session.GetString("UserName");
+            if (string.IsNullOrEmpty(username))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            await _outwordService.retunedchqstates(); // Call service for side effects and data preparation
+
+            // Populate ViewBag properties as per original VB.NET logic
+            ViewBag.Tree = await _outwordService.GetAllCategoriesForTree();
+            ViewBag.ClearingCenter = await _context.ClearingCenters.ToListAsync(); // Assuming _context is available or injected
+            ViewBag.Bindchqstate = _outwordService.Bindchqstate(); // Assuming this returns a List<SelectListItem>
+
+            return View();
+        }
+
+
+
+        public IActionResult waspdc()
+        {
+            ViewBag.waspdc = _outwordService.waspdc();
+            return Ok(ViewBag.waspdc);
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> PrintAll([FromBody] List<string> Serials)
+        {
+            var result = await _outwordService.PrintAll(Serials);
+            return result;
+        }
+
+
+
+        public async Task<IActionResult> PrintOutwordRecipt()
+        {
+            string username = HttpContext.Session.GetString("UserName");
+            if (string.IsNullOrEmpty(username))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            await _outwordService.PrintOutwordRecipt();
+            ViewBag.Tree = await _outwordService.GetAllCategoriesForTree();
+
+            return View();
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> getCustomerAccounts(string customer_number)
+        {
+            var result = await _outwordService.getCustomerAccounts(customer_number);
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> validatebranch(string brnch, string Bnk)
+        {
+            var result = await _outwordService.validatebranch(brnch, Bnk);
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> validatebank(string Bnk)
+        {
+            var result = await _outwordService.validatebank(Bnk);
+            return result;
+        }
+

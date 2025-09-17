@@ -229,3 +229,55 @@ namespace SAFA_ECC_Core_Clean.Services
 
         Task<IActionResult> deletetimeoutchq(string serial);
 
+
+
+        Task<IActionResult> RepresentReturnDis();
+
+
+
+        Task<IActionResult> FindChq(string DrwChqNo, string DrwBankNo, string DrwBranchNo, string DrwAcctNo, string BenAccountNo);
+
+
+
+        string getfinalonuscode(string Ret_Code, string Ret_CodeFinanical, string clrcenter);
+
+
+
+        Task<onusChqs> Get_ReturnedINHOUSESlipDetails(string Serial);
+
+
+
+        Task<IActionResult> retunedchqstates();
+
+
+
+        List<SelectListItem> waspdc();
+
+
+
+        List<SelectListItem> Bindchqstate();
+
+
+
+        Task<IActionResult> PrintAll(List<string> Serials);
+
+
+
+        Task<IActionResult> PrintOutwordRecipt();
+
+
+
+        Task<IActionResult> getCustomerAccounts(string customer_number);
+
+
+
+        Task<IActionResult> validatebranch(string brnch, string Bnk);
+
+
+
+        Task<IActionResult> validatebank(string Bnk);
+
+
+
+        Task<IActionResult> PrintCheques(string _customerID, string _accountNo, string _Slides);
+

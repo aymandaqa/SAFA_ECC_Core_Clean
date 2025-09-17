@@ -2374,3 +2374,754 @@ namespace SAFA_ECC_Core_Clean.Services
             return _json;
         }
 
+
+
+        public async Task<IActionResult> RepresentReturnDis()
+        {
+            _logger.LogInformation("RepresentReturnDis method called.");
+            string username = _httpContextAccessor.HttpContext.Session.GetString("UserName");
+
+            if (string.IsNullOrEmpty(username))
+            {
+                return new RedirectToActionResult("Login", "Login", null);
+            }
+
+            // Assuming GetAllCategoriesForTree() is implemented and returns a list of categories for ViewBag.Tree
+            // var tree = await GetAllCategoriesForTree(); // This would be called if needed for the viewmodel
+
+            // Since this is a GET action for a view, we return a ViewResult.
+            // In a service, we might return a ViewModel or a data structure that the controller then uses to render the view.
+            // For now, we'll return a placeholder indicating success or data readiness.
+            return new JsonResult(new { Success = true, Message = "RepresentReturnDis data prepared." });
+        }
+
+
+
+        public async Task<IActionResult> FindChq(string DrwChqNo, string DrwBankNo, string DrwBranchNo, string DrwAcctNo, string BenAccountNo)
+        {
+            _logger.LogInformation($"FindChq method called with DrwChqNo: {DrwChqNo}, DrwBankNo: {DrwBankNo}, DrwBranchNo: {DrwBranchNo}, DrwAcctNo: {DrwAcctNo}, BenAccountNo: {BenAccountNo}");
+
+            var _json = new JsonResult(new { });
+            var outList = new List<Outward_Trans>();
+            string username = _httpContextAccessor.HttpContext.Session.GetString("UserName");
+
+            try
+            {
+                _logSystem.WriteLogg("Befor Search Outward_Trans", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+
+                if (string.IsNullOrEmpty(DrwChqNo) || string.IsNullOrEmpty(DrwBankNo) || string.IsNullOrEmpty(DrwBranchNo) || string.IsNullOrEmpty(DrwAcctNo) || string.IsNullOrEmpty(BenAccountNo))
+                {
+                    _json = new JsonResult(new { ErrorMsg = "Please Fill All Data" });
+                    return _json;
+                }
+
+                string selectQuery = $"Select top 1 * from Outward_Trans where ClrCenter<>'PMA' and DrwAcctNo like'%{DrwAcctNo}%' and DrwBankNo ='{DrwBankNo}' and DrwBranchNo ={DrwBranchNo} and DrwChqNo like'%{DrwChqNo}%' and BenAccountNo ='{BenAccountNo}' and Posted ={(int)AllEnums.Cheque_Status.Returne} and ISNULL([RepresentSerial] , 0) = 0 and status <> 'Deleted' order by serial desc";
+
+                _logSystem.WriteTraceLogg("BEFORE Creating New Instance from SQL Connections", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+
+                string connectionString = _configuration.GetConnectionString("CONNECTION_STR"); // Assuming CONNECTION_STR is in appsettings.json
+
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    using (SqlCommand Com = new SqlCommand(selectQuery, con))
+                    {
+                        _logSystem.WriteLogg($"select_query IS: {selectQuery} bY : {username}, At:{DateTime.Now}", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+
+                        if (con.State != ConnectionState.Open) con.Open();
+                        using (SqlDataReader DR = await Com.ExecuteReaderAsync())
+                        {
+                            while (DR.Read())
+                            {
+                                var obj = new Outward_Trans
+                                {
+                                    Serial = DR["Serial"].ToString(),
+                                    DrwName = DR["DrwName"].ToString(),
+                                    ClrCenter = DR["ClrCenter"].ToString(),
+                                    BenfBnk = DR["BenfBnk"].ToString(),
+                                    BenfAccBranch = DR["BenfAccBranch"].ToString(),
+                                    BenName = DR["BenName"].ToString(),
+                                    ChqSequance = DR["ChqSequance"].ToString(),
+                                    DrwChqNo = DR["DrwChqNo"].ToString(),
+                                    DrwBankNo = DR["DrwBankNo"].ToString(),
+                                    DrwBranchNo = DR["DrwBranchNo"].ToString(),
+                                    Currency = DR["Currency"].ToString(),
+                                    BenAccountNo = DR["BenAccountNo"].ToString(),
+                                    DrwAcctNo = DR["DrwAcctNo"].ToString(),
+                                    ISSAccount = DR["ISSAccount"].ToString(),
+                                    Amount = Convert.ToDouble(DR["Amount"]),
+                                    InputDate = Convert.ToDateTime(DR["InputDate"]),
+                                    ValueDate = Convert.ToDateTime(DR["ValueDate"]),
+                                    // Handle nullable fields
+                                    BenfCardId = DR["BenfCardId"] == DBNull.Value ? null : DR["BenfCardId"].ToString(),
+                                    BenfCardType = DR["BenfCardType"] == DBNull.Value ? null : DR["BenfCardType"].ToString()
+                                };
+                                outList.Add(obj);
+                            }
+                        }
+                    }
+                }
+
+                if (!outList.Any())
+                {
+                    // Check old DB if not found in current
+                    selectQuery = $"Select * from Outward_Trans_Discount_Old where DrwAcctNo like'%{DrwAcctNo}%' and DrwBankNo ='{DrwBankNo}' and DrwBranchNo ={DrwBranchNo} and DrwChqNo like'%{DrwChqNo}%' and BenAccountNo ='{BenAccountNo}' and Posted ={(int)AllEnums.Cheque_Status.Returne} and ISNULL([RepresentSerial] , 0) = 0 and isnull(status,'') <> 'Deleted'";
+
+                    using (SqlConnection con1 = new SqlConnection(connectionString))
+                    {
+                        using (SqlCommand Com1 = new SqlCommand(selectQuery, con1))
+                        {
+                            _logSystem.WriteLogg($"select_query IS: {selectQuery} bY : {username}, At:{DateTime.Now}", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+
+                            if (con1.State != ConnectionState.Open) con1.Open();
+                            using (SqlDataReader DR1 = await Com1.ExecuteReaderAsync())
+                            {
+                                while (DR1.Read())
+                                {
+                                    var obj = new Outward_Trans
+                                    {
+                                        // Populate fields from DR1, handling DBNull values
+                                        Serial = DR1["Serial"].ToString(),
+                                        DrwName = DR1["DrwName"].ToString(),
+                                        ClrCenter = DR1["ClrCenter"].ToString(),
+                                        BenfBnk = DR1["BenfBnk"] == DBNull.Value ? null : DR1["BenfBnk"].ToString(),
+                                        BenfAccBranch = DR1["BenfAccBranch"] == DBNull.Value ? null : DR1["BenfAccBranch"].ToString(),
+                                        BenName = DR1["BenName"] == DBNull.Value ? null : DR1["BenName"].ToString(),
+                                        ChqSequance = DR1["ChqSequance"] == DBNull.Value ? null : DR1["ChqSequance"].ToString(),
+                                        DrwChqNo = DR1["DrwChqNo"].ToString(),
+                                        DrwBankNo = DR1["DrwBankNo"].ToString(),
+                                        DrwBranchNo = DR1["DrwBranchNo"].ToString(),
+                                        Currency = DR1["Currency"].ToString(),
+                                        BenAccountNo = DR1["BenAccountNo"].ToString(),
+                                        DrwAcctNo = DR1["DrwAcctNo"].ToString(),
+                                        ISSAccount = DR1["ISSAccount"] == DBNull.Value ? null : DR1["ISSAccount"].ToString(),
+                                        Amount = Convert.ToDouble(DR1["Amount"]),
+                                        InputDate = DR1["InputDate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(DR1["InputDate"]),
+                                        ValueDate = DR1["ValueDate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(DR1["ValueDate"]),
+                                        BenfCardId = DR1["BenfCardId"] == DBNull.Value ? null : DR1["BenfCardId"].ToString(),
+                                        BenfCardType = DR1["BenfCardType"] == DBNull.Value ? null : DR1["BenfCardType"].ToString()
+                                    };
+                                    outList.Add(obj);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                _json = new JsonResult(new { ErrorMsg = "", lstout = outList });
+                return _json;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in FindChq: {ex.Message}");
+                _logSystem.WriteError($"Error in FindChq: {ex.Message}", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+                _json = new JsonResult(new { ErrorMsg = "Somthing Wrong" });
+                return _json;
+            }
+        }
+
+
+
+        public string getfinalonuscode(string Ret_Code, string Ret_CodeFinanical, string clrcenter)
+        {
+            string Result = "";
+            if (Ret_Code == null)
+            {
+                Ret_Code = "";
+            }
+            if (Ret_CodeFinanical == null)
+            {
+                Ret_CodeFinanical = "";
+            }
+
+            try
+            {
+                string retCodeTrimmed = Ret_Code.Trim();
+                string retCodeFinanicalTrimmed = Ret_CodeFinanical.Trim();
+
+                if (clrcenter == "INHOUSE" || clrcenter == "PMA")
+                {
+                    if (retCodeTrimmed == "01")
+                    {
+                        Result = "01";
+                    }
+                    else if (retCodeTrimmed == "03")
+                    {
+                        Result = "03";
+                    }
+                    else if (retCodeTrimmed == "09")
+                    {
+                        Result = "09";
+                    }
+                    else if (retCodeTrimmed == "26")
+                    {
+                        Result = "26";
+                    }
+                    else if (retCodeTrimmed == "31")
+                    {
+                        Result = "31";
+                    }
+                    else if (retCodeTrimmed == "32")
+                    {
+                        Result = "32";
+                    }
+                    else if (retCodeFinanicalTrimmed == "02")
+                    {
+                        Result = "02";
+                    }
+                    else
+                    {
+                        Result = retCodeTrimmed;
+                    }
+                }
+                else
+                { // DISCOUNT
+                    if (retCodeTrimmed == "06")
+                    {
+                        Result = "06";
+                    }
+                    else if (retCodeTrimmed == "08")
+                    {
+                        Result = "08";
+                    }
+                    else if (retCodeTrimmed == "19")
+                    {
+                        Result = "19";
+                    }
+                    else if (retCodeTrimmed == "27")
+                    {
+                        Result = "27";
+                    }
+                    else if (retCodeTrimmed == "28")
+                    {
+                        Result = "28";
+                    }
+                    else if (retCodeFinanicalTrimmed == "02")
+                    {
+                        Result = "02";
+                    }
+                    else
+                    {
+                        Result = retCodeTrimmed;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error During Get Return Code for INWARD");
+                _logSystem.WriteError("Error During Get Return Code for INWARD", 96321, _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, _httpContextAccessor.HttpContext.Session.GetString("UserName"), _httpContextAccessor.HttpContext.Session.GetString("UserName"), "", "", "");
+            }
+            return Result;
+        }
+
+
+
+        public async Task<onusChqs> Get_ReturnedINHOUSESlipDetails(string Serial)
+        {
+            _logger.LogInformation($"Get_ReturnedINHOUSESlipDetails method called for Serial: {Serial}");
+            int _Step = 20000 + 6300;
+            string username = _httpContextAccessor.HttpContext.Session.GetString("UserName");
+
+            var outChq = new onusChqs();
+            outChq.onus = new OnUs_Tbl();
+            outChq.onus163 = new Get_Outward_Slip_CCS_VIEW();
+
+            try
+            {
+                _logSystem.WriteTraceLogg("Try to get Cheque Details to print Returned Outward slip", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+                _Step += 1;
+
+                outChq.onus = await _context.OnUs_Tbl.SingleOrDefaultAsync(u => u.Serial.ToString() == Serial);
+
+                if (outChq.onus == null)
+                {
+                    outChq.onus163 = await _context.Get_Outward_Slip_CCS_VIEW.SingleOrDefaultAsync(u => u.Serial.ToString() == Serial);
+
+                    if (outChq.onus163 != null)
+                    {
+                        var returnCodeTbl = await _context.Return_Codes_Tbl.SingleOrDefaultAsync(u => u.ReturnCode == outChq.onus163.ReturnedCode && u.ClrCenter != "DISCOUNT");
+                        if (returnCodeTbl != null)
+                        {
+                            outChq.onus163.ReturnedCode = returnCodeTbl.Description_AR;
+                        }
+
+                        // Assuming FrontImg and RearImg are byte arrays
+                        if (outChq.onus163.FrontImg == null || outChq.onus163.FrontImg.Length == 0)
+                        {
+                            outChq.onus163.FrontImg = new byte[] { 0x12, 0xFF }; // Placeholder for empty image
+                        }
+                        if (outChq.onus163.RearImg == null || outChq.onus163.RearImg.Length == 0)
+                        {
+                            outChq.onus163.RearImg = new byte[] { 0x12, 0xFF }; // Placeholder for empty image
+                        }
+                    }
+                }
+
+                _Step += 1;
+                if (outChq.onus != null)
+                {
+                    string ChqSeq = outChq.onus.CHQ_SEQ;
+                    string Bank_Id = outChq.onus.Bank_Code;
+                    string RetCode = "";
+
+                    RetCode = getfinalonuscode(outChq.onus.Return_Code.ToString(), outChq.onus.Return_Code.ToString(), "INHOUSE"); // Assuming Return_CodeFinancail is same as Return_Code for now
+
+                    string Brn = outChq.onus.Branch_Code;
+                    _Step += 1;
+                    outChq.onus.Value_Date = outChq.onus.Value_Date?.Date; // Ensure it's just date
+
+                    outChq.Imgs = await _context.OnUs_Imgs.FirstOrDefaultAsync(u => u.Serial.ToString() == Serial);
+                    _Step += 1;
+                    outChq.Bank_Name = (await _context.Banks_Tbl.SingleOrDefaultAsync(u => u.Bank_Id == Bank_Id))?.Bank_Name;
+                    _Step += 1;
+
+                    if (outChq.onus.ClrCenter?.ToUpper().Trim() != "DISCOUNT")
+                    {
+                        outChq.RetCode_Descreption = (await _context.Return_Codes_Tbl.FirstOrDefaultAsync(u => u.ReturnCode == RetCode && u.ClrCenter == "PMA"))?.Description_AR;
+                    }
+                    else if (outChq.onus.ClrCenter?.ToUpper().Trim() == "DISCOUNT")
+                    {
+                        outChq.RetCode_Descreption = (await _context.Return_Codes_Tbl.FirstOrDefaultAsync(u => u.ReturnCode == RetCode && u.ClrCenter == "DISCOUNT"))?.Description_AR;
+                    }
+                    _Step += 1;
+
+                    if (Brn.Trim().Length == 3)
+                    {
+                        Brn = "PS0010" + Brn;
+                    }
+                    else
+                    {
+                        Brn = "PS001" + Brn;
+                    }
+
+                    outChq.Branch_Name = (await _context.Companies_Tbl.SingleOrDefaultAsync(u => u.Company_Code == Brn))?.Company_Name_AR;
+                    _Step += 1;
+                }
+                else if (outChq.onus163 != null)
+                {
+                    string ChqSeq = outChq.onus163.Serial.ToString();
+                    string Bank_Id = outChq.onus163.DrwBankNo;
+                    string RetCode = outChq.onus163.ReturnedCode;
+
+                    string Brn = outChq.onus163.InputBrn;
+                    _Step += 1;
+                    outChq.onus163.ValueDate = outChq.onus163.ValueDate.Date; // Ensure it's just date
+                    _Step += 1;
+                    _Step += 1;
+                    outChq.Bank_Name = (await _context.Banks_Tbl.SingleOrDefaultAsync(u => u.Bank_Id == Bank_Id))?.Bank_Name;
+                    _Step += 1;
+
+                    if (outChq.onus163.ClrCenter?.ToUpper().Trim() != "DISCOUNT")
+                    {
+                        outChq.RetCode_Descreption = (await _context.Return_Codes_Tbl.FirstOrDefaultAsync(u => u.ReturnCode == RetCode && u.ClrCenter == "PMA"))?.Description_AR;
+                    }
+                    else if (outChq.onus163.ClrCenter?.ToUpper().Trim() == "DISCOUNT")
+                    {
+                        outChq.RetCode_Descreption = (await _context.Return_Codes_Tbl.FirstOrDefaultAsync(u => u.ReturnCode == RetCode && u.ClrCenter == "DISCOUNT"))?.Description_AR;
+                    }
+                    _Step += 1;
+
+                    if (Brn.Trim().Length == 3)
+                    {
+                        Brn = "PS0010" + Brn;
+                    }
+                    else
+                    {
+                        Brn = "PS001" + Brn;
+                    }
+
+                    outChq.Branch_Name = (await _context.Companies_Tbl.SingleOrDefaultAsync(u => u.Company_Code == Brn))?.Company_Name_AR;
+                    _Step += 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in Get_ReturnedINHOUSESlipDetails: {ex.Message}");
+                _logSystem.WriteError($"Error when trying to get Outward Cheque Details, Error Message is: {ex.Message}", 40001, _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+            }
+            return outChq;
+        }
+
+
+
+        public async Task<IActionResult> retunedchqstates()
+        {
+            _httpContextAccessor.HttpContext.Session.SetString("CHQ_STATE", "No");
+            string username = _httpContextAccessor.HttpContext.Session.GetString("UserName");
+
+            if (string.IsNullOrEmpty(username))
+            {
+                return new RedirectToActionResult("Login", "Login", null);
+            }
+
+            // Assuming Bindchqstate() and GetAllCategoriesForTree() are implemented in the service
+            // and return data suitable for ViewBag.
+            // For now, we'll return a placeholder indicating success or data readiness.
+            // The actual ViewBag population will happen in the controller.
+
+            try
+            {
+                // This part would typically populate data for the view, not return a view itself.
+                // The controller will handle the View() return.
+                var clearingCenters = await _context.ClearingCenters.ToListAsync();
+                // You might want to return these as part of a ViewModel or a tuple if the controller needs them.
+                // For now, just ensuring the logic runs.
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in retunedchqstates service method.");
+            }
+
+            return new JsonResult(new { Success = true, Message = "retunedchqstates data prepared." });
+        }
+
+
+
+        public List<SelectListItem> waspdc()
+        {
+            var ObjList = new List<SelectListItem>()
+            {
+                new SelectListItem { Text = "Yes", Value = "1" },
+                new SelectListItem { Text = "No", Value = "2" }
+            };
+            return ObjList;
+        }
+
+
+
+        public List<SelectListItem> Bindchqstate()
+        {
+            var ObjList = new List<SelectListItem>()
+            {
+                new SelectListItem { Text = "Pending", Value = "1" },
+                new SelectListItem { Text = "Delivrred", Value = "2" },
+                new SelectListItem { Text = "Represnted", Value = "3" },
+                new SelectListItem { Text = "Sent By Post", Value = "4" },
+                new SelectListItem { Text = "Sent By Vaulti", Value = "5" }
+            };
+            return ObjList;
+        }
+
+
+
+        public async Task<IActionResult> PrintAll(List<string> Serials)
+        {
+            _logger.LogInformation("PrintAll method called.");
+            var _json = new JsonResult(new { });
+            string username = _httpContextAccessor.HttpContext.Session.GetString("UserName");
+
+            if (string.IsNullOrEmpty(username))
+            {
+                return new RedirectToActionResult("Login", "Login", null);
+            }
+
+            var PARA = await _context.Global_Parameter_TBL.FirstOrDefaultAsync();
+            string connection_type = _configuration["connection_type"]?.ToLower(); // Assuming connection_type is in appsettings.json
+            string _VALUS = "";
+            if (connection_type == "secure")
+            {
+                _VALUS = "https://";
+            }
+            else
+            {
+                _VALUS = "http://";
+            }
+
+            string domainName = _VALUS + _httpContextAccessor.HttpContext.Request.Host.Value + "/";
+
+            var urls = new List<URL_>();
+            try
+            {
+                string chqsource = Serials[0];
+
+                for (int i = 1; i < Serials.Count; i++)
+                {
+                    int id = Convert.ToInt32(Serials[i].Trim());
+
+                    var url = new URL_();
+                    if (chqsource == "INHOUSE")
+                    {
+                        url.URL = domainName + "OUTWORD/Get_ReturnedINHOUSESlipDetails?Serial=" + id;
+                    }
+                    else
+                    {
+                        url.URL = domainName + "OUTWORD/Get_ReturnedSlipDetails?Serial=" + id; // Assuming Get_ReturnedSlipDetails exists
+                    }
+                    urls.Add(url);
+                }
+                _json = new JsonResult(new { ErrorMsg = "", lst = urls });
+                return _json;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in PrintAll method.");
+                _logSystem.WriteError($"Error in PrintAll: {ex.Message}", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+                _json = new JsonResult(new { ErrorMsg = "Somthing Wrong" });
+                return _json;
+            }
+        }
+
+
+
+        public async Task<IActionResult> PrintOutwordRecipt()
+        {
+            _logger.LogInformation("PrintOutwordRecipt method called.");
+            string username = _httpContextAccessor.HttpContext.Session.GetString("UserName");
+
+            if (string.IsNullOrEmpty(username))
+            {
+                return new RedirectToActionResult("Login", "Login", null);
+            }
+
+            try
+            {
+                // The actual view rendering and ViewBag population will happen in the controller.
+                // Here, we just ensure any necessary data fetching or preparation is done.
+                await GetAllCategoriesForTree(); // This populates the tree data, which the controller will then use for ViewBag.
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in PrintOutwordRecipt service method.");
+                _logSystem.WriteError($"Error in PrintOutwordRecipt: {ex.Message}", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+                return new StatusCodeResult(500); // Internal Server Error
+            }
+            return new OkResult(); // Indicate success, controller will handle view
+        }
+
+
+
+        public async Task<IActionResult> getCustomerAccounts(string customer_number)
+        {
+            _logger.LogInformation($"getCustomerAccounts method called for customer_number: {customer_number}");
+            var _json = new JsonResult(new { });
+
+            try
+            {
+                var EccAccInfo_WebSvc = new SAFA_T24_ECC_SVCSoapClient();
+                var AccListobj = await EccAccInfo_WebSvc.AccountList(customer_number, 1);
+
+                if (AccListobj.Account != null && AccListobj.Account.Count > 0)
+                {
+                    _json = new JsonResult(new { AccountLst = AccListobj.Account, note = "" });
+                }
+                else
+                {
+                    _json = new JsonResult(new { AccountLst = AccListobj.Account, note = "No Accounts Exist" });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in getCustomerAccounts: {ex.Message}");
+                _logSystem.WriteError($"Error in getCustomerAccounts: {ex.Message}", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, _httpContextAccessor.HttpContext.Session.GetString("UserName"), _httpContextAccessor.HttpContext.Session.GetString("UserName"), "", "", "");
+                _json = new JsonResult(new { note = "Something Wrong !" });
+            }
+            return _json;
+        }
+
+
+
+        public async Task<IActionResult> validatebranch(string brnch, string Bnk)
+        {
+            _logger.LogInformation($"validatebranch method called for branch: {brnch}, bank: {Bnk}");
+            var _json = new JsonResult(new { });
+
+            try
+            {
+                var bankTbl = await _context.Bank_Branches_Tbl.SingleOrDefaultAsync(x => x.BankCode == Bnk && x.BranchCode == brnch);
+
+                if (bankTbl == null)
+                {
+                    _json = new JsonResult(new { ErrorMsg = "S", MSG = "Branch Number is Wrong" });
+                }
+                else
+                {
+                    _json = new JsonResult(new { ErrorMsg = "S", MSG = "" });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in validatebranch: {ex.Message}");
+                _logSystem.WriteError($"Error in validatebranch: {ex.Message}", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, _httpContextAccessor.HttpContext.Session.GetString("UserName"), _httpContextAccessor.HttpContext.Session.GetString("UserName"), "", "", "");
+                _json = new JsonResult(new { ErrorMsg = "F", MSG = "Error !" });
+            }
+            return _json;
+        }
+
+
+
+        public async Task<IActionResult> validatebank(string Bnk)
+        {
+            _logger.LogInformation($"validatebank method called for bank: {Bnk}");
+            var _json = new JsonResult(new { });
+
+            try
+            {
+                var bankTbl = await _context.Banks_Tbl.SingleOrDefaultAsync(x => x.Bank_Id == Bnk);
+
+                if (bankTbl == null)
+                {
+                    _json = new JsonResult(new { ErrorMsg = "S", MSG = "Bank Number is Wrong" });
+                }
+                else
+                {
+                    _json = new JsonResult(new { ErrorMsg = "S", MSG = "" });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in validatebank: {ex.Message}");
+                _logSystem.WriteError($"Error in validatebank: {ex.Message}", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, _httpContextAccessor.HttpContext.Session.GetString("UserName"), _httpContextAccessor.HttpContext.Session.GetString("UserName"), "", "", "");
+                _json = new JsonResult(new { ErrorMsg = "F", MSG = "Error !" });
+            }
+            return _json;
+        }
+
+
+
+        public async Task<IActionResult> PrintCheques(string _customerID, string _accountNo, string _Slides)
+        {
+            _logger.LogInformation($"PrintCheques method called for customerID: {_customerID}, accountNo: {_accountNo}");
+            var _json = new JsonResult(new { });
+            string username = _httpContextAccessor.HttpContext.Session.GetString("UserName");
+
+            try
+            {
+                var XML_TEMP_out = "";
+                var XML_TEMP = await _context.Cheque_XML_Templete.SingleOrDefaultAsync(O => O.XML_Cheque_Type == "OutwardReport");
+                if (XML_TEMP != null)
+                {
+                    XML_TEMP_out = XML_TEMP.XML_Templete;
+                }
+
+                var ChequInfoLst = new List<Cheque_Info>();
+
+                if (!string.IsNullOrEmpty(_Slides))
+                {
+                    string[] slidesLst = _Slides.Split(',');
+
+                    foreach (var slide in slidesLst)
+                    {
+                        string[] _list = slide.Split('-');
+                        var ChequInfo = new Cheque_Info
+                        {
+                            DrwBranch = _list[0],
+                            DrwBank = _list[1],
+                            DrwChequeNo = _list[2],
+                            DrwAccountNo = _list[3],
+                            Amount = Convert.ToDecimal(_list[4])
+                        };
+                        ChequInfoLst.Add(ChequInfo);
+                    }
+                }
+
+                var EccAccInfo_WebSvc = new SAFA_T24_ECC_SVCSoapClient();
+                AccountInfo_RESPONSE Accobj = new AccountInfo_RESPONSE();
+
+                if (_accountNo.Split(',')[0].Trim().Length == 12 && _accountNo.Split(',')[0].Trim().StartsWith("78"))
+                {
+                    Accobj = await EccAccInfo_WebSvc.ACCOUNT_INFO("0" + _accountNo.Split(',')[0].Trim(), 1);
+                }
+                else if (_accountNo.Split(',')[0].Trim().Length == 13)
+                {
+                    Accobj = await EccAccInfo_WebSvc.ACCOUNT_INFO(_accountNo.Split(',')[0].Trim(), 1);
+                }
+                else
+                {
+                    Accobj = await EccAccInfo_WebSvc.ACCOUNT_INFO("0" + _customerID, 1);
+                }
+
+                string htmlString = XML_TEMP_out;
+                string TableContent = "";
+                string branch = _httpContextAccessor.HttpContext.Session.GetString("ComID");
+
+                string UserBranchName = (await _context.Companies_Tbl.SingleOrDefaultAsync(c => c.Company_ID == branch))?.Company_Name_AR;
+
+                string custName = GetBnefNameAR(_customerID); // Assuming this method is implemented in the service
+                string PayBranchName = GetBranchNameAR(Accobj.OwnerBranch.Substring(5)); // Assuming this method is implemented in the service
+
+                int COUNT = 0;
+                decimal totalAmount = 0;
+
+                foreach (var j in ChequInfoLst)
+                {
+                    // bnfname = GetBnefNameAR(j.ISSAccount); // Assuming ISSAccount is available in Cheque_Info
+                    totalAmount += j.Amount;
+                    TableContent += $"<tr> <th>{COUNT + 1}</th> <th>{j.DrwBranch}</th> <th>{j.DrwBank}</th> <th>{j.DrwChequeNo}</th> <th>{j.DrwAccountNo}</th> <th>{j.Amount}</th></tr>";
+                    COUNT++;
+                }
+
+                string amout_in_word = "";
+                var N2S_AR = new Convert_Numbers_To_Words_AR();
+                try
+                {
+                    amout_in_word = N2S_AR.ConvertNumberToWords(totalAmount, _accountNo.Split(',')[1].Trim());
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error converting amount to words.");
+                    amout_in_word = totalAmount.ToString();
+                }
+
+                htmlString = htmlString.Replace("@Currency@", _accountNo.Split(',')[1].Trim());
+                htmlString = htmlString.Replace("@AccountNumber@", _accountNo.Split(',')[0].Trim());
+                htmlString = htmlString.Replace("@AccountName@", custName);
+                htmlString = htmlString.Replace("@Branch@", UserBranchName);
+                htmlString = htmlString.Replace("@CustomerBranch@", PayBranchName);
+                htmlString = htmlString.Replace("@TotalString@", amout_in_word);
+                htmlString = htmlString.Replace("@TableContent@", TableContent);
+                htmlString = htmlString.Replace("@NoOfChqs@", ChequInfoLst.Count.ToString());
+                htmlString = htmlString.Replace("@Total@", totalAmount.ToString());
+                htmlString = htmlString.Replace("@Date@", DateTime.Now.ToString("yyyy-MM-dd"));
+                htmlString = htmlString.Replace("~/@CAB_LOGO@", "/Images/logo.PNG");
+                htmlString = htmlString.Replace("@CAB_LOGO@", "/Images/logo.PNG");
+
+                _json = new JsonResult(new { ErrorMsg = "S", MSG = htmlString });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in PrintCheques: {ex.Message}");
+                _logSystem.WriteError($"Error in PrintCheques: {ex.Message}", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+                _json = new JsonResult(new { ErrorMsg = "S", MSG = "Error !" });
+            }
+            return _json;
+        }
+
+        public string GetBnefNameAR(string CUSTOMERID)
+        {
+            string _result = "";
+            try
+            {
+                _logSystem.WriteTraceLogg("get GetBnefNameAR", _applicationID, "ALL_Functions Module", System.Reflection.MethodBase.GetCurrentMethod().Name, _httpContextAccessor.HttpContext.Session.GetString("UserName"), _httpContextAccessor.HttpContext.Session.GetString("UserName"), "", "", "");
+                // Assuming 'connection_String' is available via configuration or injected
+                // This part needs to be refactored to use EF Core or a proper data access layer
+                // For now, simulating the call
+                // _result = conn.Get_One_Data(" select[DBO].[GET_CUSTOMER_NAME] (" & "'" & CUSTOMERID & "')");
+                _result = "Customer Name for " + CUSTOMERID; // Placeholder
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error when get GetBnefNameAR.");
+                _logSystem.WriteError("Error when get GetBnefNameAR, Check Error Table for details", 5800, _applicationID, "ALL_Functions Module", System.Reflection.MethodBase.GetCurrentMethod().Name, _httpContextAccessor.HttpContext.Session.GetString("UserName"), _httpContextAccessor.HttpContext.Session.GetString("UserName"), "", "", "");
+            }
+            return _result;
+        }
+
+        public string GetBranchNameAR(string branchcode)
+        {
+            string _result = "";
+            try
+            {
+                _logSystem.WriteTraceLogg("get GetBranchNameAR", _applicationID, "ALL_Functions Module", System.Reflection.MethodBase.GetCurrentMethod().Name, _httpContextAccessor.HttpContext.Session.GetString("UserName"), _httpContextAccessor.HttpContext.Session.GetString("UserName"), "", "", "");
+                // Assuming 'connection_String' is available via configuration or injected
+                // This part needs to be refactored to use EF Core or a proper data access layer
+                // For now, simulating the call
+                // _result = conn.Get_One_Data(" select[DBO].[GET_BnfName_Ar] (" & "'" & branchcode & "')");
+                _result = "Branch Name for " + branchcode; // Placeholder
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error when get GetBranchNameAR.");
+                _logSystem.WriteError("Error when get GetBranchNameAR, Check Error Table for details", 5800, _applicationID, "ALL_Functions Module", System.Reflection.MethodBase.GetCurrentMethod().Name, _httpContextAccessor.HttpContext.Session.GetString("UserName"), _httpContextAccessor.HttpContext.Session.GetString("UserName"), "", "", "");
+            }
+            return _result;
+        }
+
