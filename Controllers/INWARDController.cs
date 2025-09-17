@@ -1077,3 +1077,73 @@ namespace SAFA_ECC_Core_Clean.Controllers
             return result;
         }
 
+
+
+
+        public async Task<IActionResult> PMADataVerfication()
+        {
+            HttpContext.Session.SetString("ErrorMessage", "");
+
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string methodName = GetMethodName(); // Assuming GetMethodName() is implemented elsewhere or can be inferred
+            int userId = GetUserID();
+
+            try
+            {
+                var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
+                if (appPage == null) return NotFound();
+
+                int pageId = appPage.Page_Id;
+                int applicationId = appPage.Application_ID;
+
+                HttpContext.Session.SetString("page_id", pageId.ToString());
+
+                // Assuming getuser_group_permision is a helper function or service call
+                // await getuser_group_permision(pageId, applicationId, userId);
+
+                if (HttpContext.Session.GetString("AccessPage") == "NoAccess")
+                {
+                    return RedirectToAction("block", "Login");
+                }
+
+                ViewBag.Tree = GetAllCategoriesForTree();
+
+                var cheqStatusList = await _context.CHEQUE_STATUS_ENU.ToListAsync();
+                var branchList = await _context.Companies_Tbl.Where(o => o.Company_Type != "4").ToListAsync();
+                foreach (var item in branchList)
+                {
+                    // Assuming Company_Code is string and needs parsing
+                    if (item.Company_Code.Length > 5)
+                    {
+                        item.Company_Code = item.Company_Code.Substring(5);
+                    }
+                }
+
+                var clearingList = await _context.ClearingCenters.Where(x => x.Id == "INHOUSE" || x.Id == "PMA").ToListAsync();
+                var currencyList = await _context.CURRENCY_TBL.ToListAsync();
+
+                ViewBag.CURRENCY = currencyList;
+                ViewBag.CHEQUE_STATUS = cheqStatusList;
+                ViewBag.Branches = branchList;
+                ViewBag.Clearinglst = clearingList;
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in PMADataVerfication: {Message}", ex.Message);
+                HttpContext.Session.SetString("ErrorMessage", "An error occurred: " + ex.Message);
+                return View("Error");
+            }
+        }
+
+        private string GetMethodName()
+        {
+            // Helper to get the current method name, similar to VB.NET's System.Reflection.MethodBase.GetCurrentMethod().Name
+            return ControllerContext.ActionDescriptor.ActionName;
+        }
+
