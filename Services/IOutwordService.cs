@@ -205,3 +205,27 @@ namespace SAFA_ECC_Core_Clean.Services
 
         Task<IActionResult> updateAllchqstat(string serial, string chqstat, string chqsource);
 
+
+
+        string Get_ALT_Acc_No(string accountNo);
+
+
+
+        Task<IActionResult> getreturnList(string ClrCenter, string STATUS, string TransDate, string chqNo, string payAcc);
+
+
+
+        Task<IActionResult> savepostedstatus(string serial, string TBLNAME, string posted);
+
+
+
+        Task<IActionResult> repostTimeoutchq(string serial);
+
+
+
+        Task<bool> PDCReversalSettlement(string serial);
+
+
+
+        Task<IActionResult> deletetimeoutchq(string serial);
+

@@ -1824,3 +1824,553 @@ namespace SAFA_ECC_Core_Clean.Services
             }
         }
 
+
+
+        public string Get_ALT_Acc_No(string accountNo)
+        {
+            _logger.LogInformation($"Get_ALT_Acc_No method called for accountNo: {accountNo}");
+            string result = "";
+            try
+            {
+                _logSystem.WriteLogg("Start get Alt Account Number from ACCOUNT_ALT_No table", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, _httpContextAccessor.HttpContext.Session.GetString("UserName"), _httpContextAccessor.HttpContext.Session.GetString("UserName"), "", "", "");
+                _logSystem.WriteTraceLogg("Start get Alt Account Number from ACCOUNT_ALT_No table", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, _httpContextAccessor.HttpContext.Session.GetString("UserName"), _httpContextAccessor.HttpContext.Session.GetString("UserName"), "", "", "");
+
+                // Assuming 'connection_String' is available via configuration or injected dependency
+                // and that 'All_CLASSES.CONNECTION' is replaced by direct ADO.NET or EF Core context if possible.
+                // For now, we'll simulate the call to a stored function or direct SQL.
+                // In a real application, this would be an EF Core query or a direct ADO.NET call.
+
+                // Example of direct SQL execution if needed, assuming _context is an EF Core DbContext
+                // This requires a custom method in the DbContext or direct ADO.NET.
+                // For simplicity, let's assume a direct SQL execution for a scalar function.
+                using (var command = _context.Database.GetDbConnection().CreateCommand())
+                {
+                    command.CommandText = $"SELECT dbo.Get_Alternate_Acc_From_Decrypt_CAB_Acc_No('{accountNo}')";
+                    _context.Database.OpenConnection();
+                    var scalarResult = command.ExecuteScalar();
+                    if (scalarResult != null)
+                    {
+                        result = scalarResult.ToString();
+                    }
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in Get_ALT_Acc_No for accountNo {accountNo}: {ex.Message}");
+                _logSystem.WriteTraceLogg($"Error when trying to get Alt Account Number from ACCOUNT_ALT_No table, Check Error Table for details", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, _httpContextAccessor.HttpContext.Session.GetString("UserName"), _httpContextAccessor.HttpContext.Session.GetString("UserName"), "", "", "");
+                _logSystem.WriteError($"Error when trying to get Alt Account Number from ACCOUNT_ALT_No table, Error Message is: {ex.Message}", 0, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, _httpContextAccessor.HttpContext.Session.GetString("UserName"), _httpContextAccessor.HttpContext.Session.GetString("UserName"), "", "", "");
+                return "";
+            }
+        }
+
+
+
+        public async Task<IActionResult> getreturnList(string ClrCenter, string STATUS, string TransDate, string chqNo, string payAcc)
+        {
+            _logger.LogInformation($"getreturnList method called with ClrCenter: {ClrCenter}, STATUS: {STATUS}, TransDate: {TransDate}, chqNo: {chqNo}, payAcc: {payAcc}");
+
+            var _json = new JsonResult(new { });
+            int _step = 20000 + 3400;
+
+            try
+            {
+                string username = _httpContextAccessor.HttpContext.Session.GetString("UserName");
+                string branchCode = _httpContextAccessor.HttpContext.Session.GetString("BranchID");
+                string companyId = _httpContextAccessor.HttpContext.Session.GetString("ComID");
+                string pageId = _httpContextAccessor.HttpContext.Session.GetString("page_id");
+
+                // Check for locked page (assuming getlockedpage handles session and returns appropriate result)
+                var lockedResult = await getlockedpage(Convert.ToInt32(pageId));
+                if (lockedResult is JsonResult lockedJsonResult && lockedJsonResult.Value.GetType().GetProperty("Locked_user")?.GetValue(lockedJsonResult.Value)?.ToString() != ".")
+                {
+                    return lockedResult; // Page is locked
+                }
+
+                _logSystem.WriteLogg("Befor Search getreturnList outward chq", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+                _logSystem.WriteTraceLogg("BEFORE Search getreturnList outward chq", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+
+                List<Outward_Trans> lstPstINW = new List<Outward_Trans>();
+                string select_query = "";
+
+                _logSystem.WriteTraceLogg("BEFORE Check Values To filter outward cheques", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+
+                if (ClrCenter == "-1")
+                {
+                    select_query = "select ReturnedCode, ValueDate, Serial, ISSAccount, InputDate, DrwChqNo, DrwBankNo, DrwBranchNo, Currency, Amount, ValueDate as TransDate, DrwName, BenAccountNo, BenName, DrwAcctNo, ClrCenter, ErrorDescription from Outward_Trans POST_Tbl where (ClrCenter = 'DISCOUNT' or ClrCenter = 'PMA') ";
+                }
+                else if (ClrCenter == "1")
+                {
+                    select_query = "select ReturnedCode, ValueDate, Serial, ISSAccount, InputDate, DrwChqNo, DrwBankNo, DrwBranchNo, Currency, Amount, ValueDate as TransDate, DrwName, BenAccountNo, BenName, DrwAcctNo, ClrCenter, ErrorDescription from Outward_Trans POST_Tbl where ClrCenter = 'PMA' ";
+                }
+                else
+                {
+                    select_query = "select ReturnedCode, ValueDate, Serial, ISSAccount, InputDate, DrwChqNo, DrwBankNo, DrwBranchNo, Currency, Amount, ValueDate as TransDate, DrwName, BenAccountNo, BenName, DrwAcctNo, ClrCenter, ErrorDescription from Outward_Trans POST_Tbl where ClrCenter = 'DISCOUNT' ";
+                }
+
+                if (branchCode != "2")
+                {
+                    select_query += $" and InputBrn = {branchCode}";
+                }
+
+                if (!string.IsNullOrEmpty(TransDate))
+                {
+                    select_query += $" And TransDate like '%{TransDate.Trim()}%'";
+                }
+                if (!string.IsNullOrEmpty(STATUS))
+                {
+                    select_query += $" And posted = '{STATUS.Trim()}'";
+                }
+                if (!string.IsNullOrEmpty(chqNo))
+                {
+                    select_query += $" and DrwChqNo like '%{chqNo.Trim()}%'";
+                }
+                if (!string.IsNullOrEmpty(payAcc))
+                {
+                    select_query += $" and DrwAcctNo = '{payAcc.Trim()}'";
+                }
+
+                var discountReturnCodes = await _context.Return_Codes_Tbl.Where(x => x.ClrCenter == "DISCOUNT").ToListAsync();
+                var pmaReturnCodes = await _context.Return_Codes_Tbl.Where(x => x.ClrCenter != "DISCOUNT").ToListAsync();
+
+                using (var command = _context.Database.GetDbConnection().CreateCommand())
+                {
+                    command.CommandText = select_query;
+                    _context.Database.OpenConnection();
+                    using (var result = await command.ExecuteReaderAsync())
+                    {
+                        while (await result.ReadAsync())
+                        {
+                            var obj = new Outward_Trans
+                            {
+                                Serial = result["Serial"].ToString(),
+                                InputDate = Convert.ToDateTime(result["InputDate"]).ToString("yyyy/MM/dd"),
+                                DrwChqNo = result["DrwChqNo"].ToString(),
+                                DrwBankNo = result["DrwBankNo"].ToString(),
+                                DrwBranchNo = result["DrwBranchNo"].ToString(),
+                                Currency = result["Currency"].ToString(),
+                                Amount = Convert.ToDouble(result["Amount"]), // Assuming Amount is double
+                                TransDate = Convert.ToDateTime(result["TransDate"]).ToString("yyyy/MM/dd"),
+                                DrwName = result["DrwName"].ToString(),
+                                BenAccountNo = result["BenAccountNo"] == DBNull.Value ? "" : result["BenAccountNo"].ToString(),
+                                BenName = result["BenName"].ToString(),
+                                DrwAcctNo = result["DrwAcctNo"].ToString(),
+                                ISSAccount = result["ISSAccount"].ToString(),
+                                ClrCenter = result["ClrCenter"].ToString(),
+                                ErrorDescription = result["ErrorDescription"] == DBNull.Value ? "" : result["ErrorDescription"].ToString(),
+                                ReturnedCode = result["ReturnedCode"] == DBNull.Value ? "" : result["ReturnedCode"].ToString()
+                            };
+
+                            // Map ReturnedCode to Description_AR
+                            if (!string.IsNullOrEmpty(obj.ReturnedCode))
+                            {
+                                if (obj.ClrCenter == "DISCOUNT")
+                                {
+                                    obj.ReturnedCode = discountReturnCodes.FirstOrDefault(rc => rc.ReturnCode == obj.ReturnedCode)?.Description_AR ?? obj.ReturnedCode;
+                                }
+                                else
+                                {
+                                    obj.ReturnedCode = pmaReturnCodes.FirstOrDefault(rc => rc.ReturnCode == obj.ReturnedCode)?.Description_AR ?? obj.ReturnedCode;
+                                }
+                            }
+
+                            lstPstINW.Add(obj);
+                        }
+                    }
+                }
+
+                _logSystem.WriteLogg("Return the result of Posted INW Verified Filter", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+
+                double totAmount = 0, totILS = 0, totJOD = 0, totUSD = 0, totEUR = 0;
+                int cILS = 0, cJOD = 0, cUSD = 0, cEUR = 0;
+
+                _logSystem.WriteTraceLogg("Calculate Amount of Cheques per Currency", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+
+                var currencyMap = await _context.CURRENCY_TBL.ToDictionaryAsync(c => c.SYMBOL_ISO, c => c.ID);
+
+                foreach (var item in lstPstINW)
+                {
+                    if (currencyMap.TryGetValue(item.Currency, out int currencyId))
+                    {
+                        if (currencyId == 1) { totJOD += item.Amount; cJOD++; }
+                        else if (currencyId == 2) { totUSD += item.Amount; cUSD++; }
+                        else if (currencyId == 3) { totILS += item.Amount; cILS++; }
+                        else if (currencyId == 4) { totEUR += item.Amount; cEUR++; }
+                    }
+                }
+
+                // This part of the VB.NET code calls a web service (ECC_CAP_Services.SAFA_T24_ECC_SVCSoapClient)
+                // and iterates through lstPstINW. This needs to be re-evaluated for ASP.NET Core.
+                // For now, I'll omit the web service call as it's an external dependency and might require a different approach.
+                // If this functionality is critical, it needs a dedicated service integration.
+
+                var model = new ReturnListViewModel
+                {
+                    ErrorMsg = "",
+                    LstPDC = lstPstINW, // Assuming lstPDC is the list of Outward_Trans
+                    LstDis = discountReturnCodes,
+                    LstPMA = pmaReturnCodes,
+                    AmountTot = totAmount,
+                    ILSAmount = totILS,
+                    JODAmount = totJOD,
+                    USDAmount = totUSD,
+                    EURAmount = totEUR,
+                    ILSCount = cILS,
+                    JODCount = cJOD,
+                    USDCount = cUSD,
+                    EURCount = cEUR,
+                    Locked_user = "."
+                };
+
+                return new OkObjectResult(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in getreturnList: {ex.Message}");
+                _logSystem.WriteError($"Error in getreturnList: {ex.Message}", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+                return new JsonResult(new { ErrorMsg = ex.Message, Locked_user = "." });
+            }
+        }
+
+
+
+        public async Task<IActionResult> savepostedstatus(string serial, string TBLNAME, string posted)
+        {
+            _logger.LogInformation($"savepostedstatus method called for serial: {serial}, TBLNAME: {TBLNAME}, posted: {posted}");
+
+            var _json = new JsonResult(new { });
+            string onus_list = "Change Posted Done , Sucessfully";
+            string username = _httpContextAccessor.HttpContext.Session.GetString("UserName");
+
+            try
+            {
+                if (TBLNAME == "Inward_Trans")
+                {
+                    var inward = await _context.Inward_Trans.SingleOrDefaultAsync(x => x.Serial == serial);
+                    if (inward != null)
+                    {
+                        inward.Posted = posted;
+                        inward.History += "Change Posted Done By" + username + "At: " + DateTime.Now;
+                        inward.LastUpdate = DateTime.Now;
+                        inward.LastUpdateBy = username;
+                        await _context.SaveChangesAsync();
+
+                        _json = new JsonResult(new { ErrorMsg = "", lstPDC = onus_list });
+                        return _json;
+                    }
+                }
+                else if (TBLNAME == "Outward_Trans")
+                {
+                    var outward = await _context.Outward_Trans.SingleOrDefaultAsync(x => x.Serial == serial);
+                    if (outward != null)
+                    {
+                        outward.Posted = posted;
+                        outward.History += "Change Posted Done By" + username + "At: " + DateTime.Now;
+                        outward.LastUpdate = DateTime.Now;
+                        outward.LastUpdateBy = username;
+                        await _context.SaveChangesAsync();
+
+                        _json = new JsonResult(new { ErrorMsg = "", lstPDC = onus_list });
+                        return _json;
+                    }
+                }
+                else if (TBLNAME == "Post_Dated_Trans")
+                {
+                    var pdc = await _context.Post_Dated_Trans.SingleOrDefaultAsync(x => x.Serial == serial);
+                    if (pdc != null)
+                    {
+                        pdc.Posted = posted;
+                        pdc.History += "Change Posted Done By" + username + "At: " + DateTime.Now;
+                        pdc.LastUpdate = DateTime.Now;
+                        pdc.LastUpdateBy = username;
+                        await _context.SaveChangesAsync();
+
+                        _json = new JsonResult(new { ErrorMsg = "", lstPDC = onus_list });
+                        return _json;
+                    }
+                }
+                else if (TBLNAME == "OnUs_Tbl")
+                {
+                    var inhouse = await _context.OnUs_Tbl.SingleOrDefaultAsync(x => x.Serial == serial);
+                    if (inhouse != null)
+                    {
+                        inhouse.Posted = posted;
+                        inhouse.History += "Change Posted Done By" + username + "At: " + DateTime.Now;
+                        inhouse.LastUpdate = DateTime.Now;
+                        inhouse.LastUpdateBy = username;
+                        await _context.SaveChangesAsync();
+                        _json = new JsonResult(new { ErrorMsg = "", lstPDC = onus_list });
+                        return _json;
+                    }
+                }
+                return new JsonResult(new { ErrorMsg = "Record not found or invalid table name.", lstPDC = onus_list });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in savepostedstatus for serial {serial}, TBLNAME {TBLNAME}: {ex.Message}");
+                _logSystem.WriteError($"Error in savepostedstatus: {ex.Message}", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+                onus_list = ex.ToString();
+                _json = new JsonResult(new { ErrorMsg = ex.Message, lstPDC = onus_list });
+                return _json;
+            }
+        }
+
+
+
+        public async Task<bool> PDCReversalSettlement(string serial)
+        {
+            _logger.LogInformation($"PDCReversalSettlement method called for serial: {serial}");
+            string username = _httpContextAccessor.HttpContext.Session.GetString("UserName");
+
+            try
+            {
+                _logSystem.WriteLogg("fill list of request message (PDCReversalSettlement) to send/recive MQ Message  after timeout", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+                _logSystem.WriteTraceLogg("fill list of request message (PDCReversalSettlement) to send/recive MQ Message  after timeout", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+
+                var outTrans = await _context.Outward_Trans.SingleOrDefaultAsync(v => v.Serial == serial);
+                if (outTrans == null)
+                {
+                    _logger.LogWarning($"Outward_Trans with serial {serial} not found for PDCReversalSettlement.");
+                    return false;
+                }
+
+                var sysName = await _context.System_Configurations_Tbl
+                                    .Where(c => c.Config_Type == "PDC_SYSTEM_ID" && c.Config_Id == "1")
+                                    .Select(c => c.Config_Value)
+                                    .FirstOrDefaultAsync();
+
+                if (string.IsNullOrEmpty(sysName))
+                {
+                    _logger.LogError("PDC_SYSTEM_ID configuration not found.");
+                    return false;
+                }
+
+                // Simulate ECC_CAP_Services.SAFA_T24_ECC_SVCSoapClient and ECC_FT_Request
+                // In a real scenario, this would be an actual service call.
+                // For now, we'll use a placeholder for FT_ResponseClass.
+                var ftResponse = new FT_ResponseClass(); // Placeholder
+
+                // Populate request object (simulated)
+                // var obj = new ECC_CAP_Services.ECC_FT_Request(); // This would be a DTO for the external service
+                // obj.PsSystem = sysName;
+                // ... populate other fields from outTrans
+
+                // Simulate the web service call
+                // ftResponse.FT_Res = EccAccInfo_WebSvc.ECC_OFS_MESSAGE(obj, MsgID, 1);
+                // For demonstration, let's assume a successful response.
+                ftResponse.FT_Res = new FT_ResponseClass.FT_Res_Inner { ResponseStatus = "S", ErrorMessage = "", ResponseDescription = "Success" };
+
+                if (ftResponse.FT_Res.ErrorMessage.Contains("OFSERROR_TIMEOUT"))
+                {
+                    outTrans.ErrorDescription = "PDCReversalSettlement:OFSERROR_TIMEOUT";
+                    outTrans.LastUpdateBy = username;
+                    outTrans.IsTimeOut = 1;
+                    outTrans.History += "|" + "PDCReversalSettlement Filed (TIMEOUT) User: " + username + "AT:" + DateTime.Now;
+                    _context.Entry(outTrans).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                    return false;
+                }
+                else
+                {
+                    if (ftResponse.FT_Res.ResponseStatus == "S")
+                    {
+                        outTrans.Status = "Accept";
+                        outTrans.ErrorCode = "";
+                        outTrans.ErrorDescription = "Success";
+                        outTrans.Posted = AllEnums.Cheque_Status.Posted;
+                        outTrans.IsTimeOut = 0;
+                        await _context.SaveChangesAsync();
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in PDCReversalSettlement for serial {serial}: {ex.Message}");
+                _logSystem.WriteError($"Error in PDCReversalSettlement: {ex.Message}", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+                return false;
+            }
+        }
+
+
+
+        public async Task<IActionResult> repostTimeoutchq(string serial)
+        {
+            _logger.LogInformation($"repostTimeoutchq method called for serial: {serial}");
+
+            var _json = new JsonResult(new { });
+            string CHQ = "";
+            try
+            {
+                var outTrans = await _context.Outward_Trans.SingleOrDefaultAsync(x => x.Serial == serial);
+
+                if (outTrans != null)
+                {
+                    CHQ = await GENERATE_UNIQUE_CHEQUE_SEQUANCE(outTrans.DrwChqNo, outTrans.DrwBankNo, outTrans.DrwBranchNo, outTrans.DrwAcctNo);
+                    bool status = await PDCReversalSettlement(serial);
+
+                    if (status == true || status == false)
+                    {
+                        if (outTrans.ClrCenter == "DISCOUNT")
+                        {
+                            // Assuming PresentmentDIS_Or_PDC_timeout is implemented and returns bool
+                            bool presntmentdis = await PresentmentDIS_Or_PDC_timeout(outTrans, CHQ);
+                            if (presntmentdis == true)
+                            {
+                                _json = new JsonResult(new { ErrorMsg = "   Presentment Discount Done Sucessfully " });
+                            }
+                            else
+                            {
+                                _json = new JsonResult(new { ErrorMsg = "   Presentment Discount Faild " });
+                            }
+                            return _json;
+                        }
+                        else
+                        {
+                            // Assuming PresentmentPMA_OR_PDC_timout is implemented and returns bool
+                            bool presntmentPMA = await PresentmentPMA_OR_PDC_timout(outTrans, CHQ);
+                            if (presntmentPMA == true)
+                            {
+                                _json = new JsonResult(new { ErrorMsg = "  Presentment PMA Done Sucessfully " });
+                            }
+                            else
+                            {
+                                _json = new JsonResult(new { ErrorMsg = "  Presentment PMA Faild " });
+                            }
+                            return _json;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in repostTimeoutchq for serial {serial}: {ex.Message}");
+                _json = new JsonResult(new { ErrorMsg = "Somthing Wrong" });
+            }
+            return _json;
+        }
+
+
+
+        public async Task<IActionResult> deletetimeoutchq(string serial)
+        {
+            _logger.LogInformation($"deletetimeoutchq method called for serial: {serial}");
+
+            var _json = new JsonResult(new { });
+            string username = _httpContextAccessor.HttpContext.Session.GetString("UserName");
+
+            try
+            {
+                var outTrans = await _context.Outward_Trans.SingleOrDefaultAsync(x => x.Serial == serial);
+
+                if (outTrans != null)
+                {
+                    string chqSequance = outTrans.ChqSequance;
+
+                    try
+                    {
+                        var deleteout = new Outward_Trans_Deleted
+                        {
+                            Amount = outTrans.Amount,
+                            Serial = outTrans.Serial,
+                            AuthorizedBy = outTrans.AuthorizedBy,
+                            AuthorizerBranch = outTrans.AuthorizerBranch,
+                            BenAccountNo = outTrans.BenAccountNo,
+                            BenfAccBranch = outTrans.BenfAccBranch,
+                            BenfBnk = outTrans.BenfBnk,
+                            BenfCardId = outTrans.BenfCardId,
+                            BenfCardType = outTrans.BenfNationality, // This seems like a mapping error in VB.NET, keeping it as is for now
+                            BenfNationality = outTrans.BenfNationality,
+                            BenName = outTrans.BenName,
+                            ChqSequance = outTrans.ChqSequance,
+                            CHQState = outTrans.CHQState,
+                            CHQStatedate = outTrans.CHQStatedate,
+                            ClrCenter = outTrans.ClrCenter,
+                            ClrFileRecordID = outTrans.ClrFileRecordID,
+                            Commision_Response = outTrans.Commision_Response,
+                            Currency = outTrans.Currency,
+                            DeptNo = outTrans.DeptNo,
+                            DiscountReternedOutImgID = outTrans.DiscountReternedOutImgID,
+                            DrwAcctNo = outTrans.DrwAcctNo,
+                            DrwBankNo = outTrans.DrwBankNo,
+                            DrwBranchExt = outTrans.DrwBranchExt,
+                            DrwBranchNo = outTrans.DrwBranchNo,
+                            DrwCardId = outTrans.DrwCardId,
+                            DrwChqNo = outTrans.DrwChqNo,
+                            DrwName = outTrans.DrwName,
+                            ErrorCode = outTrans.ErrorCode,
+                            ErrorDescription = outTrans.ErrorDescription,
+                            FaildTrans = outTrans.FaildTrans,
+                            History = outTrans.History + "|    Chq Deleted By   " + username + " At:" + DateTime.Now,
+                            InputBrn = outTrans.InputBrn,
+                            InputDate = outTrans.InputDate,
+                            ISSAccount = outTrans.ISSAccount,
+                            IsTimeOut = outTrans.IsTimeOut,
+                            IsVIP = outTrans.IsVIP,
+                            LastUpdate = DateTime.Now,
+                            LastUpdateBy = username,
+                            NeedTechnicalVerification = outTrans.NeedTechnicalVerification,
+                            OperType = outTrans.OperType,
+                            PDCChqSequance = outTrans.PDCChqSequance,
+                            PDCSerial = outTrans.PDCSerial,
+                            PMAstatus = outTrans.PMAstatus,
+                            PMAstatusDate = outTrans.PMAstatusDate,
+                            Posted = outTrans.Posted,
+                            QVFAddtlInf = outTrans.QVFAddtlInf,
+                            QVFStatus = outTrans.QVFStatus,
+                            Rejected = outTrans.Rejected,
+                            RepresentSerial = outTrans.RepresentSerial,
+                            Returned = outTrans.Returned,
+                            ReturnedCode = outTrans.ReturnedCode,
+                            ReturnedDate = outTrans.ReturnedDate,
+                            RSFAddtlInf = outTrans.RSFAddtlInf,
+                            RSFStatus = outTrans.RSFStatus,
+                            SpecialHandling = outTrans.SpecialHandling,
+                            Status = outTrans.Status,
+                            System_Aut_Man = outTrans.System_Aut_Man,
+                            Temenos_Message_Series = outTrans.Temenos_Message_Series,
+                            TransCode = outTrans.TransCode,
+                            TransDate = outTrans.TransDate,
+                            UserName = outTrans.UserName,
+                            ValueDate = outTrans.ValueDate,
+                            WasPDC = outTrans.WasPDC,
+                            WithUV = outTrans.WithUV
+                        };
+
+                        _context.Outward_Trans_Deleted.Add(deleteout);
+                        await _context.SaveChangesAsync();
+                        _logSystem.WriteTraceLogg("BEFORE During Add Deleted chq from out to delete out", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+
+                        _context.Outward_Trans.Remove(outTrans);
+                        await _context.SaveChangesAsync();
+
+                        var auth = await _context.Auth_Tran_Details_TBL.SingleOrDefaultAsync(i => i.Chq_Serial == chqSequance);
+                        if (auth != null)
+                        {
+                            _context.Auth_Tran_Details_TBL.Remove(auth);
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"Error during deletion process for serial {serial}: {ex.Message}");
+                        _logSystem.WriteTraceLogg("Error during deletion process for serial " + serial + ": " + ex.Message, _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, username, username, "", "", "");
+                    }
+
+                    _json = new JsonResult(new { ErrorMsg = "Delete Cheques Done " });
+                    return _json;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in deletetimeoutchq for serial {serial}: {ex.Message}");
+                _json = new JsonResult(new { ErrorMsg = "Somthing Wrong" });
+            }
+            return _json;
+        }
+

@@ -479,3 +479,43 @@ namespace SAFA_ECC_Core_Clean.Controllers
             return result;
         }
 
+
+
+        public string Get_ALT_Acc_No(string accountNo)
+        {
+            return _outwordService.Get_ALT_Acc_No(accountNo);
+        }
+
+
+
+        public async Task<IActionResult> getreturnList(string ClrCenter, string STATUS, string TransDate, string chqNo, string payAcc)
+        {
+            var result = await _outwordService.getreturnList(ClrCenter, STATUS, TransDate, chqNo, payAcc);
+            return result;
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> savepostedstatus(string serial, string TBLNAME, string posted)
+        {
+            var result = await _outwordService.savepostedstatus(serial, TBLNAME, posted);
+            return result;
+        }
+
+
+
+        public async Task<IActionResult> repostTimeoutchq(string serial)
+        {
+            var result = await _outwordService.repostTimeoutchq(serial);
+            return result;
+        }
+
+
+
+        public async Task<IActionResult> deletetimeoutchq(string serial)
+        {
+            var result = await _outwordService.deletetimeoutchq(serial);
+            return result;
+        }
+
