@@ -434,3 +434,101 @@ namespace SAFA_ECC_Core_Clean.Controllers
     }
 }
 
+
+
+        public async Task<bool> GetPermission(string id, string page, string groupId)
+        {
+            List<Users_Permissions> usersPermissionPage = new List<Users_Permissions>();
+            List<Groups_Permissions> groupPermissionPage = new List<Groups_Permissions>();
+            try
+            {
+                groupPermissionPage = await _context.Groups_Permissions.Where(x => x.Group_Id == groupId && x.Page_Id == page && (x.Add == true || x.Delete == true || x.Access == true || x.Reverse == true || x.Update == true || x.Post == true) && x.Application_ID == 1 && x.Access == true).ToListAsync();
+
+                if (groupPermissionPage.Count == 0)
+                {
+                    if (page == "0")
+                    {
+                        usersPermissionPage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == page && x.Application_ID == 1).ToListAsync();
+                    }
+                    else
+                    {
+                        usersPermissionPage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == page && x.Value == true && x.Application_ID == 1 && x.ActionID == 6).ToListAsync();
+                    }
+
+                    if (usersPermissionPage.Count == 0)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        // Assuming GroupType.Group_Status.AdminAuthorized and SystemAdmin are string constants
+                        if (int.TryParse(page, out int pageInt))
+                        {
+                            if (pageInt >= 1300 && pageInt <= 1400 && groupId == "AdminAuthorized")
+                            {
+                                return true;
+                            }
+
+                            if (pageInt >= 1 && pageInt <= 100 && groupId == "SystemAdmin")
+                            {
+                                return true;
+                            }
+
+                            if (!(pageInt >= 1 && pageInt <= 100) && !(pageInt >= 1300 && pageInt <= 1400))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (page == "0")
+                    {
+                        usersPermissionPage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == page && x.Application_ID == 1).ToListAsync();
+                        return true;
+                    }
+                    else
+                    {
+                        usersPermissionPage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == page && x.Application_ID == 1 && x.ActionID == 6).ToListAsync();
+                        if (usersPermissionPage.Count == 0)
+                        {
+                            return true;
+                        }
+
+                        usersPermissionPage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == page && x.Value == true && x.Application_ID == 1).ToListAsync();
+                        if (usersPermissionPage.Count > 0)
+                        {
+                            if (int.TryParse(page, out int pageInt))
+                            {
+                                if (pageInt >= 1300 && pageInt <= 1400 && groupId == "AdminAuthorized")
+                                {
+                                    return true;
+                                }
+                                if (pageInt >= 1 && pageInt <= 100 && groupId == "SystemAdmin")
+                                {
+                                    return true;
+                                }
+
+                                if (!(pageInt >= 1 && pageInt <= 100) && !(pageInt >= 1300 && pageInt <= 1400))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        usersPermissionPage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == page && x.Value == false && x.Application_ID == 1 && x.ActionID == 6).ToListAsync();
+                        if (usersPermissionPage.Count > 0)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetPermission: {Message}", ex.Message);
+            }
+            return false;
+        }
+
