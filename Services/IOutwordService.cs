@@ -193,3 +193,15 @@ namespace SAFA_ECC_Core_Clean.Services
 
         Task<IActionResult> Deleteoutchq();
 
+
+
+        Task<IActionResult> outward_views(string id);
+
+
+
+        Task<IActionResult> ReturnOwtward();
+
+
+
+        Task<IActionResult> updateAllchqstat(string serial, string chqstat, string chqsource);
+

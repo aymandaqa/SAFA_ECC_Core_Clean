@@ -1640,3 +1640,187 @@ namespace SAFA_ECC_Core_Clean.Services
             }
         }
 
+
+
+        public async Task<IActionResult> outward_views(string id)
+        {
+            _logger.LogInformation($"outward_views method called for id: {id}");
+
+            var outChqs = new OutChqs(); // Assuming OutChqs is a ViewModel or DTO
+            var outObj = new Outward_Trans();
+            var Img = new Outward_Imgs();
+            List<CURRENCY_TBL> Currency = new List<CURRENCY_TBL>();
+
+            try
+            {
+                _logSystem.WriteLogg($"Show Post Date Cheque to Update it from Outword_Trans table after posted=2 for id: {id}", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, _httpContextAccessor.HttpContext.Session.GetString("UserName"), _httpContextAccessor.HttpContext.Session.GetString("UserName"), "", "", "");
+
+                outObj = await _context.Outward_Trans.SingleOrDefaultAsync(y => y.Serial == id);
+                Currency = await _context.CURRENCY_TBL.ToListAsync();
+
+                if (outObj == null)
+                {
+                    // If outObj is null, redirect to update_Post_Outword (handled in controller)
+                    return new RedirectToActionResult("update_Post_Outword", "OUTWORD", null);
+                }
+
+                foreach (var item in Currency)
+                {
+                    if (outObj.Currency == item.ID.ToString())
+                    {
+                        outObj.Currency = item.SYMBOL_ISO;
+                        break;
+                    }
+                }
+
+                Img = await _context.Outward_Imgs.FirstOrDefaultAsync(y => y.Serial == outObj.Serial);
+                outObj.Amount = Math.Round(outObj.Amount, 2, MidpointRounding.AwayFromZero);
+
+                outChqs.outward_Trans = outObj;
+                outChqs.outward_Imgs = Img;
+
+                // Return the ViewModel to the controller
+                return new OkObjectResult(outChqs);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in outward_views for id {id}: {ex.Message}");
+                _logSystem.WriteError($"Error when get cheque details from Outword_Trans, Error Message is: {ex.Message}", 0, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, _httpContextAccessor.HttpContext.Session.GetString("UserName"), _httpContextAccessor.HttpContext.Session.GetString("UserName"), "", "", "");
+                return new StatusCodeResult(500); // Internal Server Error
+            }
+        }
+
+
+
+        public async Task<IActionResult> ReturnOwtward()
+        {
+            _logger.LogInformation("ReturnOwtward method called.");
+
+            try
+            {
+                // Session management (simplified for ASP.NET Core)
+                _httpContextAccessor.HttpContext.Session.Remove("access");
+                _httpContextAccessor.HttpContext.Session.Remove("locked");
+                _httpContextAccessor.HttpContext.Session.Remove("loked_user");
+
+                string methodName = "ReturnOwtward"; // Hardcoded for now, or derive dynamically
+                _httpContextAccessor.HttpContext.Session.SetString("methodName", methodName);
+
+                int userId = Convert.ToInt32(_httpContextAccessor.HttpContext.Session.GetString("ID"));
+                int pageId = (await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName))?.Page_Id ?? 0;
+                _httpContextAccessor.HttpContext.Session.SetInt32("page_id", pageId);
+
+                string title = (await _context.App_Pages.SingleOrDefaultAsync(c => c.Page_Id == pageId))?.ENG_DESC;
+                int applicationId = (await _context.App_Pages.SingleOrDefaultAsync(y => y.Page_Name_EN == methodName))?.Application_ID ?? 0;
+
+                // Permission check (simplified, actual implementation might use Authorization filters)
+                // Assuming getuser_group_permision sets a session variable or throws an exception
+                await getuser_group_permision(pageId.ToString(), applicationId.ToString(), userId.ToString());
+
+                if (_httpContextAccessor.HttpContext.Session.GetString("AccessPage") == "NoAccess")
+                {
+                    return new RedirectToActionResult("block", "Login", null);
+                }
+
+                // Data retrieval
+                var chqStatus = await _context.CHEQUE_STATUS_ENU.Where(c => c.ID == (int)AllEnums.Cheque_Status.Cleared).ToListAsync();
+                var clrCenter = await _context.ChequeSources.Where(i => i.Id == 1 || i.Id == 2).ToListAsync();
+
+                // Return data for the view (using a ViewModel or ViewBag equivalent)
+                var model = new ReturnOwtwardViewModel
+                {
+                    ChequeStatuses = chqStatus,
+                    ChequeSources = clrCenter,
+                    Title = title
+                };
+
+                return new OkObjectResult(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in ReturnOwtward: {ex.Message}");
+                _logSystem.WriteError($"Error Loading ReturnOwtward (getuser_group_permision) {ex.Message}", 0, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, _httpContextAccessor.HttpContext.Session.GetString("UserName"), _httpContextAccessor.HttpContext.Session.GetString("UserName"), "", "", "");
+                return new StatusCodeResult(500); // Internal Server Error
+            }
+        }
+
+
+
+        public async Task<IActionResult> updateAllchqstat(string serial, string chqstat, string chqsource)
+        {
+            _logger.LogInformation($"updateAllchqstat method called with serial: {serial}, chqstat: {chqstat}, chqsource: {chqsource}");
+            var _json = new JsonResult(new { });
+
+            try
+            {
+                string[] array_list = serial.Split(',');
+                _logSystem.WriteLogg("start update ReturnOwtward (updateAllchqstat)", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, _httpContextAccessor.HttpContext.Session.GetString("UserName"), _httpContextAccessor.HttpContext.Session.GetString("UserName"), "", "", "");
+
+                foreach (var item in array_list)
+                {
+                    if (!string.IsNullOrEmpty(item))
+                    {
+                        if (chqsource != "INHOUSE")
+                        {
+                            var outTrans = await _context.Outward_Trans.SingleOrDefaultAsync(x => x.Serial == item);
+                            if (outTrans != null)
+                            {
+                                if (outTrans.CHQState != chqstat)
+                                {
+                                    string last_stat = outTrans.CHQState;
+                                    outTrans.CHQState = chqstat;
+                                    outTrans.CHQStatedate = DateTime.Now;
+                                    outTrans.LastUpdateBy = _httpContextAccessor.HttpContext.Session.GetString("UserName");
+                                    outTrans.LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                                    outTrans.History += $"cheque ( updateAllchqstat)state changed by : {_httpContextAccessor.HttpContext.Session.GetString("UserName")}AT : {DateTime.Now}From state = {last_stat}To{chqstat}";
+                                    _context.Entry(outTrans).State = EntityState.Modified;
+                                    await _context.SaveChangesAsync();
+                                }
+                                else
+                                {
+                                    _json = new JsonResult(new { chqstate = "Nothing changed !" });
+                                    return _json;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var onus = await _context.OnUs_Tbl.SingleOrDefaultAsync(x => x.Serial == item);
+                            if (onus != null)
+                            {
+                                if (onus.CHQState != chqstat)
+                                {
+                                    string last_stat = onus.CHQState;
+                                    onus.CHQState = chqstat;
+                                    onus.CHQStatedate = DateTime.Now;
+                                    onus.LastUpdateBy = _httpContextAccessor.HttpContext.Session.GetString("UserName");
+                                    onus.LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                                    onus.History += $"cheque (updateAllchqstat) state changed by : {_httpContextAccessor.HttpContext.Session.GetString("UserName")}AT : {DateTime.Now}From state = {last_stat}To{chqstat}";
+                                    _context.Entry(onus).State = EntityState.Modified;
+                                    await _context.SaveChangesAsync();
+                                }
+                                else
+                                {
+                                    _json = new JsonResult(new { chqstate = "Nothing changed !" });
+                                    return _json;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                _logSystem.WriteLogg("end update ReturnOwtward (updateAllchqstat)", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, _httpContextAccessor.HttpContext.Session.GetString("UserName"), _httpContextAccessor.HttpContext.Session.GetString("UserName"), "", "", "");
+
+                _json = new JsonResult(new { chqstate = "Done Sucessfully" });
+                return _json;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in updateAllchqstat: {ex.Message}");
+                _logSystem.WriteError($"Error update ReturnOwtward (updateAllchqstat) {ex.Message}", _applicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, _httpContextAccessor.HttpContext.Session.GetString("UserName"), _httpContextAccessor.HttpContext.Session.GetString("UserName"), "", "", "");
+
+                _json = new JsonResult(new { chqstate = "Something Wrong !" });
+                return _json;
+            }
+        }
+

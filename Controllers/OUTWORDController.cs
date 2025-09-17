@@ -431,3 +431,51 @@ namespace SAFA_ECC_Core_Clean.Controllers
             return View(new List<Outward_Trans>()); // Return an empty list if no data or error
         }
 
+
+
+        public async Task<IActionResult> outward_views(string id)
+        {
+            ViewBag.Tree = await _outwordService.GetAllCategoriesForTree();
+            var result = await _outwordService.outward_views(id);
+
+            if (result is OkObjectResult okResult && okResult.Value is OutChqs outChqs)
+            {
+                return View(outChqs);
+            }
+            else if (result is RedirectToActionResult redirectResult)
+            {
+                return RedirectToAction(redirectResult.ActionName, redirectResult.ControllerName);
+            }
+            return View("Error"); // Default error view
+        }
+
+
+
+        public async Task<IActionResult> ReturnOwtward()
+        {
+            ViewBag.Tree = await _outwordService.GetAllCategoriesForTree();
+            var result = await _outwordService.ReturnOwtward();
+
+            if (result is OkObjectResult okResult && okResult.Value is ReturnOwtwardViewModel model)
+            {
+                ViewBag.Title = model.Title;
+                ViewBag.chq_status = model.ChequeStatuses;
+                ViewBag.clr_center = model.ChequeSources;
+                return View();
+            }
+            else if (result is RedirectToActionResult redirectResult)
+            {
+                return RedirectToAction(redirectResult.ActionName, redirectResult.ControllerName);
+            }
+            return View("Error");
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> updateAllchqstat(string serial, string chqstat, string chqsource)
+        {
+            var result = await _outwordService.updateAllchqstat(serial, chqstat, chqsource);
+            return result;
+        }
+
