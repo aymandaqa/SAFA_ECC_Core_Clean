@@ -560,3 +560,39 @@ namespace SAFA_ECC_Core_Clean.Controllers
             }
         }
 
+
+
+        public string GetList(string x)
+        {
+            int _step = 90000;
+            _step += 600;
+            try
+            {
+                if (HttpContext.Session.GetString("treeitem") == null)
+                {
+                    HttpContext.Session.SetString("treeitem", "");
+                }
+
+                string treeItem = HttpContext.Session.GetString("treeitem");
+                string[] array_list = treeItem.Split(':');
+
+                if (!array_list.Contains(x))
+                {
+                    string y = treeItem + x;
+                    HttpContext.Session.SetString("treeitem", y + ":");
+                }
+                else
+                {
+                    HttpContext.Session.SetString("treeitem", treeItem.Replace(x, ""));
+                }
+                return HttpContext.Session.GetString("treeitem");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetList: {Message}", ex.Message);
+                // _LogSystem.WriteLogg("Error in GetList", _ApplicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, GetUserName(), GetUserName(), "", "", "");
+                // _LogSystem.WriteTraceLogg("Error in GetList", _ApplicationID, GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name, GetUserName(), GetUserName(), "", "", "");
+                return ""; // Or handle error appropriately
+            }
+        }
+
