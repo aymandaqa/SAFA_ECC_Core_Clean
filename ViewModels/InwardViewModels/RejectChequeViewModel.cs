@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SAFA_ECC_Core_Clean.ViewModels.InwardViewModels
+namespace SAFA_ECC_Core_Clean.ViewModels.InwardViewModels.RejectChequeViewModel
 {
     public class RejectChequeViewModel
     {
@@ -13,4 +13,5 @@ namespace SAFA_ECC_Core_Clean.ViewModels.InwardViewModels
         public string? RejectReason { get; set; }
     }
 }
+
 

@@ -1,15 +1,17 @@
+using System; 
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SAFA_ECC_Core_Clean.Data;
 using SAFA_ECC_Core_Clean.Models;
 using SAFA_ECC_Core_Clean.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Cryptography;
-using System.Text;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace SAFA_ECC_Core_Clean.Controllers
 {
-    [Authorize]
     public class AdminController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -21,422 +23,303 @@ namespace SAFA_ECC_Core_Clean.Controllers
             _logger = logger;
         }
 
+        // Helper to get UserName from Session (simulated)
+        private string GetUserName()
+        {
+            // In a real application, this would come from HttpContext.Session or Identity
+            // For now, we'll simulate it. You might need to set this in a login process.
+            return HttpContext.Session.GetString("UserName") ?? "SimulatedUser";
+        }
+
+        // Helper to get ApplicationID (simulated)
+        private int GetApplicationID()
+        {
+            // Simulate Application ID. Adjust as per your application's actual ID.
+            return 1; 
+        }
+
         // GET: Admin
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            try
-            {
-                if (!await HasPermission("Index"))
-                    return Forbid();
-
-                var stats = new AdminDashboardViewModel
-                {
-                    TotalUsers = await _context.Users_Tbl.CountAsync(),
-                    ActiveUsers = await _context.Users_Tbl.CountAsync(u => u.IsDisabled == false),
-                    TotalGroups = await _context.Groups_Tbl.CountAsync(),
-                    ActiveGroups = await _context.Groups_Tbl.CountAsync(g => g.Is_Active == true),
-                    TotalCompanies = await _context.Companies_Tbl.CountAsync(),
-                    ActiveCompanies = await _context.Companies_Tbl.CountAsync(c => c.Is_Active == true),
-                    PendingAuthorizations = await _context.AuthTrans_User_TBL_Auth.CountAsync(a => a.status == "Pending"),
-                    RecentUsers = await _context.Users_Tbl
-                        .OrderByDescending(u => u.Creation_Date)
-                        .Take(5)
-                        .ToListAsync()
-                };
-
-                return View(stats);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in Admin Index");
-                return View(new AdminDashboardViewModel());
-            }
+            return View();
         }
 
-        // GET: Admin/index2
-        public async Task<IActionResult> index2()
-        {
-            try
-            {
-                if (!await HasPermission("index2"))
-                    return Forbid();
-
-                return View();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in Admin index2");
-                return View();
-            }
-        }
-
-        // GET: Admin/AddUser
-        public async Task<IActionResult> AddUser()
-        {
-            try
-            {
-                if (!await HasPermission("AddUser"))
-                    return Forbid();
-
-                var model = new AddUserViewModel
-                {
-                    Companies = await _context.Companies_Tbl.Where(c => c.Is_Active == true).ToListAsync(),
-                    Groups = await _context.Groups_Tbl.Where(g => g.Is_Active == true).ToListAsync()
-                };
-
-                return View(model);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in AddUser GET");
-                return View(new AddUserViewModel());
-            }
-        }
-
-        // POST: Admin/AddUser
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddUser(AddUserViewModel model)
+        public async Task<JsonResult> Accept_Reject_user_Permission(string id, string Status, string app, string page)
         {
+            var jsonResult = new JsonResult(new { success = false, message = "" });
+            int userId = 0;
+            int appId = 0;
+            int pageId = 0;
+
+            if (!int.TryParse(id, out userId) || !int.TryParse(app, out appId) || !int.TryParse(page, out pageId))
+            {
+                jsonResult = new JsonResult(new { success = false, message = "Invalid input parameters." });
+                return jsonResult;
+            }
+
             try
             {
-                if (!await HasPermission("AddUser"))
-                    return Forbid();
+                _logger.LogInformation($"Start with Accept_Reject_user_Permission for UserID: {userId}, Status: {Status}");
 
-                if (ModelState.IsValid)
+                // Find the authorization record
+                var userPermissionAuth = await _context.Users_Permissions_Auth
+                    .SingleOrDefaultAsync(x => x.Application_ID == appId && x.UserID == userId && x.Page_Id == pageId);
+
+                if (userPermissionAuth != null)
                 {
-                    // Check if username already exists
-                    var existingUser = await _context.Users_Tbl.FirstOrDefaultAsync(u => u.UserName == model.UserName);
-                    if (existingUser != null) 
+                    // Find the actual permission record
+                    var userPermission = await _context.Users_Permissions
+                        .SingleOrDefaultAsync(x => x.Application_ID == appId && x.UserID == userId && x.Page_Id == pageId);
+
+                    if (Status == "1") // Accept
                     {
-                        ModelState.AddModelError("UserName", "اسم المستخدم موجود مسبقاً");
-                        model.Companies = await _context.Companies_Tbl.Where(c => c.Is_Active == true).ToListAsync();
-                        model.Groups = await _context.Groups_Tbl.Where(g => g.Is_Active == true).ToListAsync();
-                        return View(model);
+                        if (userPermission == null)
+                        {
+                            // Create new permission if it doesn't exist
+                            userPermission = new Users_Permissions
+                            {
+                                UserID = userPermissionAuth.UserID,
+                                Application_ID = userPermissionAuth.Application_ID,
+                                Page_Id = userPermissionAuth.Page_Id,
+                                Add = userPermissionAuth.Add,
+                                Reverse = userPermissionAuth.Reverse,
+                                Post = userPermissionAuth.Post,
+                                Delete = userPermissionAuth.Delete,
+                                Update = userPermissionAuth.Update,
+                                Access = userPermissionAuth.Access,
+                                Value = userPermissionAuth.Value // Assuming 'Value' is the equivalent of 'Reverse' in VB for user permissions
+                            };
+                            _context.Users_Permissions.Add(userPermission);
+                        }
+                        else
+                        {
+                            // Update existing permission
+                            userPermission.Add = userPermissionAuth.Add;
+                            userPermission.Reverse = userPermissionAuth.Reverse;
+                            userPermission.Post = userPermissionAuth.Post;
+                            userPermission.Delete = userPermissionAuth.Delete;
+                            userPermission.Update = userPermissionAuth.Update;
+                            userPermission.Access = userPermissionAuth.Access;
+                            userPermission.Value = userPermissionAuth.Value;
+                        }
+                        userPermissionAuth.status = "Accept";
+                    }
+                    else // Reject
+                    {
+                        userPermissionAuth.status = "Reject";
                     }
 
-                    var user = new Users_Tbl
-                    {
-                        UserName = model.UserName,
-                        Password = HashPassword(model.Password), // Changed from User_Password to Password
-                        FullNameEN = model.FullName, // Assuming FullName is English for now
-                        Email = model.Email,
-                        Company_ID = model.CompanyId,
-                        Group_ID = model.GroupId,
-                        IsDisabled = false,
-                        Creation_Date = DateTime.Now,
-                        Created_By = User.Identity.Name
-                    };
-
-                    _context.Users_Tbl.Add(user);
                     await _context.SaveChangesAsync();
 
-                    TempData["SuccessMessage"] = "تم إضافة المستخدم بنجاح";
-                    return RedirectToAction(nameof(userlist));
-                }
-
-                model.Companies = await _context.Companies_Tbl.Where(c => c.Is_Active == true).ToListAsync();
-                model.Groups = await _context.Groups_Tbl.Where(g => g.Is_Active == true).ToListAsync();
-                return View(model);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in AddUser POST");
-                TempData["ErrorMessage"] = "حدث خطأ أثناء إضافة المستخدم";
-                return View(model);
-            }
-        }
-
-        // GET: Admin/EditUser
-        public async Task<IActionResult> EditUser(int id)
-        {
-            try
-            {
-                if (!await HasPermission("EditUser"))
-                    return Forbid();
-
-                var user = await _context.Users_Tbl.FindAsync(id);
-                if (user == null)
-                    return NotFound();
-
-                var model = new EditUserViewModel
-                {
-                    UserId = user.User_ID,
-                    UserName = user.UserName,
-                FullName = user.FullNameEN ?? user.UserName,
-                    Email = user.Email,
-                    CompanyId = user.Company_ID ?? 0, // Handle nullable
-                    GroupId = user.Group_ID ?? 0,     // Handle nullable
-                    IsDisabled = user.IsDisabled ?? false, // Handle nullable
-                    Companies = await _context.Companies_Tbl.Where(c => c.Is_Active == true).ToListAsync(),
-                    Groups = await _context.Groups_Tbl.Where(g => g.Is_Active == true).ToListAsync()
-                };
-
-                return View(model);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in EditUser GET");
-                return NotFound();
-            }
-        }
-
-        // POST: Admin/EditUser
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditUser(EditUserViewModel model)
-        {
-            try
-            {
-                if (!await HasPermission("EditUser"))
-                    return Forbid();
-
-                if (ModelState.IsValid)
-                {
-                    var user = await _context.Users_Tbl.FindAsync(model.UserId);
-                    if (user == null)
-                        return NotFound();
-
-                    user.UserName = model.UserName;
-                    user.FullNameEN = model.FullName;
-                    user.Email = model.Email;
-                    user.Company_ID = model.CompanyId;
-                    user.Group_ID = model.GroupId;
-                    user.IsDisabled = model.IsDisabled;
-                    user.Last_Amend_Date = DateTime.Now;
-                    user.Last_Amend_By = User.Identity.Name;
-
-                    if (!string.IsNullOrEmpty(model.NewPassword))
+                    // Log History
+                    var history = new Users_Permissions_History
                     {
-                        user.Password = HashPassword(model.NewPassword); // Changed from User_Password to Password
+                        UserID = userPermissionAuth.UserID,
+                        Application_ID = userPermissionAuth.Application_ID,
+                        Page_Id = userPermissionAuth.Page_Id,
+                        Add = userPermissionAuth.Add,
+                        Reverse = userPermissionAuth.Reverse,
+                        Post = userPermissionAuth.Post,
+                        Delete = userPermissionAuth.Delete,
+                        Update = userPermissionAuth.Update,
+                        Access = userPermissionAuth.Access,
+                        Value = userPermissionAuth.Value,
+                        UserName = GetUserName(),
+                        Updatedate = DateTime.Now
+                    };
+                    _context.Users_Permissions_History.Add(history);
+                    await _context.SaveChangesAsync();
+
+                    jsonResult = new JsonResult(new { success = true, message = "Operation successful." });
+                }
+                else
+                {
+                    jsonResult = new JsonResult(new { success = false, message = "User permission authorization record not found." });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error in Accept_Reject_user_Permission for UserID: {userId}. Error: {ex.Message}");
+                // In a real app, you'd integrate with your _LogSystem here
+                jsonResult = new JsonResult(new { success = false, message = "An error occurred during the operation." });
+            }
+            return jsonResult;
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> Accept_Reject_Finanical_Site(string id, string Status)
+        {
+            var jsonResult = new JsonResult(new { success = false, message = "" });
+            int financialSiteId = 0;
+
+            if (!int.TryParse(id, out financialSiteId))
+            {
+                jsonResult = new JsonResult(new { success = false, message = "Invalid input parameter." });
+                return jsonResult;
+            }
+
+            try
+            {
+                _logger.LogInformation($"Start with Accept_Reject_Finanical_Site for FinancialSiteID: {financialSiteId}, Status: {Status}");
+
+                var financialSiteAuth = await _context.Financial_Sites_Auth
+                    .SingleOrDefaultAsync(x => x.Financial_Site_ID == financialSiteId);
+
+                if (financialSiteAuth != null)
+                {
+                    var financialSite = await _context.Financial_Sites
+                        .SingleOrDefaultAsync(x => x.Financial_Site_ID == financialSiteId);
+
+                    if (Status == "1") // Accept
+                    {
+                        if (financialSite == null)
+                        {
+                            financialSite = new Financial_Sites
+                            {
+                                Financial_Site_ID = financialSiteAuth.Financial_Site_ID,
+                                Site_Name = financialSiteAuth.Site_Name,
+                                // Copy other relevant properties from financialSiteAuth to financialSite
+                            };
+                            _context.Financial_Sites.Add(financialSite);
+                        }
+                        else
+                        {
+                            financialSite.Site_Name = financialSiteAuth.Site_Name;
+                            // Update other relevant properties
+                        }
+                        financialSiteAuth.status = "Accept";
+                    }
+                    else // Reject
+                    {
+                        financialSiteAuth.status = "Reject";
                     }
 
-                    _context.Update(user);
                     await _context.SaveChangesAsync();
 
-                    TempData["SuccessMessage"] = "تم تحديث المستخدم بنجاح";
-                    return RedirectToAction(nameof(userlist));
-                }
-
-                model.Companies = await _context.Companies_Tbl.Where(c => c.Is_Active == true).ToListAsync();
-                model.Groups = await _context.Groups_Tbl.Where(g => g.Is_Active == true).ToListAsync();
-                return View(model);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in EditUser POST");
-                TempData["ErrorMessage"] = "حدث خطأ أثناء تحديث المستخدم";
-                return View(model);
-            }
-        }
-
-        // GET: Admin/userlist
-        public async Task<IActionResult> userlist()
-        {
-            try
-            {
-                if (!await HasPermission("userlist"))
-                    return Forbid();
-
-                var users = await _context.Users_Tbl
-                    .Include(u => u.Companies_Tbl) // Changed from u.Company to u.Companies_Tbl
-                    .Include(u => u.Groups_Tbl)     // Changed from u.Group to u.Groups_Tbl
-                    .OrderBy(u => u.UserName)
-                    .ToListAsync();
-
-                return View(users);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in userlist");
-                return View(new List<Users_Tbl>());
-            }
-        }
-
-        // GET: Admin/Addgroup
-        public async Task<IActionResult> Addgroup()
-        {
-            try
-            {
-                if (!await HasPermission("Addgroup"))
-                    return Forbid();
-
-                return View(new AddGroupViewModel());
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in Addgroup GET");
-                return View(new AddGroupViewModel());
-            }
-        }
-
-        // POST: Admin/Addgroup
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Addgroup(AddGroupViewModel model)
-        {
-            try
-            {
-                if (!await HasPermission("Addgroup"))
-                    return Forbid();
-
-                if (ModelState.IsValid)
-                {
-                    var group = new Groups_Tbl
+                    // Log History
+                    var history = new Financial_Sites_History
                     {
-                        Group_Name_EN = model.GroupName, // Assign to Group_Name_EN
-                        Group_Description = model.GroupDescription,
-                        Is_Active = true,
-                        Creation_Date = DateTime.Now,
-                        Created_By = User.Identity.Name
+                        Financial_Site_ID = financialSiteAuth.Financial_Site_ID,
+                        Site_Name = financialSiteAuth.Site_Name,
+                        UserName = GetUserName(),
+                        Updatedate = DateTime.Now
                     };
-
-                    _context.Groups_Tbl.Add(group);
+                    _context.Financial_Sites_History.Add(history);
                     await _context.SaveChangesAsync();
 
-                    TempData["SuccessMessage"] = "تم إضافة المجموعة بنجاح";
-                    return RedirectToAction(nameof(grouplist));
+                    jsonResult = new JsonResult(new { success = true, message = "Operation successful." });
                 }
-
-                return View(model);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in Addgroup POST");
-                TempData["ErrorMessage"] = "حدث خطأ أثناء إضافة المجموعة";
-                return View(model);
-            }
-        }
-
-        // GET: Admin/grouplist
-        public async Task<IActionResult> grouplist()
-        {
-            try
-            {
-                if (!await HasPermission("grouplist"))
-                    return Forbid();
-
-                var groups = await _context.Groups_Tbl
-                    .OrderBy(g => g.Group_Name_EN) // Order by Group_Name_EN
-                    .ToListAsync();
-
-                return View(groups);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in grouplist");
-                return View(new List<Groups_Tbl>());
-            }
-        }
-
-        // GET: Admin/Add_Password_Policies
-        public async Task<IActionResult> Add_Password_Policies()
-        {
-            try
-            {
-                if (!await HasPermission("Add_Password_Policies"))
-                    return Forbid();
-
-                return View(new PasswordPolicyViewModel());
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in Add_Password_Policies GET");
-                return View(new PasswordPolicyViewModel());
-            }
-        }
-
-        // POST: Admin/Add_Password_Policies
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add_Password_Policies(PasswordPolicyViewModel model)
-        {
-            try
-            {
-                if (!await HasPermission("Add_Password_Policies"))
-                    return Forbid();
-
-                if (ModelState.IsValid)
+                else
                 {
-                    var policy = new Password_Policies_TBL
-                    {
-                        Policy_Name = model.PolicyName,
-                        Min_Length = model.MinimumLength,
-                        Max_Length = model.MaxLength,
-                        Require_Uppercase = model.RequireUppercase,
-                        Require_Lowercase = model.RequireLowercase,
-                        Require_Numbers = model.RequireNumbers,
-                        Require_Special_Chars = model.RequireSpecialChars,
-                        Password_Expiry_Days = model.PasswordExpiryDays,
-                        Is_Active = true,
-                        Creation_Date = DateTime.Now, 
-                        Created_By = User.Identity.Name
-                    };
-
-                    _context.Password_Policies_TBL.Add(policy);
-                    await _context.SaveChangesAsync();
-
-                    TempData["SuccessMessage"] = "تم إضافة سياسة كلمة المرور بنجاح";
-                    return RedirectToAction(nameof(Index));
+                    jsonResult = new JsonResult(new { success = false, message = "Financial site authorization record not found." });
                 }
-
-                return View(model);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in Add_Password_Policies POST");
-                TempData["ErrorMessage"] = "حدث خطأ أثناء إضافة سياسة كلمة المرور";
-                return View(model);
+                _logger.LogError(ex, $"Error in Accept_Reject_Finanical_Site for FinancialSiteID: {financialSiteId}. Error: {ex.Message}");
+                jsonResult = new JsonResult(new { success = false, message = "An error occurred during the operation." });
             }
+            return jsonResult;
         }
 
-        // Helper method to check permissions
-        private async Task<bool> HasPermission(string actionName)
+        [HttpPost]
+        public async Task<JsonResult> Accept_Reject_Group_Permission(string id, string Status, string app, string page)
         {
+            var jsonResult = new JsonResult(new { success = false, message = "" });
+            int groupId = 0;
+            int appId = 0;
+            int pageId = 0;
+
+            if (!int.TryParse(id, out groupId) || !int.TryParse(app, out appId) || !int.TryParse(page, out pageId))
+            {
+                jsonResult = new JsonResult(new { success = false, message = "Invalid input parameters." });
+                return jsonResult;
+            }
+
             try
             {
-                var userName = User.Identity.Name;
-                if (string.IsNullOrEmpty(userName))
-                    return false;
+                _logger.LogInformation($"Start with Accept_Reject_Group_Permission for GroupID: {groupId}, Status: {Status}");
 
-                var user = await _context.Users_Tbl.FirstOrDefaultAsync(u => u.UserName == userName);
-                if (user == null)
-                    return false;
+                var groupPermissionAuth = await _context.Groups_Permissions_Auth
+                    .SingleOrDefaultAsync(x => x.Application_ID == appId && x.Group_Id == groupId && x.Page_Id == pageId);
 
-                // Check if user has permission for this action
-                var hasUserPermission = await _context.Users_Permissions // Changed from User_Permissions_Tbl to Users_Permissions
-                    .AnyAsync(up => up.UserID == user.User_ID && 
-                                   up.Page_Name == "Admin" && 
-                                   up.Action_Name == actionName && 
-                                   up.Value == true); // Changed Is_Allowed to Value
+                if (groupPermissionAuth != null)
+                {
+                    var groupPermission = await _context.Groups_Permissions
+                        .SingleOrDefaultAsync(x => x.Application_ID == appId && x.Group_Id == groupId && x.Page_Id == pageId);
 
-                if (hasUserPermission)
-                    return true;
+                    if (Status == "1") // Accept
+                    {
+                        if (groupPermission == null)
+                        {
+                            groupPermission = new Groups_Permissions
+                            {
+                                Group_Id = groupPermissionAuth.Group_Id,
+                                Application_ID = groupPermissionAuth.Application_ID,
+                                Page_Id = groupPermissionAuth.Page_Id,
+                                Add = groupPermissionAuth.Add,
+                                Reverse = groupPermissionAuth.Reverse,
+                                Post = groupPermissionAuth.Post,
+                                Delete = groupPermissionAuth.Delete,
+                                Update = groupPermissionAuth.Update,
+                                Access = groupPermissionAuth.Access,
+                                // Assuming 'Reverse' in VB was meant for a boolean flag, mapping to 'Reverse' in C# model
+                                Reverse = groupPermissionAuth.Reverse 
+                            };
+                            _context.Groups_Permissions.Add(groupPermission);
+                        }
+                        else
+                        {
+                            groupPermission.Add = groupPermissionAuth.Add;
+                            groupPermission.Reverse = groupPermissionAuth.Reverse;
+                            groupPermission.Post = groupPermissionAuth.Post;
+                            groupPermission.Delete = groupPermissionAuth.Delete;
+                            groupPermission.Update = groupPermissionAuth.Update;
+                            groupPermission.Access = groupPermissionAuth.Access;
+                            groupPermission.Reverse = groupPermissionAuth.Reverse;
+                        }
+                        groupPermissionAuth.status = "Accept";
+                    }
+                    else // Reject
+                    {
+                        groupPermissionAuth.status = "Reject";
+                    }
 
-                // Check group permissions
-                var hasGroupPermission = await _context.Group_Permissions // Changed from Group_Permissions_Tbl to Group_Permissions
-                    .AnyAsync(gp => gp.GroupID == user.Group_ID && 
-                                   gp.Page_Name == "Admin" && 
-                                   gp.Action_Name == actionName && 
-                                   gp.Is_Allowed == true);
+                    await _context.SaveChangesAsync();
 
-                return hasGroupPermission;
+                    // Log History
+                    var history = new Groups_Permissions_History
+                    {
+                        Group_Id = groupPermissionAuth.Group_Id,
+                        Application_ID = groupPermissionAuth.Application_ID,
+                        Page_Id = groupPermissionAuth.Page_Id,
+                        Add = groupPermissionAuth.Add,
+                        Reverse = groupPermissionAuth.Reverse,
+                        Post = groupPermissionAuth.Post,
+                        Delete = groupPermissionAuth.Delete,
+                        Update = groupPermissionAuth.Update,
+                        Access = groupPermissionAuth.Access,
+                        Reverse = groupPermissionAuth.Reverse,
+                        UserName = GetUserName(),
+                        Updatedate = DateTime.Now
+                    };
+                    _context.Groups_Permissions_History.Add(history);
+                    await _context.SaveChangesAsync();
+
+                    jsonResult = new JsonResult(new { success = true, message = "Operation successful." });
+                }
+                else
+                {
+                    jsonResult = new JsonResult(new { success = false, message = "Group permission authorization record not found." });
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking permissions for {ActionName}", actionName);
-                return false;
+                _logger.LogError(ex, $"Error in Accept_Reject_Group_Permission for GroupID: {groupId}. Error: {ex.Message}");
+                jsonResult = new JsonResult(new { success = false, message = "An error occurred during the operation." });
             }
-        }
-
-        // Helper method to hash passwords
-        private string HashPassword(string password)
-        {
-            using (var sha256 = SHA256.Create())
-            {
-                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(hashedBytes);
-            }
+            return jsonResult;
         }
     }
 }

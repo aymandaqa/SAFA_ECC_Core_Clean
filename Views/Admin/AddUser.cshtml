@@ -1,6 +1,5 @@
 
-@using SAFA_ECC_Core_Clean.ViewModels
-@model AddUserViewModel
+@model SAFA_ECC_Core_Clean.ViewModels.AdminViewModels.AddUserViewModel
 
 @{ 
     ViewData["Title"] = "إضافة مستخدم جديد";
@@ -43,7 +42,7 @@
 
                         <div class="mb-3">
                             <label asp-for="Role" class="form-label"></label>
-                            <select asp-for="Role" class="form-select" asp-items="Html.GetEnumSelectList<SAFA_ECC_Core_Clean.ViewModels.UserRole>()">
+                            <select asp-for="Role" class="form-select" asp-items="Html.GetEnumSelectList<SAFA_ECC_Core_Clean.ViewModels.UsersViewModels.UserRole>()">
                                 <option value="">اختر الدور</option>
                             </select>
                             <span asp-validation-for="Role" class="text-danger"></span>

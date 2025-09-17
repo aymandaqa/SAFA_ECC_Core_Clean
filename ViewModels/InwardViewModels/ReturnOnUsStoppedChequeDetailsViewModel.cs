@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using SAFA_ECC_Core_Clean.Models;
 
-namespace SAFA_ECC_Core_Clean.ViewModels.InwardViewModels
+namespace SAFA_ECC_Core_Clean.ViewModels.InwardViewModels.ReturnOnUsStoppedChequeDetailsViewModel
 {
     public class ReturnOnUsStoppedChequeDetailsViewModel
     {
@@ -25,4 +25,5 @@ namespace SAFA_ECC_Core_Clean.ViewModels.InwardViewModels
         public string? GUAR_CUSTOMER { get; set; }
     }
 }
+
 
