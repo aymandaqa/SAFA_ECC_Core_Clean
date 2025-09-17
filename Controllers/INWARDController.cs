@@ -1746,3 +1746,469 @@ namespace SAFA_ECC_Core_Clean.Controllers
             }
         }
 
+
+
+        [HttpGet]
+        public async Task<ActionResult> UpdateChqDate(string Serial, string chqNo, string DrwBankNo, string DrwBranchNo, string DrwAcctNo, double Amount, string verifyStatus, string RC)
+        {
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            int _step = 90000 + 1600;
+            string ret_cod = "";
+
+            if (!string.IsNullOrEmpty(RC))
+            {
+                ret_cod = RC.Split('-')[0];
+            }
+            else
+            {
+                ret_cod = "";
+            }
+
+            string methodName = "InwardDateVerficationDetails";
+            _step += 1;
+            // Dim group_name As New Group_Types_Tbl - Not directly used
+            int applicationid;
+            int userid = GetUserID();
+            // Dim _CAB As New SAFA_ECCEntities - Replaced by _context
+            int pageid;
+            // Dim WF_History As New WFHistory - Created inside try block
+            string DecryptedAccount = "";
+
+            try
+            {
+                pageid = (await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName)).Page_Id;
+                _step += 1;
+                applicationid = (await _context.App_Pages.SingleOrDefaultAsync(y => y.Page_Name_EN == methodName)).Application_ID;
+                _step += 1;
+                // Assuming getuser_group_permision is a helper function or service call
+                // await getuser_group_permision(pageid, applicationid, userid);
+                // If HttpContext.Session.GetString("AccessPage") == "NoAccess" Then
+                //     Return RedirectToAction("block", "Login");
+                // End If
+                _step += 1;
+                // ViewBag.Tree = GetAllCategoriesForTree(); // Needs implementation
+                _step += 1;
+
+                _logger.LogInformation("Verify inward cheque and update its details");
+
+                var Inw = await _context.Inward_Trans.SingleOrDefaultAsync(Y => Y.Serial == Serial);
+                _step += 1;
+                string INW_chqserial = (await _context.Inward_Trans.SingleOrDefaultAsync(Y => Y.Serial == Serial)).ChqSequance;
+                _step += 1;
+
+                if (Inw.VerifiedTechnically == true)
+                {
+                    // VerifiedTechnically(Inw.ClrCenter, Inw.ChqSequance, Inw.Serial, verifyStatus, ret_cod);
+                    // This function needs to be converted or its logic inlined
+                }
+                else
+                {
+                    string _str = "the User : " + GetUserName() + "|" + DateTime.Now + "|";
+                    if (Inw.DrwBankNo != DrwBankNo)
+                    {
+                        _str += " Update DrwBankNo   from : " + Inw.DrwBankNo + " to : " + DrwBankNo;
+                    }
+                    Inw.DrwBankNo = DrwBankNo;
+                    if (Inw.VerifiedTechnically != true)
+                    {
+                        _str += " Update VerifiedTechnically   from : " + Inw.VerifiedTechnically + " to : " + 1;
+                    }
+                    Inw.VerifiedTechnically = true; // Assuming 1 means true
+                    if (Inw.DrwBranchNo != DrwBranchNo)
+                    {
+                        _str += " Update DrwBranchNo   from : " + Inw.DrwBranchNo + " to : " + DrwBranchNo;
+                    }
+                    Inw.DrwBranchNo = DrwBranchNo;
+                    if (Inw.DrwAcctNo != DrwAcctNo)
+                    {
+                        _str += " Update DrwAcctNo   from : " + Inw.DrwAcctNo + " to : " + DrwAcctNo;
+                    }
+                    Inw.DrwAcctNo = DrwAcctNo;
+                    _str += " Update verifyStatus   from : " + Inw.verifyStatus + " to : " + verifyStatus;
+                    Inw.verifyStatus = verifyStatus;
+                    if (Inw.DrwChqNo != chqNo)
+                    {
+                        _str += " Update DrwChqNo   from : " + Inw.DrwChqNo + " to : " + chqNo;
+                    }
+                    Inw.DrwChqNo = chqNo;
+                    if (Inw.DrwAcctNo != DrwAcctNo)
+                    {
+                        _str += " Update DrwAcctNo   from : " + Inw.DrwAcctNo + " to : " + DrwAcctNo;
+                    }
+                    Inw.DrwAcctNo = DrwAcctNo;
+
+                    WFHistory WF_History = new WFHistory();
+
+                    if (verifyStatus == "0") // Assuming 0 means reject
+                    {
+                        Inw.History += " |  InitialTechnicalRejection  by: " + GetUserName() + ", on " + DateTime.Now + "with Return code = " + ret_cod;
+                        Inw.FirstLevelDate = DateTime.Now;
+                        Inw.FirstLevelStatus = "Reject";
+                        Inw.FirstLevelUser = GetUserName();
+
+                        WF_History.ChqSequance = Inw.ChqSequance;
+                        WF_History.Serial = Inw.Serial;
+                        WF_History.DrwChqNo = Inw.DrwChqNo;
+                        WF_History.TransDate = Inw.ValueDate;
+                        WF_History.ID_WFStatus = (int)AllEnums.WFHistory.WF_Status.InitialTechnicalRejection; // Cast to int
+                        WF_History.Status = "InitialTechnicalRejection" + "by:" + GetUserName();
+                        WF_History.ClrCenter = Inw.ClrCenter;
+                        WF_History.DrwAccNo = Inw.DrwAcctNo;
+                        _context.WFHistories.Add(WF_History);
+                        await _context.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        Inw.History += " |  TechnicallyAccepted by: " + GetUserName() + ", on " + DateTime.Now;
+                        Inw.FirstLevelDate = DateTime.Now;
+                        Inw.FirstLevelStatus = "Accept";
+                        Inw.FirstLevelUser = GetUserName();
+                        WF_History.ChqSequance = Inw.ChqSequance;
+                        WF_History.Serial = Inw.Serial;
+                        WF_History.DrwAccNo = Inw.DrwAcctNo;
+                        WF_History.TransDate = Inw.ValueDate;
+                        WF_History.DrwChqNo = Inw.DrwChqNo;
+                        WF_History.ID_WFStatus = (int)AllEnums.WFHistory.WF_Status.TechnicallyAccepted; // Cast to int
+                        WF_History.Status = "TechnicallyAccepted" + "By :" + GetUserName();
+                        WF_History.ClrCenter = Inw.ClrCenter;
+                        _context.WFHistories.Add(WF_History);
+                        await _context.SaveChangesAsync();
+                    }
+                    Inw.Amount = Amount;
+                    Inw.NeedTechnicalVerification = 0;
+                    Inw.Posted = (int)AllEnums.Cheque_Status.Verified; // Cast to int
+                    Inw.LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    Inw.LastUpdateBy = GetUserName();
+                    if (!string.IsNullOrEmpty(RC) && verifyStatus == "0")
+                    {
+                        Inw.ReturnCode = ret_cod;
+                    }
+                    Inw.History += "|  Record updated by " + GetUserName() + ", on " + DateTime.Now;
+                    try
+                    {
+                        var dischq = await _context.Inward_Trans.SingleOrDefaultAsync(f => f.Serial == Serial);
+                        if (dischq != null)
+                        {
+                            string result = null;
+                            // result = Get_Legal_Doc_Type_ID(dischq.DrwAcctNo, dischq.DrwChqNo); // Needs conversion
+                            if (!string.IsNullOrEmpty(result))
+                            {
+                                _str += " Update DrwCardType from  : " + dischq.DrwCardType + "  to: " + result;
+                                dischq.DrwCardType = result;
+                                await _context.SaveChangesAsync();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error in updating DrwCardType: {Message}", ex.Message);
+                    }
+
+                    Inw.History += _str;
+                    await _context.SaveChangesAsync();
+                    _step += 1;
+
+                    try
+                    {
+                        // by amani to sent email
+                        double Amount_ = 0;
+                        double evaluated = 0;
+                        var OUT = await _context.Inward_Trans.SingleOrDefaultAsync(i => i.Serial == Serial);
+
+                        var para_ = await _context.Global_Parameter_TBL.SingleOrDefaultAsync(i => i.Parameter_Name == "INWARD_NOTIFICATION_AMOUNT");
+                        if (para_ != null)
+                        {
+                            Amount_ = para_.Parameter_Value;
+                            // evaluated = EVALUATE_AMOUNT_IN_JOD(OUT.Currency, OUT.Amount); // Needs conversion
+                            if (evaluated >= Amount_)
+                            {
+                                // Send_Email(evaluated); // Needs conversion
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error in sending email notification: {Message}", ex.Message);
+                    }
+                }
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Database update error in UpdateChqDate: {Message}", ex.Message);
+                return Json(new { status = "Error", message = "Database error occurred." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in UpdateChqDate: {Message}", ex.Message);
+                return Json(new { status = "Error", message = "An unexpected error occurred." });
+            }
+
+            return Json(new { status = "Success", message = "Cheque updated successfully." });
+        }
+
+
+        public async Task<IActionResult> Get_Inward_Trans_Details_OnUs_Json(string id)
+        {
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            try
+            {
+                var inwardTrans = await _context.Inward_Trans.SingleOrDefaultAsync(t => t.Serial == id);
+                if (inwardTrans == null)
+                {
+                    return NotFound();
+                }
+
+                // Convert to ViewModel if necessary, or return as JSON
+                return Json(inwardTrans);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in Get_Inward_Trans_Details_OnUs_Json: {Message}", ex.Message);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        public async Task<IActionResult> getPermission(int pageId, int applicationId, int userId)
+        {
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            try
+            {
+                // This function needs to be fully converted based on its VB.NET original logic.
+                // It likely involves querying permissions tables and setting session variables.
+                // Placeholder for now.
+                _logger.LogInformation("getPermission called for PageId: {PageId}, AppId: {AppId}, UserId: {UserId}", pageId, applicationId, userId);
+                return Json(new { status = "Success", message = "Permission check placeholder." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in getPermission: {Message}", ex.Message);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        public async Task<IActionResult> Ge_t(string id)
+        {
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            try
+            {
+                // This function needs to be fully converted based on its VB.NET original logic.
+                // Placeholder for now.
+                _logger.LogInformation("Ge_t called with id: {Id}", id);
+                return Json(new { status = "Success", message = "Ge_t function placeholder." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in Ge_t: {Message}", ex.Message);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        public async Task<IActionResult> GetList()
+        {
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            try
+            {
+                // This function needs to be fully converted based on its VB.NET original logic.
+                // Placeholder for now.
+                _logger.LogInformation("GetList function called.");
+                return Json(new { status = "Success", message = "GetList function placeholder." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetList: {Message}", ex.Message);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        public async Task<IActionResult> getuser_group_permision(int pageId, int applicationId, int userId)
+        {
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            try
+            {
+                // This function needs to be fully converted based on its VB.NET original logic.
+                // It likely involves querying permissions tables and setting session variables.
+                // Placeholder for now.
+                _logger.LogInformation("getuser_group_permision called for PageId: {PageId}, AppId: {AppId}, UserId: {UserId}", pageId, applicationId, userId);
+                return Json(new { status = "Success", message = "User group permission check placeholder." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in getuser_group_permision: {Message}", ex.Message);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        public async Task<IActionResult> Pendding_ONUS_Request()
+        {
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            try
+            {
+                // This function needs to be fully converted based on its VB.NET original logic.
+                // Placeholder for now.
+                _logger.LogInformation("Pendding_ONUS_Request function called.");
+                return Json(new { status = "Success", message = "Pendding_ONUS_Request function placeholder." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in Pendding_ONUS_Request: {Message}", ex.Message);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        public async Task<IActionResult> InwordDateVerfication(string AccNo)
+        {
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            try
+            {
+                // This function needs to be fully converted based on its VB.NET original logic.
+                // Placeholder for now.
+                _logger.LogInformation("InwordDateVerfication called with AccNo: {AccNo}", AccNo);
+                return Json(new { status = "Success", message = "InwordDateVerfication function placeholder." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in InwordDateVerfication: {Message}", ex.Message);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        public async Task<IActionResult> InwardFixederrorDetailsONUS(string id)
+        {
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            try
+            {
+                // This function needs to be fully converted based on its VB.NET original logic.
+                // Placeholder for now.
+                _logger.LogInformation("InwardFixederrorDetailsONUS called with id: {Id}", id);
+                return Json(new { status = "Success", message = "InwardFixederrorDetailsONUS function placeholder." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in InwardFixederrorDetailsONUS: {Message}", ex.Message);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        public async Task<IActionResult> Inward_DateVerficationDetails(string id)
+        {
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            try
+            {
+                // This function needs to be fully converted based on its VB.NET original logic.
+                // Placeholder for now.
+                _logger.LogInformation("Inward_DateVerficationDetails called with id: {Id}", id);
+                return Json(new { status = "Success", message = "Inward_DateVerficationDetails function placeholder." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in Inward_DateVerficationDetails: {Message}", ex.Message);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        public async Task<IActionResult> getDocType(string id)
+        {
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            try
+            {
+                // This function needs to be fully converted based on its VB.NET original logic.
+                // Placeholder for now.
+                _logger.LogInformation("getDocType called with id: {Id}", id);
+                return Json(new { status = "Success", message = "getDocType function placeholder." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in getDocType: {Message}", ex.Message);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        public async Task<IActionResult> PMADataVerfication(string id)
+        {
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            try
+            {
+                // This function needs to be fully converted based on its VB.NET original logic.
+                // Placeholder for now.
+                _logger.LogInformation("PMADataVerfication called with id: {Id}", id);
+                return Json(new { status = "Success", message = "PMADataVerfication function placeholder." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in PMADataVerfication: {Message}", ex.Message);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        public async Task<IActionResult> PMADATAVerficationDetails_OnUS(string id)
+        {
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            try
+            {
+                // This function needs to be fully converted based on its VB.NET original logic.
+                // Placeholder for now.
+                _logger.LogInformation("PMADATAVerficationDetails_OnUS called with id: {Id}", id);
+                return Json(new { status = "Success", message = "PMADATAVerficationDetails_OnUS function placeholder." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in PMADATAVerficationDetails_OnUS: {Message}", ex.Message);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+    }
+}
+
