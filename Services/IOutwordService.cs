@@ -13,3 +13,30 @@ namespace SAFA_ECC_Core_Clean.Services
 
 
         Task<IActionResult> CheckImg();
+
+
+        Task<List<SelectListItem>> BindHoldType();
+
+
+        Task<List<SelectListItem>> GetAllCategoriesForTree();
+
+
+        Task<ActionResult> Hold_CHQ(Hold_CHQ Hold, string HOLD_TYPE, string Reserved);
+
+
+        Task<ActionResult> Hold_CHQ(Hold_CHQ Hold, string HOLD_TYPE, string Reserved);
+
+
+        Task<ActionResult> GetHold_CHQ();
+
+
+        Task<IActionResult> ReturnDiscountChq();
+
+
+        Task<string> Get_Deacrypted_Account(string Drw_Account, string ChqNo);
+
+
+        Task<IActionResult> Rejected_Out_Request();
+
+
+        Task<IActionResult> RepresnetDisDetails(string id);
