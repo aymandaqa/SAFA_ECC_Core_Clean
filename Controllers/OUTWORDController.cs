@@ -284,3 +284,69 @@ namespace SAFA_ECC_Core_Clean.Controllers
             return View("Error"); // Default error view
         }
 
+
+
+        [HttpGet]
+        public async Task<IActionResult> Update_Out_ChqDate(string Serial, string BenName, string BenfAccBranch, string AcctType, string DrwChqNo, string DrwBankNo, string DrwBranchNo, string DrwAcctNo, double Amount, DateTime DueDate, string Currency, string BenfBnk, string BenfCardType, string BenfCardId, string BenAccountNo, string BenfNationality, string NeedTechnicalVerification, string WithUV, string SpecialHandling, string IsVIP, string DrwName)
+        {
+            // Permission checks should be handled by authorization attributes or policies.
+            // For now, we assume the user is authorized.
+
+            // Populate ViewBag.Tree if needed (e.g., from a shared layout or view component)
+            ViewBag.Tree = await _outwordService.GetAllCategoriesForTree();
+
+            var result = await _outwordService.Update_Out_ChqDate(Serial, BenName, BenfAccBranch, AcctType, DrwChqNo, DrwBankNo, DrwBranchNo, DrwAcctNo, Amount, DueDate, Currency, BenfBnk, BenfCardType, BenfCardId, BenAccountNo, BenfNationality, NeedTechnicalVerification, WithUV, SpecialHandling, IsVIP, DrwName);
+
+            if (result is OkResult)
+            {
+                // Handle success, maybe redirect or return a success view
+                return RedirectToAction("Out_VerficationDetails", new { id = Serial }); // Example redirect
+            }
+            else if (result is NotFoundResult)
+            {
+                return NotFound();
+            }
+            else if (result is StatusCodeResult statusCodeResult && statusCodeResult.StatusCode == 500)
+            {
+                return StatusCode(500, "An error occurred during the update.");
+            }
+            return View("Error"); // Default error view
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> Update_Out_ChqDate_Accept(string Serial, string BenName, string BenfAccBranch, string AcctType, string DrwChqNo, string DrwBankNo, string DrwBranchNo, string DrwAcctNo, double Amount, DateTime DueDate, string Currency, string BenfBnk, string BenfCardType, string BenfCardId, string BenAccountNo, string BenfNationality, string NeedTechnicalVerification, string WithUV, string SpecialHandling, string IsVIP, string DrwName)
+        {
+            // Permission checks should be handled by authorization attributes or policies.
+            // For now, we assume the user is authorized.
+
+            // Populate ViewBag.Tree if needed (e.g., from a shared layout or view component)
+            ViewBag.Tree = await _outwordService.GetAllCategoriesForTree();
+
+            var result = await _outwordService.Update_Out_ChqDate_Accept(Serial, BenName, BenfAccBranch, AcctType, DrwChqNo, DrwBankNo, DrwBranchNo, DrwAcctNo, Amount, DueDate, Currency, BenfBnk, BenfCardType, BenfCardId, BenAccountNo, BenfNationality, NeedTechnicalVerification, WithUV, SpecialHandling, IsVIP, DrwName);
+
+            if (result is OkResult)
+            {
+                // Handle success, maybe redirect or return a success view
+                return RedirectToAction("Out_VerficationDetails", new { id = Serial }); // Example redirect
+            }
+            else if (result is NotFoundResult)
+            {
+                return NotFound();
+            }
+            else if (result is StatusCodeResult statusCodeResult && statusCodeResult.StatusCode == 500)
+            {
+                return StatusCode(500, "An error occurred during the update.");
+            }
+            return View("Error"); // Default error view
+        }
+
+
+
+        public async Task<IActionResult> getSearchListDis_PMA(string Branchs, string STATUS, string BenAccNo, string AccType, string FromBank, string ToBank, string Currency, string ChequeSource, string Amount, string DRWAccNo, string ChequeNo, string waspdc)
+        {
+            var result = await _outwordService.getSearchListDis_PMA(Branchs, STATUS, BenAccNo, AccType, FromBank, ToBank, Currency, ChequeSource, Amount, DRWAccNo, ChequeNo, waspdc);
+            return result;
+        }
+
