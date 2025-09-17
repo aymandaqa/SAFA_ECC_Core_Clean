@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using SAFA_ECC_Core_Clean.Models;
 
-namespace SAFA_ECC_Core_Clean.ViewModels.InwardViewModels.ReturnOnUsStoppedChequeDetailsViewModel
+namespace SAFA_ECC_Core_Clean.ViewModels.InwardViewModels
 {
     public class ReturnOnUsStoppedChequeDetailsViewModel
     {

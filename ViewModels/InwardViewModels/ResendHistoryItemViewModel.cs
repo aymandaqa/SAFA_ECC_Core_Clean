@@ -1,6 +1,6 @@
 using System;
 
-namespace SAFA_ECC_Core_Clean.ViewModels.InwardViewModels.ResendHistoryItemViewModel
+namespace SAFA_ECC_Core_Clean.ViewModels.InwardViewModels
 {
     public class ResendHistoryItemViewModel
     {

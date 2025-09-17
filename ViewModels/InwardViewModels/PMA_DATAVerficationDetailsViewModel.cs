@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using SAFA_ECC_Core_Clean.Models;
 using SAFA_ECC_Core_Clean.ViewModels.SharedViewModels;
 
-namespace SAFA_ECC_Core_Clean.ViewModels.InwardViewModels.PMA_DATAVerficationDetailsViewModel
+namespace SAFA_ECC_Core_Clean.ViewModels.InwardViewModels
 {
     public class PMA_DATAVerficationDetailsViewModel
     {

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SAFA_ECC_Core_Clean.ViewModels.InwardViewModels.RejectChequeViewModel
+namespace SAFA_ECC_Core_Clean.ViewModels.InwardViewModels
 {
     public class RejectChequeViewModel
     {
