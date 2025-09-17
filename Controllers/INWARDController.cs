@@ -837,3 +837,185 @@ namespace SAFA_ECC_Core_Clean.Controllers
             return ControllerContext.RouteData.Values["action"].ToString();
         }
 
+
+
+        public async Task<IActionResult> InwardFixederrorDetailsONUS(string id)
+        {
+            HttpContext.Session.SetString("ErrorMessage", "");
+
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string methodName = GetMethodName();
+            List<Return_Codes_Tbl> retDescList = new List<Return_Codes_Tbl>();
+            string clrCenter = "";
+
+            int userId = GetUserID();
+
+            try
+            {
+                var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
+                if (appPage == null) return NotFound();
+
+                int pageId = appPage.Page_Id;
+                int applicationId = appPage.Application_ID;
+
+                // Assuming getuser_group_permision is a helper function or service call
+                // await GetUserGroupPermission(pageId, applicationId, userId);
+
+                ViewBag.Title = appPage.ENG_DESC;
+                // ViewBag.Tree = GetAllCategoriesForTree(); // Needs implementation
+
+                clrCenter = "DISCOUNT";
+                retDescList = await _context.Return_Codes_Tbl.Where(i => i.ClrCenter != clrCenter).ToListAsync();
+                ViewBag.Ret_Desc = retDescList;
+
+                var inChq = new OnusChqs(); // Assuming OnusChqs is a ViewModel
+                var img = new OnUs_Imgs();
+                var incObj = new OnUs_Tbl();
+                List<CURRENCY_TBL> currencyList = new List<CURRENCY_TBL>();
+
+                _logger.LogInformation("Show Cheque fixed error it from ONUS table");
+
+                incObj = await _context.OnUs_Tbl.SingleOrDefaultAsync(y => y.Serial == id && (y.Posted == (int)AllEnums.Cheque_Status.New || y.Posted == (int)AllEnums.Cheque_Status.Posted || y.Posted == (int)AllEnums.Cheque_Status.Rejected));
+                currencyList = await _context.CURRENCY_TBL.ToListAsync();
+
+                if (incObj == null)
+                {
+                    return RedirectToAction("FixedError", "INWARD");
+                }
+
+                foreach (var currency in currencyList)
+                {
+                    if (incObj.Currency == "1" || incObj.Currency == "2" || incObj.Currency == "3" || incObj.Currency == "5")
+                    {
+                        if (Convert.ToInt32(incObj.Currency) == currency.ID)
+                        {
+                            incObj.Currency = currency.SYMBOL_ISO;
+                            break;
+                        }
+                    }
+                }
+
+                ViewBag.data = currencyList;
+                img = await _context.OnUs_Imgs.FirstOrDefaultAsync(y => y.Serial == incObj.Serial);
+
+                if (img == null)
+                {
+                    try
+                    {
+                        var onusimg = await _context.Cheque_Images_Link_Tbl.SingleOrDefaultAsync(v => v.Serial == incObj.Serial && v.Cheque_ype == "OnUs");
+                        if (onusimg == null)
+                        {
+                            var postimg = await _context.Cheque_Images_Link_Tbl.SingleOrDefaultAsync(v => v.Serial == incObj.PDC_Serial && v.Cheque_ype == "PDC");
+                            if (postimg != null)
+                            {
+                                onusimg = new Cheque_Images_Link_Tbl
+                                {
+                                    Serial = incObj.Serial,
+                                    Cheque_ype = "OnUs",
+                                    ImageSerial = postimg.ImageSerial,
+                                    ChqSequance = incObj.ChqSequance,
+                                    TransDate = DateTime.Now
+                                };
+                                _context.Cheque_Images_Link_Tbl.Add(onusimg);
+                                await _context.SaveChangesAsync();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error creating OnUs image link: {Message}", ex.Message);
+                    }
+                    img = await _context.OnUs_Imgs.FirstOrDefaultAsync(y => y.Serial == incObj.Serial);
+                }
+
+                incObj.Amount = Math.Round(incObj.Amount, 2, MidpointRounding.AwayFromZero);
+                inChq.onus = incObj;
+                inChq.Imgs = img;
+
+                return View(inChq);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in InwardFixederrorDetailsONUS: {Message}", ex.Message);
+                HttpContext.Session.SetString("ErrorMessage", "An error occurred: " + ex.Message);
+                return View("Error");
+            }
+        }
+
+        private string GetMethodName([System.Runtime.CompilerServices.CallerMemberName] string memberName = null)
+        {
+            return memberName;
+        }
+
+
+        public async Task<IActionResult> InwardFixederrorDetailsPMADIS(string id)
+        {
+            if (string.IsNullOrEmpty(GetUserName()))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            HttpContext.Session.SetString("ErrorMessage", "");
+
+            string methodName = GetMethodName();
+            int userId = GetUserID();
+
+            try
+            {
+                var appPage = await _context.App_Pages.SingleOrDefaultAsync(t => t.Page_Name_EN == methodName);
+                if (appPage == null) return NotFound();
+
+                int pageId = appPage.Page_Id;
+                int applicationId = appPage.Application_ID;
+
+                // await GetUserGroupPermission(pageId, applicationId, userId);
+
+                ViewBag.Title = appPage.ENG_DESC;
+                // ViewBag.Tree = GetAllCategoriesForTree();
+
+                string clrCenter = "";
+                List<Return_Codes_Tbl> retDescList = new List<Return_Codes_Tbl>();
+
+                var inChq = new INChqs(); // Assuming INChqs is a ViewModel
+                var img = new INWARD_IMAGES();
+                var incObj = new Inward_Trans();
+                List<CURRENCY_TBL> currencyList = new List<CURRENCY_TBL>();
+
+                _logger.LogInformation("Show Cheque fixed error it from Inward_Trans table");
+
+                incObj = await _context.Inward_Trans.SingleOrDefaultAsync(y => y.Serial == id);
+
+                if (incObj.ClrCenter == "PMA")
+                {
+                    clrCenter = "PMA";
+                    retDescList = await _context.Return_Codes_Tbl.Where(i => i.ClrCenter != clrCenter).ToListAsync();
+                }
+                else
+                {
+                    clrCenter = "DISCOUNT";
+                    retDescList = await _context.Return_Codes_Tbl.Where(i => i.ClrCenter == clrCenter).ToListAsync();
+                }
+                ViewBag.Ret_Desc = retDescList;
+
+                currencyList = await _context.CURRENCY_TBL.ToListAsync();
+
+                if (incObj == null)
+                {
+                    return RedirectToAction("FixedError", "INWARD");
+                }
+
+                // Further logic for image and inChq population would go here
+
+                return View(inChq);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in InwardFixederrorDetailsPMADIS: {Message}", ex.Message);
+                HttpContext.Session.SetString("ErrorMessage", "An error occurred: " + ex.Message);
+                return View("Error");
+            }
+        }
