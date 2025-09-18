@@ -1,117 +1,146 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using SAFA_ECC_Core_Clean.Services;
+using System.Threading.Tasks;
+using System.Text.Json;
+using SAFA_ECC_Core_Clean.Models;
 using System.Collections.Generic;
-using System.Linq;
 using System.Data;
-using System;
-using Microsoft.AspNetCore.Http;
 
 namespace SAFA_ECC_Core_Clean.Controllers
 {
-    // Placeholder for Category and TreeNode classes based on VB.NET usage
-    public class Category
-    {
-        public int SubMenu_ID { get; set; }
-        public int? Parent_ID { get; set; }
-        public string SubMenu_Name_EN { get; set; }
-        public int Related_Page_ID { get; set; }
-    }
-
-    public class TreeNode
-    {
-        public string SubMenu_Name_EN { get; set; }
-        public int SubMenu_ID { get; set; }
-        public int Related_Page_ID { get; set; }
-        public List<TreeNode> Children { get; set; }
-    }
-
     public class AuthenticationController : Controller
     {
-        private static List<TreeNode> FillRecursive(List<Category> flatObjects, int? parentId = null)
+        private readonly ILogger<AuthenticationController> _logger;
+        private readonly IAuthenticationService _authenticationService;
+
+        public AuthenticationController(ILogger<AuthenticationController> logger, IAuthenticationService authenticationService)
         {
-            return flatObjects.Where(x => x.Parent_ID == parentId)
-                              .Select(item => new TreeNode
-                              {
-                                  SubMenu_Name_EN = item.SubMenu_Name_EN,
-                                  SubMenu_ID = item.SubMenu_ID,
-                                  Related_Page_ID = item.Related_Page_ID,
-                                  Children = FillRecursive(flatObjects, item.SubMenu_ID)
-                              }).ToList();
+            _logger = logger;
+            _authenticationService = authenticationService;
         }
 
-        public void getuser_group_permision(string pageid, string applicationid, string userid)
+        // The FillRecursive method will be moved to the service layer
+        // The Category and TreeNode models are now in SAFA_ECC_Core_Clean.Models
+
+        public async Task<IActionResult> Index()
         {
-            int _step = 10000;
-            _step += 1700;
+            // Assuming User.Identity.Name and HttpContext.Session can provide the necessary data
+            string userName = User.Identity.Name;
+            int userId = 0; // Placeholder, retrieve actual userId if available
+            string groupId = HttpContext.Session.GetString("groupid"); // Assuming groupid is stored in session
 
-            // Placeholder for Session management in ASP.NET Core
-            // HttpContext.Session.SetString("permission_user_Group", null);
-            // HttpContext.Session.SetString("AccessPage", "");
+            // Helper functions to mimic Session.Item behavior
 
-            string _groupid = ""; //HttpContext.Session.GetString("groupid"); // Assuming session is configured
 
-            try
-            {
-                // ... (rest of the logic)
-            }
-            catch (Exception ex)
-            {
-                // ... (logging)
-            }
+            var treeHtml = await _authenticationService.GetAllCategoriesForTree(userName, userId, groupId);
+            ViewBag.Tree = treeHtml;
+            return View();
         }
 
-        public DataTable Getpage(string page)
+        public async Task<IActionResult> getuser_group_permision(string pageid, string applicationid, string userid)
         {
-            int _step = 40000;
-            _step += 200;
+            string userName = User.Identity.Name;
+            int userId = 0; // Placeholder, retrieve actual userId if available
+            string groupId = HttpContext.Session.GetString("groupid"); // Assuming groupid is stored in session
 
-            try
-            {
-                return new DataTable(); // Dummy return
-            }
-            catch (Exception ex)
-            {
-                return null; // Or rethrow exception
-            }
+            var result = await _authenticationService.getuser_group_permision(pageid, applicationid, userid, userName, userId, groupId);
+
+            // Now, handle the session updates in the controller layer
+            HttpContext.Session.SetString("permission_user_Group", System.Text.Json.JsonSerializer.Serialize(result.GroupPermissions));
+            HttpContext.Session.SetString("AccessPage", result.AccessPage);
+            HttpContext.Session.SetString("pagename", result.Pagename);
+
+            return Json(result); // Or return a specific view/partial view if needed
         }
 
-        public bool getPermission(string id, string _page, string _groupid)
+        public async Task<DataTable> Getpage(string page)
         {
-            try
-            {
-                return false; // Dummy return
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            return await _authenticationService.Getpage(page, User.Identity.Name, 0); // Placeholder for userId
         }
 
-        public bool getPermission1(string id, string _page, string _groupid)
+        public async Task<bool> getPermission(string id, string _page, string _groupid)
         {
-            try
-            {
-                return false; // Dummy return
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            return await _authenticationService.getPermission(id, _page, _groupid, User.Identity.Name, 0); // Placeholder for userId
         }
 
-        public bool Ge_t(string x)
+        public async Task<bool> getPermission1(string id, string _page, string _groupid)
         {
-            int _step = 40000;
-            _step += 500;
-            try
-            {
-                return false; // Dummy return
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            return await _authenticationService.getPermission1(id, _page, _groupid, User.Identity.Name, 0); // Placeholder for userId
         }
+
+        public async Task<bool> Ge_t(string x)
+        {
+            return await _authenticationService.Ge_t(x, User.Identity.Name, 0); // Placeholder for userId
+        }
+
+        // TODO: Continue migrating other actions from AuthenticationController.vb
     }
 }
 
+
+
+
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _authenticationService.Login(model);
+
+                if (result.Success)
+                {
+                    // Set session variables based on the result from the service
+                    HttpContext.Session.SetString("UserName", result.UserName);
+                    HttpContext.Session.SetString("ID", result.UserID);
+                    HttpContext.Session.SetString("groupid", result.GroupID);
+                    HttpContext.Session.SetString("BranchID", result.BranchID);
+                    HttpContext.Session.SetString("BranchName", result.BranchName);
+                    HttpContext.Session.SetString("UserType", result.UserType);
+                    HttpContext.Session.SetString("ApplicationID", result.ApplicationID);
+                    HttpContext.Session.SetString("CompanyID", result.CompanyID);
+                    HttpContext.Session.SetString("CompanyName", result.CompanyName);
+                    HttpContext.Session.SetString("CompanyBranchID", result.CompanyBranchID);
+                    HttpContext.Session.SetString("CompanyBranchName", result.CompanyBranchName);
+                    HttpContext.Session.SetString("CompanyBranchType", result.CompanyBranchType);
+                    HttpContext.Session.SetString("CompanyBranchAddress", result.CompanyBranchAddress);
+                    HttpContext.Session.SetString("CompanyBranchPhone", result.CompanyBranchPhone);
+                    HttpContext.Session.SetString("CompanyBranchFax", result.CompanyBranchFax);
+                    HttpContext.Session.SetString("CompanyBranchEmail", result.CompanyBranchEmail);
+                    HttpContext.Session.SetString("CompanyBranchWebsite", result.CompanyBranchWebsite);
+                    HttpContext.Session.SetString("CompanyBranchLogo", result.CompanyBranchLogo);
+                    HttpContext.Session.SetString("CompanyBranchCurrency", result.CompanyBranchCurrency);
+                    HttpContext.Session.SetString("CompanyBranchCurrencySymbol", result.CompanyBranchCurrencySymbol);
+                    HttpContext.Session.SetString("CompanyBranchCurrencyName", result.CompanyBranchCurrencyName);
+                    HttpContext.Session.SetString("CompanyBranchCurrencyDecimalPlaces", result.CompanyBranchCurrencyDecimalPlaces);
+                    HttpContext.Session.SetString("CompanyBranchCurrencyRate", result.CompanyBranchCurrencyRate);
+                    HttpContext.Session.SetString("CompanyBranchCurrencyRateDate", result.CompanyBranchCurrencyRateDate);
+                    HttpContext.Session.SetString("CompanyBranchCurrencyRateTime", result.CompanyBranchCurrencyRateTime);
+                    HttpContext.Session.SetString("CompanyBranchCurrencyRateUser", result.CompanyBranchCurrencyRateUser);
+                    HttpContext.Session.SetString("CompanyBranchCurrencyRateStatus", result.CompanyBranchCurrencyRateStatus);
+                    HttpContext.Session.SetString("CompanyBranchCurrencyRateDescription", result.CompanyBranchCurrencyRateDescription);
+
+                    return RedirectToAction("Index", "Home"); // Redirect to home page on successful login
+                }
+                ModelState.AddModelError(string.Empty, result.Message);
+            }
+            return View(model);
+        }
+
+
+
+
+        public IActionResult LogOff()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login", "Authentication");
+        }
 
