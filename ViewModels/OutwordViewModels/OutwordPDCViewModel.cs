@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SAFA_ECC_Core_Clean.Models;
 using System.Collections.Generic;
+using SAFA_ECC_Core_Clean.ViewModels.Enums;
 
 namespace SAFA_ECC_Core_Clean.ViewModels.OutwordViewModels
 {

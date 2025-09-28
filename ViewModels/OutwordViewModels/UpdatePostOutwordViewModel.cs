@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using SAFA_ECC_Core_Clean.ViewModels.Enums;
 
 namespace SAFA_ECC_Core_Clean.ViewModels.OutwordViewModels
 {

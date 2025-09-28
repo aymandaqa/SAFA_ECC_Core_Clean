@@ -21,12 +21,11 @@ namespace SAFA_ECC_Core_Clean.Services
         // private readonly LogSystem _logSystem; 
         private readonly int _applicationID = 1; // Example Application ID
 
-        public AdminService(ApplicationDbContext context, ILogger<AdminService> logger, IConfiguration configuration/*, LogSystem logSystem*/)
+        public AdminService(ApplicationDbContext context, ILogger<AdminService> logger, IConfiguration configuration)
         {
             _context = context;
             _logger = logger;
             _configuration = configuration;
-            // _logSystem = logSystem;
         }
 
         public async Task<List<UserPermissionViewModel>> GetUserPermissions(int userId, int appId, string userName, int currentUserId)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SAFA_ECC_Core_Clean.Models;
+using SAFA_ECC_Core_Clean.ViewModels.SharedViewModels;
 
 namespace SAFA_ECC_Core_Clean.ViewModels.InwardViewModels
 {

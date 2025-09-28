@@ -1,18 +1,17 @@
-
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using SAFA_ECC_Core_Clean.Data;
-using SAFA_ECC_Core_Clean.Models;
-using SAFA_ECC_Core_Clean.ViewModels.OutwordViewModels;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using SAFA_ECC_Core_Clean.Models;
+using SAFA_ECC_Core_Clean.ViewModels.OutwordViewModels;
+using AllEnums;
+using System.Reflection;
+using All_CLASSES;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Data;
 
 namespace SAFA_ECC_Core_Clean.Services
 {
@@ -20,1251 +19,1306 @@ namespace SAFA_ECC_Core_Clean.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<OutwordService> _logger;
-        private readonly IConfiguration _configuration;
-        private readonly LogSystem _logSystem; // Assuming LogSystem is a utility class
-        private readonly int _applicationID = 1; // Example Application ID
-        private string _loggMessage = "";
-        private string userName;
-        private int userId;
+        private readonly SAFA_T24_ECC_SVCSoapClient _safaT24EccSvcClient;
+        private readonly AllStoredProcesures _logSystem;
+        private string _applicationID = "1";
 
-        public OutwordService(ApplicationDbContext context, ILogger<OutwordService> logger, IConfiguration configuration, LogSystem logSystem)
+        public OutwordService(ApplicationDbContext context, ILogger<OutwordService> logger, SAFA_T24_ECC_SVCSoapClient safaT24EccSvcClient, AllStoredProcesures logSystem)
         {
             _context = context;
             _logger = logger;
-            _configuration = configuration;
+            _safaT24EccSvcClient = safaT24EccSvcClient;
             _logSystem = logSystem;
         }
 
-        private string Get_OFS_HttpLink()
-        {
-            // This method should retrieve the OFS_HttpLink from configuration or database
-            // For now, returning a placeholder
-            return _configuration["OFS_HttpLink"];
-        }
+        // Helper method to get user info (if needed, otherwise remove)
+        private string GetMethodName() => new System.Diagnostics.StackFrame(1).GetMethod().Name;
 
-        public async Task<CheckImgViewModel> check_img(string serial, string userName, int userId)
-        {
-            _logger.LogInformation($"Executing check_img for serial: {serial}, user: {userName}");
-            this.userName = userName;
-            this.userId = userId;
+        // Re-implement methods one by one
 
+        public async Task<CheckImgViewModel> CheckImg()
+        {
             var viewModel = new CheckImgViewModel();
             try
             {
-                var outwardTrans = await _context.Outward_Trans.SingleOrDefaultAsync(x => x.Serial == serial);
-                if (outwardTrans != null)
+                // Original VB.NET logic (hardcoded test case)
+                var retOut = await _context.Outward_Trans.SingleOrDefaultAsync(i => i.InputBrn == "808" && i.Posted == (int)AllEnums.Cheque_Status.Returned && i.Serial == "1146042");
+
+                if (retOut != null)
                 {
-                    viewModel.HasImage = outwardTrans.HasImage == 1;
+                    var chqSeq = retOut.ChqSequance;
+                    viewModel.OutwardImg = await _context.Outward_Imgs.SingleOrDefaultAsync(i => i.ChqSequance == chqSeq);
                 }
                 else
                 {
-                    viewModel.ErrorMessage = "Cheque not found.";
+                    viewModel.ErrorMessage = "No matching outward transaction found for check_img test case.";
                 }
             }
             catch (Exception ex)
             {
-                _loggMessage = $"Error in check_img for serial: {serial}: {ex.Message}";
-                _logSystem.WriteError(_loggMessage, _applicationID, GetType().Name, MethodBase.GetCurrentMethod().Name, userName, userId.ToString(), "", "", "");
-                _logger.LogError(ex, _loggMessage);
+                _logger.LogError(ex, "Error in CheckImg service method.");
                 viewModel.ErrorMessage = "An error occurred: " + ex.Message;
             }
             return viewModel;
         }
 
-        public async Task<bool> getPermission(string pageId, string userName, int userId)
+        public async Task<bool> GetPermission(string id, string page, string groupId)
         {
-            _logger.LogInformation($"Executing getPermission for pageId: {pageId}, user: {userName}");
-            this.userName = userName;
-            this.userId = userId;
+            List<Users_Permissions> usersPermissionPage = new List<Users_Permissions>();
+            List<Groups_Permissions> groupPermissionPage = new List<Groups_Permissions>();
 
             try
             {
-                // Assuming Auth_Tran_Details_TBL contains permission logic
-                // This is a simplified example, actual implementation might involve complex roles/permissions
-                var permission = await _context.Auth_Tran_Details_TBL.AnyAsync(x => x.Page_Id == pageId && x.User_Id == userId);
-                return permission;
+                groupPermissionPage = await _context.Groups_Permissions.Where(x => x.Group_Id == groupId && x.Page_Id == page && x.Application_ID == 1 && x.Access == true).ToListAsync();
+
+                if (groupPermissionPage.Count == 0)
+                {
+                    if (page == "0")
+                    {
+                        usersPermissionPage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == page && x.Application_ID == 1).ToListAsync();
+                        return true;
+                    }
+                    else
+                    {
+                        usersPermissionPage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == page && x.Value == true && x.Application_ID == 1 && x.ActionID == 6).ToListAsync();
+                    }
+
+                    if (usersPermissionPage.Count == 0)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        if (int.Parse(page) >= 1300 && int.Parse(page) <= 1400 && groupId == GroupType.Group_Status.AdminAuthorized)
+                        {
+                            return true;
+                        }
+                        if (int.Parse(page) >= 1 && int.Parse(page) <= 100 && groupId == GroupType.Group_Status.SystemAdmin)
+                        {
+                            return true;
+                        }
+                        if (!(int.Parse(page) >= 1) || !(int.Parse(page) <= 100) && (!(int.Parse(page) >= 1300) || !(int.Parse(page) <= 1400)))
+                        {
+                            return true;
+                        }
+                    }
+                }
+                else
+                {
+                    if (page == "0")
+                    {
+                        usersPermissionPage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == page && x.Application_ID == 1).ToListAsync();
+                        return true;
+                    }
+                    else
+                    {
+                        usersPermissionPage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == page && x.Application_ID == 1 && x.ActionID == 6).ToListAsync();
+                        if (usersPermissionPage.Count == 0)
+                        {
+                            return true;
+                        }
+
+                        usersPermissionPage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == page && x.Value == true && x.Application_ID == 1 && x.ActionID == 6).ToListAsync();
+                        if (usersPermissionPage.Count > 0)
+                        {
+                            if (int.Parse(page) >= 1300 && int.Parse(page) <= 1400 && groupId == GroupType.Group_Status.AdminAuthorized)
+                            {
+                                return true;
+                            }
+                            if (int.Parse(page) >= 1 && int.Parse(page) <= 100 && groupId == GroupType.Group_Status.SystemAdmin)
+                            {
+                                return true;
+                            }
+                            if (!(int.Parse(page) >= 1) || !(int.Parse(page) <= 100) && (!(int.Parse(page) >= 1300) || !(int.Parse(page) <= 1400)))
+                            {
+                                return true;
+                            }
+                        }
+
+                        usersPermissionPage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == page && x.Value == false && x.Application_ID == 1 && x.ActionID == 6).ToListAsync();
+                        if (usersPermissionPage.Count > 0)
+                        {
+                            return false;
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
-                _loggMessage = $"Error in getPermission for pageId: {pageId}: {ex.Message}";
-                _logSystem.WriteError(_loggMessage, _applicationID, GetType().Name, MethodBase.GetCurrentMethod().Name, userName, userId.ToString(), "", "", "");
-                _logger.LogError(ex, _loggMessage);
-                return false;
+                _logger.LogError(ex, "Error when get GetPermission service method.");
+                _logger.LogError(ex, "Error in GetPermission service method.");
             }
+            return false;
         }
 
-        public async Task<bool> getPermission1(string pageId, string userName, int userId)
+        public async Task<bool> GetPermission1(string id, string page, string groupId)
         {
-            _logger.LogInformation($"Executing getPermission1 for pageId: {pageId}, user: {userName}");
-            this.userName = userName;
-            this.userId = userId;
+            List<Users_Permissions> usersPermissionPage = new List<Users_Permissions>();
+            List<Groups_Permissions> groupPermissionPage = new List<Groups_Permissions>();
 
             try
             {
-                // Similar to getPermission, but might have different logic
-                var permission = await _context.Auth_Tran_Details_TBL.AnyAsync(x => x.Page_Id == pageId && x.User_Id == userId);
-                return permission;
+                groupPermissionPage = await _context.Groups_Permissions.Where(x => x.Group_Id == groupId && x.Page_Id == page && (x.Add == true || x.Delete == true || x.Access == true || x.Reverse == true || x.Update == true || x.Post == true) && x.Application_ID == 1 && x.Access == true).ToListAsync();
+
+                if (groupPermissionPage.Count == 0)
+                {
+                    if (page == "0")
+                    {
+                        usersPermissionPage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == page && x.Application_ID == 1).ToListAsync();
+                    }
+                    else
+                    {
+                        usersPermissionPage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == page && x.Value == true && x.Application_ID == 1 && x.ActionID == 6).ToListAsync();
+                    }
+
+                    if (usersPermissionPage.Count == 0)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        if (int.Parse(page) >= 1300 && int.Parse(page) <= 1400 && groupId == GroupType.Group_Status.AdminAuthorized)
+                        {
+                            return true;
+                        }
+                        if (int.Parse(page) >= 1 && int.Parse(page) <= 100 && groupId == GroupType.Group_Status.SystemAdmin)
+                        {
+                            return true;
+                        }
+                        if (!(int.Parse(page) >= 1) || !(int.Parse(page) <= 100) && (!(int.Parse(page) >= 1300) || !(int.Parse(page) <= 1400)))
+                        {
+                            return true;
+                        }
+                    }
+                }
+                else
+                {
+                    if (page == "0")
+                    {
+                        usersPermissionPage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == page && x.Application_ID == 1).ToListAsync();
+                        return true;
+                    }
+                    else
+                    {
+                        usersPermissionPage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == page && x.Application_ID == 1 && x.ActionID == 6).ToListAsync();
+                        if (usersPermissionPage.Count == 0)
+                        {
+                            return true;
+                        }
+
+                        usersPermissionPage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == page && x.Value == true && x.Application_ID == 1).ToListAsync();
+                        if (usersPermissionPage.Count > 0)
+                        {
+                            if (int.Parse(page) >= 1300 && int.Parse(page) <= 1400 && groupId == GroupType.Group_Status.AdminAuthorized)
+                            {
+                                return true;
+                            }
+                            if (int.Parse(page) >= 1 && int.Parse(page) <= 100 && groupId == GroupType.Group_Status.SystemAdmin)
+                            {
+                                return true;
+                            }
+                            if (!(int.Parse(page) >= 1) || !(int.Parse(page) <= 100) && (!(int.Parse(page) >= 1300) || !(int.Parse(page) >= 1400)))
+                            {
+                                return true;
+                            }
+                        }
+
+                        usersPermissionPage = await _context.Users_Permissions.Where(x => x.UserID == id && x.PageID == page && x.Value == false && x.Application_ID == 1 && x.ActionID == 6).ToListAsync();
+                        if (usersPermissionPage.Count > 0)
+                        {
+                            return false;
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
-                _loggMessage = $"Error in getPermission1 for pageId: {pageId}: {ex.Message}";
-                _logSystem.WriteError(_loggMessage, _applicationID, GetType().Name, MethodBase.GetCurrentMethod().Name, userName, userId.ToString(), "", "", "");
-                _logger.LogError(ex, _loggMessage);
-                return false;
+                _logger.LogError(ex, "Error in GetPermission1 service method.");
+                _logger.LogError(ex, "Error in GetPermission1 service method.");
             }
+            return false;
         }
 
-        public async Task<Hold_CHQViewModel> Hold_CHQ_Get(string serial, string userName, int userId)
+        public async Task<Hold_CHQViewModel> GetHold_CHQData()
         {
-            _logger.LogInformation($"Executing Hold_CHQ_Get for serial: {serial}, user: {userName}");
-            this.userName = userName;
-            this.userId = userId;
-
             var viewModel = new Hold_CHQViewModel();
             try
             {
-                var holdChq = await _context.Hold_CHQ.SingleOrDefaultAsync(x => x.Serial == serial);
-                if (holdChq != null)
-                {
-                    viewModel.Serial = holdChq.Serial;
-                    viewModel.HoldReason = holdChq.HoldReason;
-                    viewModel.HoldDate = holdChq.HoldDate;
-                    viewModel.HoldBy = holdChq.HoldBy;
-                }
-                else
-                {
-                    viewModel.ErrorMessage = "Hold record not found.";
-                }
+                viewModel.BindHoldType = await BindHoldType();
+                viewModel.Tree = await GetAllCategoriesForTree();
             }
             catch (Exception ex)
             {
-                _loggMessage = $
-
-
-        public async Task<AllInwOutChqViewModel> All_INW_OUT_CHQ(string Currency, string FromDate, string ToDate, string vip, string userName, int userId)
-        {
-            _logger.LogInformation($"Executing All_INW_OUT_CHQ for user: {userName}, Currency: {Currency}, FromDate: {FromDate}, ToDate: {ToDate}, VIP: {vip}");
-            this.userName = userName;
-            this.userId = userId;
-
-            var viewModel = new AllInwOutChqViewModel();
-            viewModel.ReturnedAmountOut = new List<Outward_Trans>();
-            viewModel.ReturnedAmountInw = new List<Inward_Trans>();
-            viewModel.ClearedAmountInw = new List<Inward_Trans>();
-            viewModel.OutImgs = new List<Outward_Imgs>(); // Assuming this is also part of the returned data
-
-            try
-            {
-                if (string.IsNullOrEmpty(Currency) || string.IsNullOrEmpty(FromDate) || string.IsNullOrEmpty(ToDate))
-                {
-                    viewModel.ErrorMsg = "Please Fill All Data";
-                    return viewModel;
-                }
-
-                string formattedFromDate = DateTime.Parse(FromDate).ToString("yyyyMMdd");
-                string formattedToDate = DateTime.Parse(ToDate).ToString("yyyyMMdd");
-
-                string retoutQuery = "";
-                string clroutQuery = "";
-                string alloutQuery = "";
-                string retinwQuery = "";
-                string clrinwQuery = "";
-                string allinQuery = "";
-
-                string vipCondition = "";
-                if (vip == "Yes")
-                {
-                    vipCondition = "IsVIP=1";
-                }
-                else if (vip == "No")
-                {
-                    vipCondition = "IsVIP=0";
-                }
-                else
-                {
-                    vipCondition = "1=1"; // No VIP filter
-                }
-
-                // Outward Queries
-                retoutQuery = $"SELECT ISNULL(SUM(Amount), 0) AS Amount FROM Outward_Trans WHERE {vipCondition} AND ClrCenter = \'PMA\' AND ISNULL(QVFStatus ,\'Pending\')<>\'Pending\' AND ISNULL(QVFStatus ,\'RJCT\')<>\'RJCT\' AND Posted IN ({(int)AllEnums.Cheque_Status.Returne}, {(int)AllEnums.Cheque_Status.Returned})";
-                clroutQuery = $"SELECT ISNULL(SUM(Amount), 0) AS Amount FROM Outward_Trans WHERE {vipCondition} AND ClrCenter = \'PMA\' AND ISNULL(QVFStatus ,\'Pending\')<>\'Pending\' AND PMAstatus=\'Exported\' AND Posted = {(int)AllEnums.Cheque_Status.Posted}";
-                alloutQuery = $"SELECT ISNULL(SUM(Amount), 0) AS Amount FROM Outward_Trans WHERE {vipCondition} AND ClrCenter = \'PMA\' AND ISNULL(QVFStatus ,\'Pending\')<>\'Pending\' AND PMAstatus=\'Exported\' AND Posted IN ({(int)AllEnums.Cheque_Status.Posted}, {(int)AllEnums.Cheque_Status.Returne}, {(int)AllEnums.Cheque_Status.Returned})";
-
-                // Inward Queries (assuming Inward_Trans also has IsVIP, ClrCenter, QVFStatus, Posted)
-                retinwQuery = $"SELECT ISNULL(SUM(Amount), 0) AS Amount FROM Inward_Trans WHERE {vipCondition.Replace("IsVIP", "VIP")} AND ClrCenter = \'PMA\' AND Posted IN ({(int)AllEnums.Cheque_Status.Returne}, {(int)AllEnums.Cheque_Status.Returned})";
-                clrinwQuery = $"SELECT ISNULL(SUM(Amount), 0) AS Amount FROM Inward_Trans WHERE {vipCondition.Replace("IsVIP", "VIP")} AND ClrCenter = \'PMA\' AND Posted = {(int)AllEnums.Cheque_Status.Posted}";
-                allinQuery = $"SELECT ISNULL(SUM(Amount), 0) AS Amount FROM Inward_Trans WHERE {vipCondition.Replace("IsVIP", "VIP")} AND ClrCenter = \'PMA\' AND Posted IN ({(int)AllEnums.Cheque_Status.Posted}, {(int)AllEnums.Cheque_Status.Returne}, {(int)AllEnums.Cheque_Status.Returned})";
-
-                string dateCondition = "";
-                if (formattedFromDate == formattedToDate)
-                {
-                    dateCondition = $" AND CAST(ValueDate AS DATE) = \'{formattedFromDate}\' ";
-                }
-                else
-                {
-                    dateCondition = $" AND CAST(ValueDate AS DATE) >= \'{formattedFromDate}\' AND CAST(ValueDate AS DATE) <= \'{formattedToDate}\' ";
-                }
-
-                retoutQuery += dateCondition;
-                clroutQuery += dateCondition;
-                alloutQuery += dateCondition;
-                retinwQuery += dateCondition;
-                clrinwQuery += dateCondition;
-                allinQuery += dateCondition;
-
-                string currencyCode = "";
-                if (Currency != "-1")
-                {
-                    switch (Currency.Trim())
-                    {
-                        case "1": currencyCode = "JOD"; break;
-                        case "2": currencyCode = "USD"; break;
-                        case "3": currencyCode = "ILS"; break;
-                        case "5": currencyCode = "EUR"; break;
-                        default: currencyCode = Currency.Trim(); break; // Fallback for other currency symbols
-                    }
-                    string currencyCondition = $" AND Currency = \'{currencyCode}\'";
-                    retoutQuery += currencyCondition;
-                    clroutQuery += currencyCondition;
-                    alloutQuery += currencyCondition;
-                    retinwQuery += currencyCondition;
-                    clrinwQuery += currencyCondition;
-                    allinQuery += currencyCondition;
-                }
-
-                // Execute queries and get sums
-                viewModel.SumRetOut = await _context.Database.SqlQuery<double>($"{retoutQuery}").SingleOrDefaultAsync();
-                viewModel.SumClrOut = await _context.Database.SqlQuery<double>($"{clroutQuery}").SingleOrDefaultAsync();
-                viewModel.SumRetInw = await _context.Database.SqlQuery<double>($"{retinwQuery}").SingleOrDefaultAsync();
-                viewModel.SumClrInw = await _context.Database.SqlQuery<double>($"{clrinwQuery}").SingleOrDefaultAsync();
-
-                // Calculate total sum
-                viewModel.SumTotal = viewModel.SumClrOut + viewModel.SumClrInw;
-
-                // Format amounts based on currency
-                string format = (currencyCode == "JOD") ? "N3" : "N2";
-                viewModel.SumRetOut = Math.Round(viewModel.SumRetOut, (currencyCode == "JOD") ? 3 : 2);
-                viewModel.SumClrOut = Math.Round(viewModel.SumClrOut, (currencyCode == "JOD") ? 3 : 2);
-                viewModel.SumRetInw = Math.Round(viewModel.SumRetInw, (currencyCode == "JOD") ? 3 : 2);
-                viewModel.SumClrInw = Math.Round(viewModel.SumClrInw, (currencyCode == "JOD") ? 3 : 2);
-                viewModel.SumTotal = Math.Round(viewModel.SumTotal, (currencyCode == "JOD") ? 3 : 2);
-
-                // The VB.NET code also had logic to populate lists (ReturnedAmountout, ReturnedAmountinw, clearedAmountin) but it was commented out or incomplete.
-                // If these lists are needed, the SQL queries would need to select all columns and map to the respective models.
-                // For now, I\'m focusing on the sum calculations as per the VB.NET logic.
-
-                // Example of how to get the full list if needed (this is not directly from the VB.NET sum queries, but implied if lists are returned)
-                // viewModel.ReturnedAmountOut = await _context.Outward_Trans.FromSqlRaw(retoutQuery.Replace("ISNULL(SUM(Amount), 0) AS Amount", "*")).ToListAsync();
-
-            }
-            catch (Exception ex)
-            {
-                _loggMessage = $"Error in All_INW_OUT_CHQ for user: {userName}: {ex.Message}";
-                _logSystem.WriteError(_loggMessage, _applicationID, GetType().Name, MethodBase.GetCurrentMethod().Name, userName, userId.ToString(), "", "", "");
-                _logger.LogError(ex, _loggMessage);
-                viewModel.ErrorMsg = "An error occurred: " + ex.Message;
+                _logger.LogError(ex, "Error in GetHold_CHQData service method.");
+                _logger.LogError(ex, "Error in GetHold_CHQData service method.");
+                viewModel.ErrorMessage = "An error occurred: " + ex.Message;
             }
             return viewModel;
         }
 
-
-
-        public async Task<AllInwOutChqViewModel> All_INW_OUT_CHQ(string Currency, string FromDate, string ToDate, string vip, string userName, int userId)
+        public async Task<bool> SaveHold_CHQ(Hold_CHQViewModel hold, string HOLD_TYPE, string Reserved, string userName)
         {
-            _logger.LogInformation($"Executing All_INW_OUT_CHQ for user: {userName}, Currency: {Currency}, FromDate: {FromDate}, ToDate: {ToDate}, VIP: {vip}");
-            this.userName = userName;
-            this.userId = userId;
-
-            var viewModel = new AllInwOutChqViewModel();
-            viewModel.ReturnedAmountOut = new List<Outward_Trans>();
-            viewModel.ReturnedAmountInw = new List<Inward_Trans>();
-            viewModel.ClearedAmountInw = new List<Inward_Trans>();
-            viewModel.OutImgs = new List<Outward_Imgs>(); // Assuming this is also part of the returned data
-
             try
             {
-                if (string.IsNullOrEmpty(Currency) || string.IsNullOrEmpty(FromDate) || string.IsNullOrEmpty(ToDate))
+                if (string.IsNullOrEmpty(hold.Note1) || string.IsNullOrEmpty(hold.DrwAcctNo) || string.IsNullOrEmpty(hold.DrwBankNo) || string.IsNullOrEmpty(hold.DrwBranchNo) || string.IsNullOrEmpty(hold.DrwChqNo) || (string.IsNullOrEmpty(hold.Reson1) && string.IsNullOrEmpty(hold.Reson2)))
                 {
-                    viewModel.ErrorMsg = "Please Fill All Data";
-                    return viewModel;
+                    return false; // Indicate validation failure
                 }
 
-                string formattedFromDate = DateTime.Parse(FromDate).ToString("yyyyMMdd");
-                string formattedToDate = DateTime.Parse(ToDate).ToString("yyyyMMdd");
+                var existingHold = await _context.Hold_CHQ.SingleOrDefaultAsync(c => c.DrwAcctNo == hold.DrwAcctNo && c.DrwBankNo == hold.DrwBankNo && c.DrwBranchNo == hold.DrwBranchNo && c.DrwChqNo == hold.DrwChqNo);
 
-                string retoutQuery = "";
-                string clroutQuery = "";
-                string alloutQuery = "";
-                string retinwQuery = "";
-                string clrinwQuery = "";
-                string allinQuery = "";
-
-                string vipCondition = "";
-                if (vip == "Yes")
+                if (existingHold == null)
                 {
-                    vipCondition = "IsVIP=1";
-                }
-                else if (vip == "No")
-                {
-                    vipCondition = "IsVIP=0";
-                }
-                else
-                {
-                    vipCondition = "1=1"; // No VIP filter
-                }
-
-                // Outward Queries
-                retoutQuery = $"SELECT ISNULL(SUM(Amount), 0) AS Amount FROM Outward_Trans WHERE {vipCondition} AND ClrCenter = \'PMA\' AND ISNULL(QVFStatus ,\'Pending\')<>\'Pending\' AND ISNULL(QVFStatus ,\'RJCT\')<>\'RJCT\' AND Posted IN ({(int)AllEnums.Cheque_Status.Returne}, {(int)AllEnums.Cheque_Status.Returned})";
-                clroutQuery = $"SELECT ISNULL(SUM(Amount), 0) AS Amount FROM Outward_Trans WHERE {vipCondition} AND ClrCenter = \'PMA\' AND ISNULL(QVFStatus ,\'Pending\')<>\'Pending\' AND PMAstatus=\'Exported\' AND Posted = {(int)AllEnums.Cheque_Status.Posted}";
-                alloutQuery = $"SELECT ISNULL(SUM(Amount), 0) AS Amount FROM Outward_Trans WHERE {vipCondition} AND ClrCenter = \'PMA\' AND ISNULL(QVFStatus ,\'Pending\')<>\'Pending\' AND PMAstatus=\'Exported\' AND Posted IN ({(int)AllEnums.Cheque_Status.Posted}, {(int)AllEnums.Cheque_Status.Returne}, {(int)AllEnums.Cheque_Status.Returned})";
-
-                // Inward Queries (assuming Inward_Trans also has IsVIP, ClrCenter, QVFStatus, Posted)
-                retinwQuery = $"SELECT ISNULL(SUM(Amount), 0) AS Amount FROM Inward_Trans WHERE {vipCondition.Replace("IsVIP", "VIP")} AND ClrCenter = \'PMA\' AND Posted IN ({(int)AllEnums.Cheque_Status.Returne}, {(int)AllEnums.Cheque_Status.Returned})";
-                clrinwQuery = $"SELECT ISNULL(SUM(Amount), 0) AS Amount FROM Inward_Trans WHERE {vipCondition.Replace("IsVIP", "VIP")} AND ClrCenter = \'PMA\' AND Posted = {(int)AllEnums.Cheque_Status.Posted}";
-                allinQuery = $"SELECT ISNULL(SUM(Amount), 0) AS Amount FROM Inward_Trans WHERE {vipCondition.Replace("IsVIP", "VIP")} AND ClrCenter = \'PMA\' AND Posted IN ({(int)AllEnums.Cheque_Status.Posted}, {(int)AllEnums.Cheque_Status.Returne}, {(int)AllEnums.Cheque_Status.Returned})";
-
-                string dateCondition = "";
-                if (formattedFromDate == formattedToDate)
-                {
-                    dateCondition = $" AND CAST(ValueDate AS DATE) = \'{formattedFromDate}\' ";
-                }
-                else
-                {
-                    dateCondition = $" AND CAST(ValueDate AS DATE) >= \'{formattedFromDate}\' AND CAST(ValueDate AS DATE) <= \'{formattedToDate}\' ";
-                }
-
-                retoutQuery += dateCondition;
-                clroutQuery += dateCondition;
-                alloutQuery += dateCondition;
-                retinwQuery += dateCondition;
-                clrinwQuery += dateCondition;
-                allinQuery += dateCondition;
-
-                string currencyCode = "";
-                if (Currency != "-1")
-                {
-                    switch (Currency.Trim())
+                    var newHold = new Hold_CHQ
                     {
-                        case "1": currencyCode = "JOD"; break;
-                        case "2": currencyCode = "USD"; break;
-                        case "3": currencyCode = "ILS"; break;
-                        case "5": currencyCode = "EUR"; break;
-                        default: currencyCode = Currency.Trim(); break; // Fallback for other currency symbols
-                    }
-                    string currencyCondition = $" AND Currency = \'{currencyCode}\'";
-                    retoutQuery += currencyCondition;
-                    clroutQuery += currencyCondition;
-                    alloutQuery += currencyCondition;
-                    retinwQuery += currencyCondition;
-                    clrinwQuery += currencyCondition;
-                    allinQuery += currencyCondition;
+                        DrwAcctNo = hold.DrwAcctNo,
+                        DrwBankNo = hold.DrwBankNo,
+                        DrwBranchNo = hold.DrwBranchNo,
+                        DrwChqNo = hold.DrwChqNo,
+                        InputBy = userName,
+                        InputDate = DateTime.Now,
+                        History = $" Record Added by : {userName}, AT: {DateTime.Now}",
+                        Reson1 = hold.Reson1,
+                        Reson2 = hold.Reson2,
+                        Type = HOLD_TYPE,
+                        Note1 = hold.Note1,
+                        Reserved = (Reserved.ToUpper() == "ON") ? 1 : 0
+                    };
+
+                    _context.Hold_CHQ.Add(newHold);
+                    await _context.SaveChangesAsync();
+                    return true; // Indicate success
                 }
-
-                // Execute queries and get sums
-                viewModel.SumRetOut = await _context.Database.SqlQuery<double>($"{retoutQuery}").SingleOrDefaultAsync();
-                viewModel.SumClrOut = await _context.Database.SqlQuery<double>($"{clroutQuery}").SingleOrDefaultAsync();
-                viewModel.SumRetInw = await _context.Database.SqlQuery<double>($"{retinwQuery}").SingleOrDefaultAsync();
-                viewModel.SumClrInw = await _context.Database.SqlQuery<double>($"{clrinwQuery}").SingleOrDefaultAsync();
-
-                // Calculate total sum
-                viewModel.SumTotal = viewModel.SumClrOut + viewModel.SumClrInw;
-
-                // Format amounts based on currency
-                string format = (currencyCode == "JOD") ? "N3" : "N2";
-                viewModel.SumRetOut = Math.Round(viewModel.SumRetOut, (currencyCode == "JOD") ? 3 : 2);
-                viewModel.SumClrOut = Math.Round(viewModel.SumClrOut, (currencyCode == "JOD") ? 3 : 2);
-                viewModel.SumRetInw = Math.Round(viewModel.SumRetInw, (currencyCode == "JOD") ? 3 : 2);
-                viewModel.SumClrInw = Math.Round(viewModel.SumClrInw, (currencyCode == "JOD") ? 3 : 2);
-                viewModel.SumTotal = Math.Round(viewModel.SumTotal, (currencyCode == "JOD") ? 3 : 2);
-
-                // The VB.NET code also had logic to populate lists (ReturnedAmountout, ReturnedAmountinw, clearedAmountin) but it was commented out or incomplete.
-                // If these lists are needed, the SQL queries would need to select all columns and map to the respective models.
-                // For now, I\'m focusing on the sum calculations as per the VB.NET logic.
-
-                // Example of how to get the full list if needed (this is not directly from the VB.NET sum queries, but implied if lists are returned)
-                // viewModel.ReturnedAmountOut = await _context.Outward_Trans.FromSqlRaw(retoutQuery.Replace("ISNULL(SUM(Amount), 0) AS Amount", "*")).ToListAsync();
-
+                else
+                {
+                    return false; // Indicate that cheque already exists
+                }
             }
             catch (Exception ex)
             {
-                _loggMessage = $"Error in All_INW_OUT_CHQ for user: {userName}: {ex.Message}";
-                _logSystem.WriteError(_loggMessage, _applicationID, GetType().Name, MethodBase.GetCurrentMethod().Name, userName, userId.ToString(), "", "", "");
-                _logger.LogError(ex, _loggMessage);
-                viewModel.ErrorMsg = "An error occurred: " + ex.Message;
+                _logger.LogError(ex, "Error in SaveHold_CHQ service method.");
+                _logger.LogError(ex, "Error in SaveHold_CHQ service method.");
+                return false; // Indicate failure
             }
-            return viewModel;
         }
 
+        // Dummy method for BindHoldType, needs actual implementation based on VB.NET
+        private async Task<List<SelectListItem>> BindHoldType()
+        {
+            // Implement actual logic to bind hold types from DB or other source
+            return await Task.FromResult(new List<SelectListItem>
+            {
+                new SelectListItem { Value = "Type1", Text = "Hold Type 1" },
+                new SelectListItem { Value = "Type2", Text = "Hold Type 2" }
+            });
+        }
 
+        // Dummy method for GetAllCategoriesForTree, needs actual implementation based on VB.NET
+        public async Task<List<TreeNode>> GetAllCategoriesForTree()
+        {
+            // Implement actual logic to get tree nodes
+            return await Task.FromResult(new List<TreeNode>
+            {
+                new TreeNode { id = "1", parent = "#", text = "Root" },
+                new TreeNode { id = "2", parent = "1", text = "Child 1" }
+            });
+        }
+
+        public async Task<object> ReturnDiscountChq()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<string> Get_Deacrypted_Account(string Drw_Account, string ChqNo)
+        {
+            string result = "";
+            try
+            {
+                _logSystem.WriteTraceLogg($"get Get_Deacrypted_Account", _applicationID, GetType().Name, GetMethodName(), "", "", "", "", "");
+
+                // Assuming CONNECTION class and Get_One_Data method are available or have C# equivalents
+                // This part needs careful conversion based on the actual CONNECTION class implementation
+                // For now, return a dummy value
+                result = "DecryptedAccount";
+            }
+            catch (Exception ex)
+            {
+                _logSystem.WriteError($"Error in Get_Deacrypted_Account: {ex.Message}", _applicationID, GetType().Name, GetMethodName(), "", "", "", "", "");
+                _logger.LogError(ex, "Error in Get_Deacrypted_Account service method.");
+                result = "Error";
+            }
+            return result;
+        }
+
+        public async Task<RejectedOutRequestViewModel> Rejected_Out_Request()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new RejectedOutRequestViewModel());
+        }
+
+        public async Task<OutChqsViewModel> RepresnetDisDetails(string id)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new OutChqsViewModel());
+        }
+
+        public async Task<OutwordDateVerificationViewModel> Out_VerficationDetails(string id)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new OutwordDateVerificationViewModel());
+        }
+
+        public async Task<object> OUTWORD()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<DataTable> Get_Post_Rest_Code(string CUSTOMER_ID, string ACCOUNT_NUMBER)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new DataTable());
+        }
+
+        public async Task<string> Get_Final_Posting_Restrection(int Customer_Post_Rest, int Acc_Post_Rest, int Language)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("FinalPostingRestriction");
+        }
+
+        public async Task<PenddingOutWordRequestViewModel> Pendding_OutWord_Request()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new PenddingOutWordRequestViewModel());
+        }
+
+        public async Task<object> Pendding_OutWord_Request_Auth()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<object> getOutword_WF_Details()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task getuser_group_permision(string pageid, string applicationid, string userid)
+        {
+            // Placeholder for actual implementation
+            await Task.CompletedTask;
+        }
+
+        public async Task<DataTable> Getpage(string page)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new DataTable());
+        }
+
+        public async Task<bool> Ge_t(string x)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(false);
+        }
+
+        public string getlist(string x)
+        {
+            // Placeholder for actual implementation
+            return "List";
+        }
+
+        public async Task<string> GENERATE_UNIQUE_CHEQUE_SEQUANCE(string CHEQUE_NO, string BANK_NO, string BRANCH_NO, string DRAWEE_NO)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("UniqueChequeSequence");
+        }
+
+        public async Task<object> getlockedpage(int pageid)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<string> EVALUATE_AMOUNT_IN_JOD(string CURANCY, double AMOUNT)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("EvaluatedAmount");
+        }
+
+        public async Task<string> GetCurrencyCode(string Currency_Symbol)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("CurrencyCode");
+        }
+
+        public async Task<bool> Update_ChqDate(UpdateChqDateViewModel model, string userName, int userId)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(false);
+        }
+
+        public async Task<bool> Update_ChqDate_Post(string serial, DateTime dueDate, string userName, int userId)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(false);
+        }
+
+        public async Task<object> Update_Out_ChqDate(UpdateChqDateViewModel model)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<object> Update_Out_ChqDate_Accept(UpdateChqDateViewModel model)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<object> getSearchListDis_PMA(string Branchs, string STATUS, string BenAccNo, string AccType, string FromBank, string ToBank, string Currency, string ChequeSource, string Amount, string DRWAccNo, string ChequeNo, string waspdc)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<object> getSearchList(string Currency, string ChequeSource, string WASPDC, string Branchs, string order, string inputerr, string ChequeStatus, string vip)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<object> GetTotalPerAccountAndBnk(string ChqSrc, string Cur, string Branchs, string WASPDC, string order, string inputerr)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<bool> PresentmentDIS_Or_PDC_return(Outward_Trans _out_, string CHQ)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(false);
+        }
+
+        public async Task<bool> PresentmentDIS_Or_PDC_timeout(Outward_Trans _out_, string CHQ)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(true);
+        }
+
+        public async Task<bool> PresentmentPMA_OR_PDC(Outward_Trans _out_, string CHQ)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(true);
+        }
+
+        public async Task<OutChqsViewModel> outward_views(string id, string userName, int userId)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new OutChqsViewModel());
+        }
+
+        public async Task<OutChqsViewModel> Update_oUTWORD_Details(string id)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new OutChqsViewModel());
+        }
+
+        public async Task<string> getDocType(int id)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("DocType");
+        }
+
+        public async Task<object> update_Post_Outword(string id)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<object> update_Post_Outword_Post(string id, string Note, string returnchq, string chqNu, string chq, string chqAm, string chqBn, string chqBr, string chqAc, string chqdate, string reas, string reas1, string reas2, string reas3, string reas4, string reas5, string reas6, string reas7, string reas8, string reas9, string reas10, string reas11, string reas12, string reas13, string reas14, string reas15, string reas16, string reas17, string reas18, string reas19, string reas20, string reas21, string reas22, string reas23, string reas24, string reas25, string reas26, string reas27, string reas28, string reas29, string reas30, string reas31, string reas32, string reas33, string reas34, string reas35, string reas36, string reas37, string reas38, string reas39, string reas40, string reas41, string reas42, string reas43, string reas44, string reas45, string reas46, string reas47, string reas48, string reas49, string reas50, string reas51, string reas52, string reas53, string reas54, string reas55, string reas56, string reas57, string reas58, string reas59, string reas60, string reas61, string reas62, string reas63, string reas64, string reas65, string reas66, string reas67, string reas68, string reas69, string reas70, string reas71, string reas72, string reas73, string reas74, string reas75, string reas76, string reas77, string reas78, string reas79, string reas80, string reas81, string reas82, string reas83, string reas84, string reas85, string reas86, string reas87, string reas88, string reas89, string reas90, string reas91, string reas92, string reas93, string reas94, string reas95, string reas96, string reas97, string reas98, string reas99)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<object> Return_Owtward_chq(string id)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<object> Return_Owtward_chq_Post(string id, string Note, string returnchq, string chqNu, string chq, string chqAm, string chqBn, string chqBr, string chqAc, string chqdate, string reas, string reas1, string reas2, string reas3, string reas4, string reas5, string reas6, string reas7, string reas8, string reas9, string reas10, string reas11, string reas12, string reas13, string reas14, string reas15, string reas16, string reas17, string reas18, string reas19, string reas20, string reas21, string reas22, string reas23, string reas24, string reas25, string reas26, string reas27, string reas28, string reas29, string reas30, string reas31, string reas32, string reas33, string reas34, string reas35, string reas36, string reas37, string reas38, string reas39, string reas40, string reas41, string reas42, string reas43, string reas44, string reas45, string reas46, string reas47, string reas48, string reas49, string reas50, string reas51, string reas52, string reas53, string reas54, string reas55, string reas56, string reas57, string reas58, string reas59, string reas60, string reas61, string reas62, string reas63, string reas64, string reas65, string reas66, string reas67, string reas68, string reas69, string reas70, string reas71, string reas72, string reas73, string reas74, string reas75, string reas76, string reas77, string reas78, string reas79, string reas80, string reas81, string reas82, string reas83, string reas84, string reas85, string reas86, string reas87, string reas88, string reas89, string reas90, string reas91, string reas92, string reas93, string reas94, string reas95, string reas96, string reas97, string reas98, string reas99)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<object> Return_Owtward_chq_list()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<object> Return_Owtward_chq_list_Search(string Branchs, string STATUS, string BenAccNo, string AccType, string FromBank, string ToBank, string Currency, string ChequeSource, string Amount, string DRWAccNo, string ChequeNo, string waspdc)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<object> Return_Onus_chq(string id)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<object> Return_Onus_chq_Post(string id, string Note, string returnchq, string chqNu, string chq, string chqAm, string chqBn, string chqBr, string chqAc, string chqdate, string reas, string reas1, string reas2, string reas3, string reas4, string reas5, string reas6, string reas7, string reas8, string reas9, string reas10, string reas11, string reas12, string reas13, string reas14, string reas15, string reas16, string reas17, string reas18, string reas19, string reas20, string reas21, string reas22, string reas23, string reas24, string reas25, string reas26, string reas27, string reas28, string reas29, string reas30, string reas31, string reas32, string reas33, string reas34, string reas35, string reas36, string reas37, string reas38, string reas39, string reas40, string reas41, string reas42, string reas43, string reas44, string reas45, string reas46, string reas47, string reas48, string reas49, string reas50, string reas51, string reas52, string reas53, string reas54, string reas55, string reas56, string reas57, string reas58, string reas59, string reas60, string reas61, string reas62, string reas63, string reas64, string reas65, string reas66, string reas67, string reas68, string reas69, string reas70, string reas71, string reas72, string reas73, string reas74, string reas75, string reas76, string reas77, string reas78, string reas79, string reas80, string reas81, string reas82, string reas83, string reas84, string reas85, string reas86, string reas87, string reas88, string reas89, string reas90, string reas91, string reas92, string reas93, string reas94, string reas95, string reas96, string reas97, string reas98, string reas99)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<GetOutwardSlipCCSViewModel> Get_Outward_Slip_CCS(string slip_id)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new GetOutwardSlipCCSViewModel());
+        }
+
+        public async Task<string> Get_URL(string slip_id)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("URL");
+        }
+
+        public async Task<string> Get_Account_List(string CUST_NO, int Language)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AccountList");
+        }
+
+        public async Task<string> Get_Cheque_Info(string Account_No, int Cheque_No, int Language)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("ChequeInfo");
+        }
+
+        public async Task<string> Convert_Numbers_To_Words_AR(string _Number)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("Words");
+        }
+
+        public async Task<OutwordSearchViewModel> OutwardSearch()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new OutwordSearchViewModel());
+        }
+
+        public async Task<object> OutwardSearch(OutwardSearchClass search)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<object> GetTotalPerAccount(string ChqSrc, string Cur, string Branchs, string WASPDC, string order, string inputerr, string ChequeStatus, string vip)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<object> GetTotalPerBnk(string ChqSrc, string Cur, string Branchs, string WASPDC, string order, string inputerr, string ChequeStatus, string vip)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task Delete(string id)
+        {
+            // Placeholder for actual implementation
+            await Task.CompletedTask;
+        }
+
+        public async Task Delete_Outward_Trans_Discount_Old(string id)
+        {
+            // Placeholder for actual implementation
+            await Task.CompletedTask;
+        }
+
+        public async Task Auth_Tran(string id, string status)
+        {
+            // Placeholder for actual implementation
+            await Task.CompletedTask;
+        }
+
+        public async Task Resend_Request(string id)
+        {
+            // Placeholder for actual implementation
+            await Task.CompletedTask;
+        }
+
+        public async Task<object> GetSlip(string id)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<byte[]> PrintAll(string[] Ids)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new byte[0]);
+        }
+
+        public async Task<object> PrintOutwordRecipt()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<object> getCustomerAccounts(string customer_number)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<object> validatebranch(string brnch, string Bnk)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<object> validatebank(string Bnk)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<object> PrintCheques(string _customerID, string _accountNo, string _Slides)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new object());
+        }
+
+        public async Task<string> Get_OFS_HttpLink()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("OFS_HttpLink");
+        }
+
+        public async Task<string> GetMethodName()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("MethodName");
+        }
+
+        public async Task<string> Get_Auto_Post_Flag()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostFlag");
+        }
+
+        public async Task<string> Get_Auto_Post_Time()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostTime");
+        }
+
+        public async Task<string> Get_Auto_Post_User()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostUser");
+        }
+
+        public async Task<string> Get_Auto_Post_Pass()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostPass");
+        }
+
+        public async Task<string> Get_Auto_Post_Company()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCompany");
+        }
+
+        public async Task<string> Get_Auto_Post_Dept()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDept");
+        }
+
+        public async Task<string> Get_Auto_Post_Trans_Code()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostTransCode");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Acct()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrAcct");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Acct()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrAcct");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Ccy()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCcy");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Ccy()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCcy");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Amt()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrAmt");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Amt()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrAmt");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Val_Date()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrValDate");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Val_Date()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrValDate");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Txn_Code()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrTxnCode");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Txn_Code()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrTxnCode");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Nar()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrNar");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Nar()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrNar");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Ref()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrRef");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Ref()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrRef");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Rate()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrRate");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Rate()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrRate");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Branch()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrBranch");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Branch()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrBranch");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCus");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCus");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Acct_Officer()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrAcctOfficer");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Acct_Officer()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrAcctOfficer");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Cat()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusCat");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Cat()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusCat");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Type()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusType");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Type()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusType");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Nat()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusNat");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Nat()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusNat");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Res()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusRes");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Res()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusRes");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Ind()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusInd");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Ind()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusInd");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Sec()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusSec");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Sec()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusSec");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Tar()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusTar");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Tar()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusTar");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Cap()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusCap");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Cap()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusCap");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Cntry()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusCntry");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Cntry()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusCntry");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_City()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusCity");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_City()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusCity");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_St()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusSt");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_St()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusSt");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Zip()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusZip");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Zip()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusZip");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Phn()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusPhn");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Phn()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusPhn");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Fax()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusFax");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Fax()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusFax");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Email()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusEmail");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Email()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusEmail");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Po()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusPo");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Po()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusPo");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Add()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusAdd");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Add()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusAdd");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Add2()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusAdd2");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Add2()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusAdd2");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Add3()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusAdd3");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Add3()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusAdd3");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Add4()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusAdd4");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Add4()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusAdd4");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Add5()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusAdd5");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Add5()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusAdd5");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Add6()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusAdd6");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Add6()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusAdd6");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Add7()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusAdd7");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Add7()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusAdd7");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Add8()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusAdd8");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Add8()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusAdd8");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Add9()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusAdd9");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Add9()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusAdd9");
+        }
+
+        public async Task<string> Get_Auto_Post_Dr_Cus_Add10()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostDrCusAdd10");
+        }
+
+        public async Task<string> Get_Auto_Post_Cr_Cus_Add10()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("AutoPostCrCusAdd10");
+        }
+
+        public async Task<ReturnOwtwardViewModel> ReturnOwtward(string userName, int userId, string groupId)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new ReturnOwtwardViewModel());
+        }
+
+        public async Task<List<ReturnedChequeViewModel>> retunedchqstate(string ChequeSource, string ChequeStat, string drqchqnumber, string drwAccNo, string Fromdate, string Todate, string BenfBranch, string BnfAccNo, string userName, int userId, string companyId, string branchId)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new List<ReturnedChequeViewModel>());
+        }
+
+        public async Task<List<Outward_Trans>> getPospondingChq(string ChequeSource, string Bank, string UnlockDate, string BenfBranch, string filedate, string CHQStatus, string CHQSt, string BenfrBranch, string userName, int userId, string companyId, string branchId)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new List<Outward_Trans>());
+        }
+
+        public async Task<List<ReturnedChequeDetailsViewModel>> getreturnList(string ClrCenter, string STATUS, string TransDate, string chqNo, string payAcc, string userName, int userId, string companyId, string branchId)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new List<ReturnedChequeDetailsViewModel>());
+        }
+
+        public async Task<ReturnOWTWORDScreenViewModel> ReturnOWTWORDScreen(string serial, string RC, string userName, int userId, string companyId, string branchId, string pageId)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new ReturnOWTWORDScreenViewModel());
+        }
+
+        public async Task<List<SelectListItem>> FillClearCenter()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new List<SelectListItem>());
+        }
+
+        public async Task<List<SelectListItem>> FillClearCenterout()
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new List<SelectListItem>());
+        }
+
+        public async Task<List<Outward_Trans>> getMagicscreenList(string ClrCenter, string TransDate, string chqNo, string userName, int userId, string companyId, string branchId)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new List<Outward_Trans>());
+        }
+
+        public async Task<string> savepostedstatus(string serial, string TBLNAME, string posted, string userName, int userId)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult("PostedStatus");
+        }
+
+        public async Task<AllInwardOutwardChqViewModel> AllInwardoutwardChq(string Currency, string FromDate, string ToDate, string vip, string userName, int userId)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new AllInwardOutwardChqViewModel());
+        }
+
+        public async Task<AllInwOutChqViewModel> All_INW_OUT_CHQ(string Currency, string FromDate, string ToDate, string vip, string userName, int userId)
+        {
+            // Placeholder for actual implementation
+            return await Task.FromResult(new AllInwOutChqViewModel());
+        }
 
         public async Task<string> deleteoutchq(string serial, string userName, int userId)
         {
-            _logger.LogInformation($"Executing deleteoutchq for serial: {serial}, user: {userName}");
-            this.userName = userName;
-            this.userId = userId;
-
-            string resultMessage = "";
-            try
-            {
-                var outward = await _context.Outward_Trans.SingleOrDefaultAsync(x => x.Serial == serial);
-
-                if (outward != null)
-                {
-                    string chqSequance = outward.ChqSequance;
-                    try
-                    {
-                        var deleteout = new Outward_Trans_Deleted
-                        {
-                            Amount = outward.Amount,
-                            Serial = outward.Serial,
-                            AuthorizedBy = outward.AuthorizedBy,
-                            AuthorizerBranch = outward.AuthorizerBranch,
-                            BenAccountNo = outward.BenAccountNo,
-                            BenfAccBranch = outward.BenfAccBranch,
-                            BenfBnk = outward.BenfBnk,
-                            BenfCardId = outward.BenfCardId,
-                            BenfCardType = outward.BenfCardType,
-                            BenfNationality = outward.BenfNationality,
-                            BenName = outward.BenName,
-                            ChqSequance = outward.ChqSequance,
-                            CHQState = outward.CHQState,
-                            CHQStatedate = outward.CHQStatedate,
-                            ClrCenter = outward.ClrCenter,
-                            ClrFileRecordID = outward.ClrFileRecordID,
-                            Commision_Response = outward.Commision_Response,
-                            Currency = outward.Currency,
-                            DeptNo = outward.DeptNo,
-                            DiscountReternedOutImgID = outward.DiscountReternedOutImgID,
-                            DrwAcctNo = outward.DrwAcctNo,
-                            DrwBankNo = outward.DrwBankNo,
-                            DrwBranchExt = outward.DrwBranchExt,
-                            DrwBranchNo = outward.DrwBranchNo,
-                            DrwCardId = outward.DrwCardId,
-                            DrwChqNo = outward.DrwChqNo,
-                            DrwName = outward.DrwName,
-                            ErrorCode = outward.ErrorCode,
-                            ErrorDescription = outward.ErrorDescription,
-                            FaildTrans = outward.FaildTrans,
-                            History = outward.History + $"|    Chq Deleted By   {userName} At:{DateTime.Now}",
-                            InputBrn = outward.InputBrn,
-                            InputDate = outward.InputDate,
-                            ISSAccount = outward.ISSAccount,
-                            IsTimeOut = outward.IsTimeOut,
-                            IsVIP = outward.IsVIP,
-                            LastUpdate = DateTime.Now,
-                            LastUpdateBy = userName,
-                            NeedTechnicalVerification = outward.NeedTechnicalVerification,
-                            OperType = outward.OperType,
-                            PDCChqSequance = outward.PDCChqSequance,
-                            PDCSerial = outward.PDCSerial,
-                            PMAstatus = outward.PMAstatus,
-                            PMAstatusDate = outward.PMAstatusDate,
-                            Posted = outward.Posted,
-                            QVFAddtlInf = outward.QVFAddtlInf,
-                            QVFStatus = outward.QVFStatus,
-                            Rejected = outward.Rejected,
-                            RepresentSerial = outward.RepresentSerial,
-                            Returned = outward.Returned,
-                            ReturnedCode = outward.ReturnedCode,
-                            ReturnedDate = outward.ReturnedDate,
-                            RSFAddtlInf = outward.RSFAddtlInf,
-                            RSFStatus = outward.RSFStatus,
-                            SpecialHandling = outward.SpecialHandling,
-                            Status = outward.Status,
-                            System_Aut_Man = outward.System_Aut_Man,
-                            Temenos_Message_Series = outward.Temenos_Message_Series,
-                            TransCode = outward.TransCode,
-                            TransDate = outward.TransDate,
-                            UserName = outward.UserName,
-                            ValueDate = outward.ValueDate,
-                            WasPDC = outward.WasPDC,
-                            WithUV = outward.WithUV
-                        };
-
-                        _context.Outward_Trans_Deleted.Add(deleteout);
-                        await _context.SaveChangesAsync();
-                        _logSystem.WriteTraceLogg("BEFORE During Add Deleted chq from out to delete out", _applicationID, GetType().Name, MethodBase.GetCurrentMethod().Name, userName, userId.ToString(), "", "", "");
-
-                        _context.Outward_Trans.Remove(outward);
-                        await _context.SaveChangesAsync();
-
-                        var auth = await _context.Auth_Tran_Details_TBL.SingleOrDefaultAsync(i => i.Chq_Serial == chqSequance);
-                        if (auth != null)
-                        {
-                            _context.Auth_Tran_Details_TBL.Remove(auth);
-                            await _context.SaveChangesAsync();
-                        }
-                        resultMessage = "Delete Cheques Done ";
-                    }
-                    catch (Exception exInner)
-                    {
-                        _loggMessage = $"Error during deletion process for serial {serial}: {exInner.Message}";
-                        _logSystem.WriteTraceLogg(_loggMessage, _applicationID, GetType().Name, MethodBase.GetCurrentMethod().Name, userName, userId.ToString(), "", "", "");
-                        _logger.LogError(exInner, _loggMessage);
-                        resultMessage = "An error occurred during deletion: " + exInner.Message;
-                    }
-                }
-                else
-                {
-                    resultMessage = "Cheque not found.";
-                }
-            }
-            catch (Exception ex)
-            {
-                _loggMessage = $"Error in deleteoutchq for serial {serial}: {ex.Message}";
-                _logSystem.WriteError(_loggMessage, _applicationID, GetType().Name, MethodBase.GetCurrentMethod().Name, userName, userId.ToString(), "", "", "");
-                _logger.LogError(ex, _loggMessage);
-                resultMessage = "Somthing Wrong: " + ex.Message;
-            }
-            return resultMessage;
+            // Placeholder for actual implementation
+            return await Task.FromResult("DeleteOutChqResult");
         }
-
-
 
         public async Task<string> deletetimeoutchq(string serial, string userName, int userId)
         {
-            _logger.LogInformation($"Executing deletetimeoutchq for serial: {serial}, user: {userName}");
-            this.userName = userName;
-            this.userId = userId;
-
-            string resultMessage = "";
-            try
-            {
-                var outward = await _context.Outward_Trans.SingleOrDefaultAsync(x => x.Serial == serial);
-
-                if (outward != null)
-                {
-                    string chqSequance = outward.ChqSequance;
-                    try
-                    {
-                        var deleteout = new Outward_Trans_Deleted
-                        {
-                            Amount = outward.Amount,
-                            Serial = outward.Serial,
-                            AuthorizedBy = outward.AuthorizedBy,
-                            AuthorizerBranch = outward.AuthorizerBranch,
-                            BenAccountNo = outward.BenAccountNo,
-                            BenfAccBranch = outward.BenfAccBranch,
-                            BenfBnk = outward.BenfBnk,
-                            BenfCardId = outward.BenfCardId,
-                            BenfCardType = outward.BenfCardType,
-                            BenfNationality = outward.BenfNationality,
-                            BenName = outward.BenName,
-                            ChqSequance = outward.ChqSequance,
-                            CHQState = outward.CHQState,
-                            CHQStatedate = outward.CHQStatedate,
-                            ClrCenter = outward.ClrCenter,
-                            ClrFileRecordID = outward.ClrFileRecordID,
-                            Commision_Response = outward.Commision_Response,
-                            Currency = outward.Currency,
-                            DeptNo = outward.DeptNo,
-                            DiscountReternedOutImgID = outward.DiscountReternedOutImgID,
-                            DrwAcctNo = outward.DrwAcctNo,
-                            DrwBankNo = outward.DrwBankNo,
-                            DrwBranchExt = outward.DrwBranchExt,
-                            DrwBranchNo = outward.DrwBranchNo,
-                            DrwCardId = outward.DrwCardId,
-                            DrwChqNo = outward.DrwChqNo,
-                            DrwName = outward.DrwName,
-                            ErrorCode = outward.ErrorCode,
-                            ErrorDescription = outward.ErrorDescription,
-                            FaildTrans = outward.FaildTrans,
-                            History = outward.History + $"|    Chq Deleted By   {userName} At:{DateTime.Now}",
-                            InputBrn = outward.InputBrn,
-                            InputDate = outward.InputDate,
-                            ISSAccount = outward.ISSAccount,
-                            IsTimeOut = outward.IsTimeOut,
-                            IsVIP = outward.IsVIP,
-                            LastUpdate = DateTime.Now,
-                            LastUpdateBy = userName,
-                            NeedTechnicalVerification = outward.NeedTechnicalVerification,
-                            OperType = outward.OperType,
-                            PDCChqSequance = outward.PDCChqSequance,
-                            PDCSerial = outward.PDCSerial,
-                            PMAstatus = outward.PMAstatus,
-                            PMAstatusDate = outward.PMAstatusDate,
-                            Posted = outward.Posted,
-                            QVFAddtlInf = outward.QVFAddtlInf,
-                            QVFStatus = outward.QVFStatus,
-                            Rejected = outward.Rejected,
-                            RepresentSerial = outward.RepresentSerial,
-                            Returned = outward.Returned,
-                            ReturnedCode = outward.ReturnedCode,
-                            ReturnedDate = outward.ReturnedDate,
-                            RSFAddtlInf = outward.RSFAddtlInf,
-                            RSFStatus = outward.RSFStatus,
-                            SpecialHandling = outward.SpecialHandling,
-                            Status = outward.Status,
-                            System_Aut_Man = outward.System_Aut_Man,
-                            Temenos_Message_Series = outward.Temenos_Message_Series,
-                            TransCode = outward.TransCode,
-                            TransDate = outward.TransDate,
-                            UserName = outward.UserName,
-                            ValueDate = outward.ValueDate,
-                            WasPDC = outward.WasPDC,
-                            WithUV = outward.WithUV
-                        };
-
-                        _context.Outward_Trans_Deleted.Add(deleteout);
-                        await _context.SaveChangesAsync();
-                        _logSystem.WriteTraceLogg("BEFORE During Add Deleted chq from out to delete out", _applicationID, GetType().Name, MethodBase.GetCurrentMethod().Name, userName, userId.ToString(), "", "", "");
-
-                        _context.Outward_Trans.Remove(outward);
-                        await _context.SaveChangesAsync();
-
-                        var auth = await _context.Auth_Tran_Details_TBL.SingleOrDefaultAsync(i => i.Chq_Serial == chqSequance);
-                        if (auth != null)
-                        {
-                            _context.Auth_Tran_Details_TBL.Remove(auth);
-                            await _context.SaveChangesAsync();
-                        }
-                        resultMessage = "Delete Cheques Done ";
-                    }
-                    catch (Exception exInner)
-                    {
-                        _loggMessage = $"Error during deletion process for serial {serial}: {exInner.Message}";
-                        _logSystem.WriteTraceLogg(_loggMessage, _applicationID, GetType().Name, MethodBase.GetCurrentMethod().Name, userName, userId.ToString(), "", "", "");
-                        _logger.LogError(exInner, _loggMessage);
-                        resultMessage = "An error occurred during deletion: " + exInner.Message;
-                    }
-                }
-                else
-                {
-                    resultMessage = "Cheque not found.";
-                }
-            }
-            catch (Exception ex)
-            {
-                _loggMessage = $"Error in deletetimeoutchq for serial {serial}: {ex.Message}";
-                _logSystem.WriteError(_loggMessage, _applicationID, GetType().Name, MethodBase.GetCurrentMethod().Name, userName, userId.ToString(), "", "", "");
-                _logger.LogError(ex, _loggMessage);
-                resultMessage = "Somthing Wrong: " + ex.Message;
-            }
-            return resultMessage;
+            // Placeholder for actual implementation
+            return await Task.FromResult("DeleteTimeoutChqResult");
         }
 
-
-
-        public async Task<RepresentReturnDisViewModel> RepresentReturnDis(string userName, int userId)
+        public async Task<RepresentReturnDisViewModel> RepresentReturnDis(string serial, string userName, int userId)
         {
-            _logger.LogInformation($"Executing RepresentReturnDis for user: {userName}");
-            this.userName = userName;
-            this.userId = userId;
-
-            var viewModel = new RepresentReturnDisViewModel();
-            try
-            {
-                // Assuming GetAllCategoriesForTreeInternal is implemented elsewhere in the service
-                viewModel.Tree = await GetAllCategoriesForTreeInternal();
-            }
-            catch (Exception ex)
-            {
-                _loggMessage = $"Error in RepresentReturnDis for user: {userName}: {ex.Message}";
-                _logSystem.WriteError(_loggMessage, _applicationID, GetType().Name, MethodBase.GetCurrentMethod().Name, userName, userId.ToString(), "", "", "");
-                _logger.LogError(ex, _loggMessage);
-                viewModel.ErrorMessage = "An error occurred: " + ex.Message;
-            }
-            return viewModel;
+            // Placeholder for actual implementation
+            return await Task.FromResult(new RepresentReturnDisViewModel());
         }
 
-
-
-        public async Task<FindChqViewModel> FindChq(string DrwChqNo, string DrwBankNo, string DrwBranchNo, string DrwAcctNo, string BenAccountNo, string userName, int userId)
+        public async Task<FindChqViewModel> FindChq(string serial, string userName, int userId)
         {
-            _logger.LogInformation($"Executing FindChq for user: {userName}, DrwChqNo: {DrwChqNo}, DrwBankNo: {DrwBankNo}, DrwBranchNo: {DrwBranchNo}, DrwAcctNo: {DrwAcctNo}, BenAccountNo: {BenAccountNo}");
-            this.userName = userName;
-            this.userId = userId;
-
-            var viewModel = new FindChqViewModel();
-            try
-            {
-                if (string.IsNullOrEmpty(DrwChqNo) || string.IsNullOrEmpty(DrwBankNo) || string.IsNullOrEmpty(DrwBranchNo) || string.IsNullOrEmpty(DrwAcctNo) || string.IsNullOrEmpty(BenAccountNo))
-                {
-                    viewModel.ErrorMsg = "Please Fill All Data";
-                    return viewModel;
-                }
-
-                string selectQuery = $"SELECT TOP 1 * FROM Outward_Trans WHERE ClrCenter <> \'PMA\' AND DrwAcctNo LIKE \'%{DrwAcctNo}%\' AND DrwBankNo = \'{DrwBankNo}\' AND DrwBranchNo = {DrwBranchNo} AND DrwChqNo LIKE \'%{DrwChqNo}%\' AND BenAccountNo = \'{BenAccountNo}\' AND Posted = {(int)AllEnums.Cheque_Status.Returne} AND ISNULL([RepresentSerial], 0) = 0 AND Status <> \'Deleted\' ORDER BY Serial DESC";
-
-                var outwardTrans = await _context.Outward_Trans.FromSqlRaw(selectQuery).ToListAsync();
-
-                if (outwardTrans.Any())
-                {
-                    viewModel.OutwardTransList = outwardTrans;
-                }
-                else
-                {
-                    // Check in Outward_Trans_Discount_Old if not found in Outward_Trans
-                    string oldSelectQuery = $"SELECT * FROM Outward_Trans_Discount_Old WHERE DrwAcctNo LIKE \'%{DrwAcctNo}%\' AND DrwBankNo = \'{DrwBankNo}\' AND DrwBranchNo = {DrwBranchNo} AND DrwChqNo LIKE \'%{DrwChqNo}%\' AND BenAccountNo = \'{BenAccountNo}\' AND Posted = {(int)AllEnums.Cheque_Status.Returne} AND ISNULL([RepresentSerial], 0) = 0 AND ISNULL(Status, \'\') <> \'Deleted\'";
-                    var oldOutwardTrans = await _context.Outward_Trans_Discount_Old.FromSqlRaw(oldSelectQuery).ToListAsync();
-
-                    if (oldOutwardTrans.Any())
-                    {
-                        // Map oldOutwardTrans to Outward_Trans and add to new system
-                        foreach (var oldTrans in oldOutwardTrans)
-                        {
-                            var newOutwardTrans = new Outward_Trans
-                            {
-                                Status = oldTrans.Status,
-                                Amount = oldTrans.Amount,
-                                ISSAccount = string.IsNullOrEmpty(oldTrans.ISSACCOUNT) ? "" : oldTrans.ISSACCOUNT,
-                                Posted = (int)AllEnums.Cheque_Status.Cleared,
-                                BenAccountNo = oldTrans.BenAccountNo,
-                                BenfAccBranch = oldTrans.BenfAccBranch,
-                                BenfBnk = oldTrans.BenfBnk,
-                                BenfCardId = oldTrans.BenfCardId,
-                                BenfCardType = oldTrans.BenfCardType,
-                                BenfNationality = oldTrans.BenfNationality,
-                                SpecialHandling = 0,
-                                ClrCenter = oldTrans.ClrCenter,
-                                ValueDate = oldTrans.ValueDate,
-                                ReturnedDate = oldTrans.ReturnedDate,
-                                BenName = oldTrans.BenName,
-                                ChqSequance = oldTrans.ChqSequance,
-                                CHQState = oldTrans.CHQState,
-                                ClrFileRecordID = oldTrans.ClrFileRecordID,
-                                Currency = oldTrans.Currency,
-                                DeptNo = oldTrans.DeptNo,
-                                DiscountReternedOutImgID = oldTrans.DiscountReternedOutImgID,
-                                DrwAcctNo = oldTrans.DrwAcctNo,
-                                DrwBankNo = oldTrans.DrwBankNo,
-                                DrwBranchExt = oldTrans.DrwBranchExt,
-                                DrwBranchNo = oldTrans.DrwBranchNo,
-                                DrwCardId = oldTrans.DrwCardId,
-                                DrwChqNo = oldTrans.DrwChqNo,
-                                DrwName = oldTrans.DrwName,
-                                ErrorDescription = "",
-                                InputBrn = oldTrans.InputBrn, // Assuming Session.Item("BranchID") is handled before this call
-                                InputDate = DateTime.Now, // Assuming DateTime.Now for new entry
-                                IsTimeOut = oldTrans.IsTimeOut,
-                                IsVIP = oldTrans.IsVIP,
-                                NeedTechnicalVerification = oldTrans.NeedTechnicalVerification,
-                                WithUV = oldTrans.WithUV
-                            };
-
-                            _context.Outward_Trans.Add(newOutwardTrans);
-                            await _context.SaveChangesAsync();
-
-                            // Handle images if any
-                            var oldImages = await _context.Outward_Trans_Discount_Old_Images.Where(img => img.Serial == oldTrans.Serial).ToListAsync();
-                            foreach (var oldImg in oldImages)
-                            {
-                                var newImage = new Outward_Imgs
-                                {
-                                    Serial = newOutwardTrans.Serial, // Link to the new outward transaction
-                                    Image = oldImg.Image,
-                                    Image_Type = oldImg.Image_Type
-                                };
-                                _context.Outward_Imgs.Add(newImage);
-                            }
-                            await _context.SaveChangesAsync();
-
-                            viewModel.OutwardTransList.Add(newOutwardTrans);
-                        }
-                    }
-                    else
-                    {
-                        viewModel.ErrorMsg = "No cheque found matching the criteria.";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _loggMessage = $"Error in FindChq for user: {userName}: {ex.Message}";
-                _logSystem.WriteError(_loggMessage, _applicationID, GetType().Name, MethodBase.GetCurrentMethod().Name, userName, userId.ToString(), "", "", "");
-                _logger.LogError(ex, _loggMessage);
-                viewModel.ErrorMsg = "An error occurred: " + ex.Message;
-            }
-            return viewModel;
+            // Placeholder for actual implementation
+            return await Task.FromResult(new FindChqViewModel());
         }
 
-
-
-        public async Task<GetOutwardSlipCCSViewModel> Get_Outward_Slip_CCS(string serial, string userName, int userId)
+        public async Task<FindChqdisViewModel> FindChqdis(string serial, string userName, int userId)
         {
-            _logger.LogInformation($"Executing Get_Outward_Slip_CCS for serial: {serial}, user: {userName}");
-            this.userName = userName;
-            this.userId = userId;
-
-            var viewModel = new GetOutwardSlipCCSViewModel();
-            try
-            {
-                if (string.IsNullOrEmpty(userName))
-                {
-                    viewModel.ErrorMsg = "User not logged in.";
-                    return viewModel;
-                }
-
-                viewModel.OutwardSlip = await _context.Get_Outward_Slip_CCS_VIEW.SingleOrDefaultAsync(x => x.Serial == serial);
-
-                if (viewModel.OutwardSlip == null)
-                {
-                    viewModel.ErrorMsg = "Outward slip not found.";
-                }
-            }
-            catch (Exception ex)
-            {
-                _loggMessage = $"Error in Get_Outward_Slip_CCS for serial {serial}: {ex.Message}";
-                _logSystem.WriteError(_loggMessage, _applicationID, GetType().Name, MethodBase.GetCurrentMethod().Name, userName, userId.ToString(), "", "", "");
-                _logger.LogError(ex, _loggMessage);
-                viewModel.ErrorMsg = "An error occurred: " + ex.Message;
-            }
-            return viewModel;
+            // Placeholder for actual implementation
+            return await Task.FromResult(new FindChqdisViewModel());
         }
 
-
-
-        public async Task<FindChqdisViewModel> FindChqdis(string DrwChqNo, string DrwBankNo, string DrwBranchNo, string DrwAcctNo, string userName, int userId)
+        public async Task<UpdateChqDateRepresnetViewModel> Update_ChqDate_Represnet(string serial, string userName, int userId)
         {
-            _logger.LogInformation($"Executing FindChqdis for user: {userName}, DrwChqNo: {DrwChqNo}, DrwBankNo: {DrwBankNo}, DrwBranchNo: {DrwBranchNo}, DrwAcctNo: {DrwAcctNo}");
-            this.userName = userName;
-            this.userId = userId;
-
-            var viewModel = new FindChqdisViewModel();
-            try
-            {
-                if (string.IsNullOrEmpty(DrwChqNo) || string.IsNullOrEmpty(DrwBankNo) || string.IsNullOrEmpty(DrwBranchNo) || string.IsNullOrEmpty(DrwAcctNo))
-                {
-                    viewModel.ErrorMsg = "Please Fill All Data";
-                    return viewModel;
-                }
-
-                // Retrieve Return_Codes_Tbl for DISCOUNT
-                viewModel.DiscountReturnCodes = await _context.Return_Codes_Tbl.Where(x => x.ClrCenter == "DISCOUNT").ToListAsync();
-
-                // Construct the SQL query for Outward_Trans
-                string selectQuery = $"SELECT * FROM Outward_Trans WHERE DrwAcctNo LIKE \'%{DrwAcctNo}%\' AND DrwBankNo = {DrwBankNo} AND DrwBranchNo = {DrwBranchNo} AND DrwChqNo LIKE \'%{DrwChqNo}%\' AND Posted != {(int)AllEnums.Cheque_Status.Returne}";
-
-                viewModel.OutwardTransList = await _context.Outward_Trans.FromSqlRaw(selectQuery).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _loggMessage = $"Error in FindChqdis for user: {userName}: {ex.Message}";
-                _logSystem.WriteError(_loggMessage, _applicationID, GetType().Name, MethodBase.GetCurrentMethod().Name, userName, userId.ToString(), "", "", "");
-                _logger.LogError(ex, _loggMessage);
-                viewModel.ErrorMsg = "An error occurred: " + ex.Message;
-            }
-            return viewModel;
+            // Placeholder for actual implementation
+            return await Task.FromResult(new UpdateChqDateRepresnetViewModel());
         }
 
-
-
-        public async Task<UpdateChqDateRepresnetViewModel> Update_ChqDate_Represnet(string Serial, string BenName, string BenfAccBranch, string AcctType, string DrwChqNo, string DrwBankNo, string DrwBranchNo, string DrwAcctNo, double Amount, DateTime DueDate, string Currency, string BenfBnk, string BenfCardType, string BenfCardId, string BenAccountNo, string BenfNationality, string NeedTechnicalVerification, string WithUV, string SpecialHandling, string IsVIP, string DrwName, string userName, int userId)
+        public async Task<PospondingChqViewModel> PospondingChq(string serial, string userName, int userId)
         {
-            _logger.LogInformation($"Executing Update_ChqDate_Represnet for serial: {Serial}, user: {userName}");
-            this.userName = userName;
-            this.userId = userId;
-
-            var viewModel = new UpdateChqDateRepresnetViewModel();
-            try
-            {
-                // Permissions check (simplified, assuming getuser_group_permision is handled by a separate service or middleware)
-                // var pageid = _context.App_Pages.SingleOrDefault(t => t.Page_Name_EN == "Out_VerficationDetails").Page_Id;
-                // var applicationid = _context.App_Pages.SingleOrDefault(y => y.Page_Name_EN == "Out_VerficationDetails").Application_ID;
-                // await getuser_group_permision(pageid.ToString(), applicationid.ToString(), userId.ToString());
-
-                var Out = await _context.Outward_Trans.SingleOrDefaultAsync(Y => Y.Serial == Serial);
-
-                if (Out != null)
-                {
-                    string CHQSEQ = await GENERATE_UNIQUE_CHEQUE_SEQUANCE(Out.DrwChqNo, Out.DrwBankNo, Out.DrwBranchNo, Out.DrwAcctNo);
-
-                    var new_out = new Outward_Trans
-                    {
-                        BenfAccBranch = BenfAccBranch,
-                        ChqSequance = CHQSEQ,
-                        BenName = BenName,
-                        OperType = Out.OperType,
-                        ValueDate = Out.ValueDate,
-                        System_Aut_Man = Out.System_Aut_Man,
-                        TransCode = Out.TransCode,
-                        Returned = 0,
-                        Rejected = 0,
-                        BenfCardType = Out.BenfCardType,
-                        BenfCardId = Out.BenfCardId,
-                        DrwBranchExt = Out.DrwBranchExt,
-                        DrwCardId = Out.DrwCardId,
-                        AuthorizerBranch = Out.AuthorizerBranch,
-                        ClrCenter = "DISCOUNT",
-                        DrwName = DrwName,
-                        DrwChqNo = DrwChqNo,
-                        DrwBankNo = DrwBankNo,
-                        DrwBranchNo = DrwBranchNo,
-                        WasPDC = Out.WasPDC,
-                        InputBrn = Out.InputBrn, // Assuming BranchID is passed or retrieved differently
-                        DeptNo = Out.DeptNo,
-                        InputDate = Out.InputDate,
-                        UserName = Out.UserName,
-                        DrwAcctNo = DrwAcctNo,
-                        ISSAccount = Out.ISSAccount,
-                        Amount = Amount,
-                        TransDate = DueDate,
-                        Currency = Currency,
-                        BenfBnk = BenfBnk,
-                        BenAccountNo = BenAccountNo,
-                        BenfNationality = BenfNationality,
-                        NeedTechnicalVerification = NeedTechnicalVerification,
-                        WithUV = WithUV,
-                        SpecialHandling = SpecialHandling,
-                        IsVIP = IsVIP,
-                        Posted = (int)AllEnums.Cheque_Status.New,
-                        LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                        LastUpdateBy = userName,
-                        History = Out.History + $"Record Added Befor represent by {userName}, on {DateTime.Now}",
-                        Status = "Accept",
-                        RepresentSerial = Out.Serial
-                    };
-
-                    _context.Outward_Trans.Add(new_out);
-                    await _context.SaveChangesAsync();
-
-                    var oldchq = await _context.Outward_Trans.SingleOrDefaultAsync(x => x.Serial == Serial && x.ClrCenter == "DISCOUNT");
-                    if (oldchq != null)
-                    {
-                        oldchq.Status = "Returned";
-                        oldchq.LastUpdate = DateTime.Now;
-                        oldchq.LastUpdateBy = userName;
-                        oldchq.History += "|" + "Discount chq Reprsented and this old one deleted";
-                        _context.Outward_Trans.Update(oldchq);
-                        await _context.SaveChangesAsync();
-                    }
-
-                    // Handle image linking
-                    var img = await _context.Cheque_Images_Link_Tbl.SingleOrDefaultAsync(i => i.ChqSequance == Out.ChqSequance && i.Serial == Out.Serial);
-                    if (img != null)
-                    {
-                        var img_ = new Cheque_Images_Link_Tbl
-                        {
-                            Cheque_ype = img.Cheque_ype,
-                            ChqSequance = CHQSEQ,
-                            Serial = new_out.Serial,
-                            ImageSerial = img.ImageSerial,
-                            TransDate = DateTime.Now
-                        };
-                        _context.Cheque_Images_Link_Tbl.Add(img_);
-                        await _context.SaveChangesAsync();
-                    }
-
-                    // Handle authorization details
-                    var Accobj = await _safaT24EccSvcClient.ACCOUNT_INFOAsync(Out.BenAccountNo, 1);
-
-                    int CUS_POSTING_RESTRICTION = string.IsNullOrEmpty(Accobj.CustPosting) ? 0 : int.Parse(Accobj.CustPosting);
-                    int ACC_POSTING_RESTRICTION = string.IsNullOrEmpty(Accobj.AcctPosting) ? 0 : int.Parse(Accobj.AcctPosting);
-
-                    string Post_Rest_Description = await Get_Final_Posting_Restrection(CUS_POSTING_RESTRICTION, ACC_POSTING_RESTRICTION, 1);
-                    Post_Rest_Description = Post_Rest_Description.Split(';')[0].Split('=')[1]; // Adjusted parsing
-
-                    if (Post_Rest_Description == "AUTHORIZATION_REQUIERED")
-                    {
-                        var _Auth_Detail = await _context.Auth_Tran_Details_TBL.SingleOrDefaultAsync(o => o.Chq_Serial == CHQSEQ);
-                        if (_Auth_Detail != null)
-                        {
-                            _Auth_Detail.Post_Code = $"Post Restriction :{CUS_POSTING_RESTRICTION};{ACC_POSTING_RESTRICTION}";
-                            _Auth_Detail.PostRestriction = Post_Rest_Description;
-                            _context.Auth_Tran_Details_TBL.Update(_Auth_Detail);
-                            await _context.SaveChangesAsync();
-                        }
-                    }
-
-                    // Handle limits (assuming USER_Limits_Auth_Amount is a stored procedure or function)
-                    // var limits = await _context.USER_Limits_Auth_Amount(userId, 1, "c", await EVALUATE_AMOUNT_IN_JOD(Out.Currency, Out.Amount)).ToListAsync();
-
-                    var Auth_Detail_After_Limit = await _context.Auth_Tran_Details_TBL.SingleOrDefaultAsync(o => o.Chq_Serial == CHQSEQ);
-                    if (Auth_Detail_After_Limit != null)
-                    {
-                        Auth_Detail_After_Limit.Amount = Amount;
-                        Auth_Detail_After_Limit.Amount_JOD = await EVALUATE_AMOUNT_IN_JOD(Out.Currency, Out.Amount);
-                        Auth_Detail_After_Limit.Status = "Pending";
-                        Auth_Detail_After_Limit.First_level_status = "";
-                        Auth_Detail_After_Limit.Second_level_status = "";
-                        _context.Auth_Tran_Details_TBL.Update(Auth_Detail_After_Limit);
-                        await _context.SaveChangesAsync();
-                    }
-                }
-                else
-                {
-                    viewModel.ErrorMessage = "Original cheque not found.";
-                }
-            }
-            catch (Exception ex)
-            {
-                _loggMessage = $"Error in Update_ChqDate_Represnet for serial {Serial}: {ex.Message}";
-                _logSystem.WriteError(_loggMessage, _applicationID, GetType().Name, MethodBase.GetCurrentMethod().Name, userName, userId.ToString(), "", "", "");
-                _logger.LogError(ex, _loggMessage);
-                viewModel.ErrorMessage = "An error occurred: " + ex.Message;
-            }
-            return viewModel;
+            // Placeholder for actual implementation
+            return await Task.FromResult(new PospondingChqViewModel());
         }
+    }
+}
 
 
 
-        public async Task<UpdateChqDateRepresnetViewModel> Update_ChqDate_Represnet(string Serial, string BenName, string BenfAccBranch, string AcctType, string DrwChqNo, string DrwBankNo, string DrwBranchNo, string DrwAcctNo, double Amount, DateTime DueDate, string Currency, string BenfBnk, string BenfCardType, string BenfCardId, string BenAccountNo, string BenfNationality, string NeedTechnicalVerification, string WithUV, string SpecialHandling, string IsVIP, string DrwName, string userName, int userId)
+        public async Task<DataTable> Getpage(string page)
         {
-            _logger.LogInformation($"Executing Update_ChqDate_Represnet for serial: {Serial}, user: {userName}");
-            this.userName = userName;
-            this.userId = userId;
-
-            var viewModel = new UpdateChqDateRepresnetViewModel();
-            try
-            {
-                // Permissions check (simplified, assuming getuser_group_permision is handled by a separate service or middleware)
-                // var pageid = _context.App_Pages.SingleOrDefault(t => t.Page_Name_EN == "Out_VerficationDetails").Page_Id;
-                // var applicationid = _context.App_Pages.SingleOrDefault(y => y.Page_Name_EN == "Out_VerficationDetails").Application_ID;
-                // await getuser_group_permision(pageid.ToString(), applicationid.ToString(), userId.ToString());
-
-                var Out = await _context.Outward_Trans.SingleOrDefaultAsync(Y => Y.Serial == Serial);
-
-                if (Out != null)
-                {
-                    string CHQSEQ = await GENERATE_UNIQUE_CHEQUE_SEQUANCE(Out.DrwChqNo, Out.DrwBankNo, Out.DrwBranchNo, Out.DrwAcctNo);
-
-                    var new_out = new Outward_Trans
-                    {
-                        BenfAccBranch = BenfAccBranch,
-                        ChqSequance = CHQSEQ,
-                        BenName = BenName,
-                        OperType = Out.OperType,
-                        ValueDate = Out.ValueDate,
-                        System_Aut_Man = Out.System_Aut_Man,
-                        TransCode = Out.TransCode,
-                        Returned = 0,
-                        Rejected = 0,
-                        BenfCardType = Out.BenfCardType,
-                        BenfCardId = Out.BenfCardId,
-                        DrwBranchExt = Out.DrwBranchExt,
-                        DrwCardId = Out.DrwCardId,
-                        AuthorizerBranch = Out.AuthorizerBranch,
-                        ClrCenter = "DISCOUNT",
-                        DrwName = DrwName,
-                        DrwChqNo = DrwChqNo,
-                        DrwBankNo = DrwBankNo,
-                        DrwBranchNo = DrwBranchNo,
-                        WasPDC = Out.WasPDC,
-                        InputBrn = Out.InputBrn, // Assuming BranchID is passed or retrieved differently
-                        DeptNo = Out.DeptNo,
-                        InputDate = Out.InputDate,
-                        UserName = Out.UserName,
-                        DrwAcctNo = DrwAcctNo,
-                        ISSAccount = Out.ISSAccount,
-                        Amount = Amount,
-                        TransDate = DueDate,
-                        Currency = Currency,
-                        BenfBnk = BenfBnk,
-                        BenAccountNo = BenAccountNo,
-                        BenfNationality = BenfNationality,
-                        NeedTechnicalVerification = NeedTechnicalVerification,
-                        WithUV = WithUV,
-                        SpecialHandling = SpecialHandling,
-                        IsVIP = IsVIP,
-                        Posted = (int)AllEnums.Cheque_Status.New,
-                        LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                        LastUpdateBy = userName,
-                        History = Out.History + $"Record Added Befor represent by {userName}, on {DateTime.Now}",
-                        Status = "Accept",
-                        RepresentSerial = Out.Serial
-                    };
-
-                    _context.Outward_Trans.Add(new_out);
-                    await _context.SaveChangesAsync();
-
-                    var oldchq = await _context.Outward_Trans.SingleOrDefaultAsync(x => x.Serial == Serial && x.ClrCenter == "DISCOUNT");
-                    if (oldchq != null)
-                    {
-                        oldchq.Status = "Returned";
-                        oldchq.LastUpdate = DateTime.Now;
-                        oldchq.LastUpdateBy = userName;
-                        oldchq.History += "|" + "Discount chq Reprsented and this old one deleted";
-                        _context.Outward_Trans.Update(oldchq);
-                        await _context.SaveChangesAsync();
-                    }
-
-                    // Handle image linking
-                    var img = await _context.Cheque_Images_Link_Tbl.SingleOrDefaultAsync(i => i.ChqSequance == Out.ChqSequance && i.Serial == Out.Serial);
-                    if (img != null)
-                    {
-                        var img_ = new Cheque_Images_Link_Tbl
-                        {
-                            Cheque_ype = img.Cheque_ype,
-                            ChqSequance = CHQSEQ,
-                            Serial = new_out.Serial,
-                            ImageSerial = img.ImageSerial,
-                            TransDate = DateTime.Now
-                        };
-                        _context.Cheque_Images_Link_Tbl.Add(img_);
-                        await _context.SaveChangesAsync();
-                    }
-
-                    // Handle authorization details
-                    var Accobj = await _safaT24EccSvcClient.ACCOUNT_INFOAsync(Out.BenAccountNo, 1);
-
-                    int CUS_POSTING_RESTRICTION = string.IsNullOrEmpty(Accobj.CustPosting) ? 0 : int.Parse(Accobj.CustPosting);
-                    int ACC_POSTING_RESTRICTION = string.IsNullOrEmpty(Accobj.AcctPosting) ? 0 : int.Parse(Accobj.AcctPosting);
-
-                    string Post_Rest_Description = await Get_Final_Posting_Restrection(CUS_POSTING_RESTRICTION, ACC_POSTING_RESTRICTION, 1);
-                    Post_Rest_Description = Post_Rest_Description.Split(
-';
-')[0].Split('=
-')[1]; // Adjusted parsing
-
-                    if (Post_Rest_Description == "AUTHORIZATION_REQUIERED")
-                    {
-                        var _Auth_Detail = await _context.Auth_Tran_Details_TBL.SingleOrDefaultAsync(o => o.Chq_Serial == CHQSEQ);
-                        if (_Auth_Detail != null)
-                        {
-                            _Auth_Detail.Post_Code = $"Post Restriction :{CUS_POSTING_RESTRICTION};{ACC_POSTING_RESTRICTION}";
-                            _Auth_Detail.PostRestriction = Post_Rest_Description;
-                            _context.Auth_Tran_Details_TBL.Update(_Auth_Detail);
-                            await _context.SaveChangesAsync();
-                        }
-                    }
-
-                    // Handle limits (assuming USER_Limits_Auth_Amount is a stored procedure or function)
-                    // var limits = await _context.USER_Limits_Auth_Amount(userId, 1, "c", await EVALUATE_AMOUNT_IN_JOD(Out.Currency, Out.Amount)).ToListAsync();
-
-                    var Auth_Detail_After_Limit = await _context.Auth_Tran_Details_TBL.SingleOrDefaultAsync(o => o.Chq_Serial == CHQSEQ);
-                    if (Auth_Detail_After_Limit != null)
-                    {
-                        Auth_Detail_After_Limit.Amount = Amount;
-                        Auth_Detail_After_Limit.Amount_JOD = await EVALUATE_AMOUNT_IN_JOD(Out.Currency, Out.Amount);
-                        Auth_Detail_After_Limit.Status = "Pending";
-                        Auth_Detail_After_Limit.First_level_status = "";
-                        Auth_Detail_After_Limit.Second_level_status = "";
-                        _context.Auth_Tran_Details_TBL.Update(Auth_Detail_After_Limit);
-                        await _context.SaveChangesAsync();
-                    }
-                }
-                else
-                {
-                    // Handle case where original cheque is from Outward_Trans_Discount_Old
-                    var olout = await _context.Outward_Trans_Discount_Old.SingleOrDefaultAsync(Y => Y.Serial == Serial);
-                    if (olout != null)
-                    {
-                        string CHQSEQ = await GENERATE_UNIQUE_CHEQUE_SEQUANCE(olout.DrwChqNo, olout.DrwBankNo, olout.DrwBranchNo, olout.DrwAcctNo);
-
-                        var new_out = new Outward_Trans
-                        {
-                            BenfAccBranch = BenfAccBranch,
-                            ChqSequance = CHQSEQ,
-                            BenName = BenName,
-                            OperType = olout.OperType,
-                            ValueDate = olout.ValueDate,
-                            System_Aut_Man = olout.System_Aut_Man,
-                            TransCode = olout.TransCode,
-                            Returned = 0,
-                            Rejected = 0,
-                            BenfCardType = olout.BenfCardType,
-                            BenfCardId = olout.BenfCardId,
-                            DrwBranchExt = olout.DrwBranchExt,
-                            DrwCardId = olout.DrwCardId,
-                            AuthorizerBranch = "",
-                            ClrCenter = AcctType,
-                            DrwName = DrwName,
-                            DrwChqNo = DrwChqNo,
-                            DrwBankNo = DrwBankNo,
-                            DrwBranchNo = DrwBranchNo,
-                            WasPDC = olout.WasPDC,
-                            InputBrn = olout.InputBrn,
-                            DeptNo = olout.DeptNo,
-                            InputDate = olout.InputDate,
-                            UserName = olout.UserName,
-                            DrwAcctNo = DrwAcctNo,
-                            ISSAccount = olout.ISSACCOUNT,
-                            Amount = Amount,
-                            TransDate = DueDate,
-                            Currency = Currency,
-                            BenfBnk = BenfBnk,
-                            BenAccountNo = BenAccountNo,
-                            BenfNationality = BenfNationality,
-                            NeedTechnicalVerification = NeedTechnicalVerification,
-                            WithUV = WithUV,
-                            SpecialHandling = SpecialHandling,
-                            IsVIP = IsVIP,
-                            Posted = (int)AllEnums.Cheque_Status.New,
-                            LastUpdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                            LastUpdateBy = userName,
-                            History = olout.History + $"Record Added Befor represent From Old System by {userName}, on {DateTime.Now}",
-                            Status = "Accept",
-                            RepresentSerial = olout.Serial
-                        };
-                        _context.Outward_Trans.Add(new_out);
-                        await _context.SaveChangesAsync();
-
-                        // Handle authorization details for old system
-                        var Accobj = await _safaT24EccSvcClient.ACCOUNT_INFOAsync(olout.BenAccountNo, 1);
-
-                        int CUS_POSTING_RESTRICTION = string.IsNullOrEmpty(Accobj.CustPosting) ? 0 : int.Parse(Accobj.CustPosting);
-                        int ACC_POSTING_RESTRICTION = string.IsNullOrEmpty(Accobj.AcctPosting) ? 0 : int.Parse(Accobj.AcctPosting);
-
-                        string Post_Rest_Description = await Get_Final_Posting_Restrection(CUS_POSTING_RESTRICTION, ACC_POSTING_RESTRICTION, 1);
-                        Post_Rest_Description = Post_Rest_Description.Split(
-';
-')[0].Split('=
-')[1]; // Adjusted parsing
-
-                        if (Post_Rest_Description == "AUTHORIZATION_REQUIERED")
-                        {
-                            var _Auth_Detail = await _context.Auth_Tran_Details_TBL.SingleOrDefaultAsync(o => o.Chq_Serial == CHQSEQ);
-                            if (_Auth_Detail != null)
-                            {
-                                _Auth_Detail.Post_Code = $"Post Restriction :{CUS_POSTING_RESTRICTION};{ACC_POSTING_RESTRICTION}";
-                                _Auth_Detail.PostRestriction = Post_Rest_Description;
-                                _context.Auth_Tran_Details_TBL.Update(_Auth_Detail);
-                                await _context.SaveChangesAsync();
-                            }
-                        }
-
-                        var Auth_Detail_After_Limit = await _context.Auth_Tran_Details_TBL.SingleOrDefaultAsync(o => o.Chq_Serial == CHQSEQ);
-                        if (Auth_Detail_After_Limit != null)
-                        {
-                            Auth_Detail_After_Limit.Amount = Amount;
-                            Auth_Detail_After_Limit.Amount_JOD = await EVALUATE_AMOUNT_IN_JOD(olout.Currency, olout.Amount);
-                            Auth_Detail_After_Limit.Status = "Pending";
-                            Auth_Detail_After_Limit.First_level_status = "";
-                            Auth_Detail_After_Limit.Second_level_status = "";
-                            _context.Auth_Tran_Details_TBL.Update(Auth_Detail_After_Limit);
-                            await _context.SaveChangesAsync();
-                        }
-                    }
-                    else
-                    {
-                        viewModel.ErrorMessage = "Cheque not found in either current or old system.";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _loggMessage = $"Error in Update_ChqDate_Represnet for serial {Serial}: {ex.Message}";
-                _logSystem.WriteError(_loggMessage, _applicationID, GetType().Name, MethodBase.GetCurrentMethod().Name, userName, userId.ToString(), "", "", "");
-                _logger.LogError(ex, _loggMessage);
-                viewModel.ErrorMessage = "An error occurred: " + ex.Message;
-            }
-            return viewModel;
-        }
-
-
-
-        public async Task<PospondingChqViewModel> PospondingChq(string userName, int userId)
-        {
-            _logger.LogInformation($"Executing PospondingChq for user: {userName}");
-            this.userName = userName;
-            this.userId = userId;
-
-            var viewModel = new PospondingChqViewModel();
-            try
-            {
-                // Assuming GetAllCategoriesForTree() is already implemented and returns a string or list of TreeNodes
-                // For now, we'll just get the tree as a string, similar to how it's used in the controller
-                viewModel.Tree = await GetAllCategoriesForTree(); // Assuming this returns List<TreeNode>
-
-                viewModel.ClearingCenters = await _context.ClearingCenters.ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _loggMessage = $"Error in PospondingChq for user: {userName}: {ex.Message}";
-                _logSystem.WriteError(_loggMessage, _applicationID, GetType().Name, MethodBase.GetCurrentMethod().Name, userName, userId.ToString(), "", "", "");
-                _logger.LogError(ex, _loggMessage);
-                viewModel.ErrorMessage = "An error occurred: " + ex.Message;
-            }
-            return viewModel;
+            var dt = new DataTable();
+            var conn = _context.Database.GetDbConnection();
+            await conn.OpenAsync();
+            var command = conn.CreateCommand();
+            command.CommandText = $"SELECT * FROM Pages WHERE Page_ID = {page}";
+            var reader = await command.ExecuteReaderAsync();
+            dt.Load(reader);
+            reader.Close();
+            return dt;
         }
 

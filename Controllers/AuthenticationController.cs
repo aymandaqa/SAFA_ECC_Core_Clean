@@ -6,6 +6,7 @@ using System.Text.Json;
 using SAFA_ECC_Core_Clean.Models;
 using System.Collections.Generic;
 using System.Data;
+using Microsoft.AspNetCore.Http;
 
 namespace SAFA_ECC_Core_Clean.Controllers
 {
@@ -20,18 +21,11 @@ namespace SAFA_ECC_Core_Clean.Controllers
             _authenticationService = authenticationService;
         }
 
-        // The FillRecursive method will be moved to the service layer
-        // The Category and TreeNode models are now in SAFA_ECC_Core_Clean.Models
-
         public async Task<IActionResult> Index()
         {
-            // Assuming User.Identity.Name and HttpContext.Session can provide the necessary data
             string userName = User.Identity.Name;
             int userId = 0; // Placeholder, retrieve actual userId if available
             string groupId = HttpContext.Session.GetString("groupid"); // Assuming groupid is stored in session
-
-            // Helper functions to mimic Session.Item behavior
-
 
             var treeHtml = await _authenticationService.GetAllCategoriesForTree(userName, userId, groupId);
             ViewBag.Tree = treeHtml;
@@ -46,12 +40,11 @@ namespace SAFA_ECC_Core_Clean.Controllers
 
             var result = await _authenticationService.getuser_group_permision(pageid, applicationid, userid, userName, userId, groupId);
 
-            // Now, handle the session updates in the controller layer
             HttpContext.Session.SetString("permission_user_Group", System.Text.Json.JsonSerializer.Serialize(result.GroupPermissions));
             HttpContext.Session.SetString("AccessPage", result.AccessPage);
             HttpContext.Session.SetString("pagename", result.Pagename);
 
-            return Json(result); // Or return a specific view/partial view if needed
+            return Json(result);
         }
 
         public async Task<DataTable> Getpage(string page)
@@ -74,23 +67,14 @@ namespace SAFA_ECC_Core_Clean.Controllers
             return await _authenticationService.Ge_t(x, User.Identity.Name, 0); // Placeholder for userId
         }
 
-        // TODO: Continue migrating other actions from AuthenticationController.vb
-    }
-}
-
-
-
-
         [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
 
-
-
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Login(ViewModels.AuthenticationViewModels.LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -98,10 +82,9 @@ namespace SAFA_ECC_Core_Clean.Controllers
 
                 if (result.Success)
                 {
-                    // Set session variables based on the result from the service
                     HttpContext.Session.SetString("UserName", result.UserName);
-                    HttpContext.Session.SetString("ID", result.UserID);
-                    HttpContext.Session.SetString("groupid", result.GroupID);
+                    HttpContext.Session.SetString("ID", result.UserId);
+                    HttpContext.Session.SetString("groupid", result.GroupId);
                     HttpContext.Session.SetString("BranchID", result.BranchID);
                     HttpContext.Session.SetString("BranchName", result.BranchName);
                     HttpContext.Session.SetString("UserType", result.UserType);
@@ -128,19 +111,18 @@ namespace SAFA_ECC_Core_Clean.Controllers
                     HttpContext.Session.SetString("CompanyBranchCurrencyRateStatus", result.CompanyBranchCurrencyRateStatus);
                     HttpContext.Session.SetString("CompanyBranchCurrencyRateDescription", result.CompanyBranchCurrencyRateDescription);
 
-                    return RedirectToAction("Index", "Home"); // Redirect to home page on successful login
+                    return RedirectToAction("Index", "Home");
                 }
                 ModelState.AddModelError(string.Empty, result.Message);
             }
             return View(model);
         }
 
-
-
-
         public IActionResult LogOff()
         {
             HttpContext.Session.Clear();
             return RedirectToAction("Login", "Authentication");
         }
+    }
+}
 

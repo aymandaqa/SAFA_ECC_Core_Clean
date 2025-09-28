@@ -1,5 +1,3 @@
-
-using Microsoft.AspNetCore.Mvc;
 using SAFA_ECC_Core_Clean.Models;
 using SAFA_ECC_Core_Clean.ViewModels.OutwordViewModels;
 using System;
@@ -14,69 +12,69 @@ namespace SAFA_ECC_Core_Clean.Services
         Task<CheckImgViewModel> CheckImg();
         Task<bool> GetPermission(string id, string page, string groupId);
         Task<bool> GetPermission1(string id, string page, string groupId);
-        Task<IActionResult> Hold_CHQ();
-        Task<IActionResult> Hold_CHQ(Hold_CHQViewModel hold, string HOLD_TYPE, string Reserved);
-        Task<IActionResult> ReturnDiscountChq();
+        Task<Hold_CHQViewModel> GetHold_CHQData();
+        Task<bool> SaveHold_CHQ(Hold_CHQViewModel hold, string HOLD_TYPE, string Reserved, string userName);
+        Task<object> ReturnDiscountChq();
         Task<string> Get_Deacrypted_Account(string Drw_Account, string ChqNo);
         Task<RejectedOutRequestViewModel> Rejected_Out_Request();
         Task<OutChqsViewModel> RepresnetDisDetails(string id);
         Task<OutwordDateVerificationViewModel> Out_VerficationDetails(string id);
-        Task<IActionResult> OUTWORD(); // This might need a specific ViewModel if it returns data to a view
+        Task<object> OUTWORD();
         Task<DataTable> Get_Post_Rest_Code(string CUSTOMER_ID, string ACCOUNT_NUMBER);
         Task<string> Get_Final_Posting_Restrection(int Customer_Post_Rest, int Acc_Post_Rest, int Language);
         Task<PenddingOutWordRequestViewModel> Pendding_OutWord_Request();
-        Task<IActionResult> Pendding_OutWord_Request_Auth(); // This might need a specific ViewModel if it returns data to a view
-        Task<IActionResult> getOutword_WF_Details(); // This might need a specific ViewModel if it returns data to a view
+        Task<object> Pendding_OutWord_Request_Auth();
+        Task<object> getOutword_WF_Details();
         Task getuser_group_permision(string pageid, string applicationid, string userid);
         Task<DataTable> Getpage(string page);
         Task<bool> Ge_t(string x);
         Task<List<TreeNode>> GetAllCategoriesForTree();
         string getlist(string x);
         Task<string> GENERATE_UNIQUE_CHEQUE_SEQUANCE(string CHEQUE_NO, string BANK_NO, string BRANCH_NO, string DRAWEE_NO);
-        Task<IActionResult> getlockedpage(int pageid);
+        Task<object> getlockedpage(int pageid);
         Task<string> EVALUATE_AMOUNT_IN_JOD(string CURANCY, double AMOUNT);
         Task<string> GetCurrencyCode(string Currency_Symbol);
         Task<bool> Update_ChqDate(UpdateChqDateViewModel model, string userName, int userId);
         Task<bool> Update_ChqDate_Post(string serial, DateTime dueDate, string userName, int userId);
-        Task<IActionResult> Update_Out_ChqDate(UpdateChqDateViewModel model);
-        Task<IActionResult> Update_Out_ChqDate_Accept(UpdateChqDateViewModel model);
-        Task<IActionResult> getSearchListDis_PMA(string Branchs, string STATUS, string BenAccNo, string AccType, string FromBank, string ToBank, string Currency, string ChequeSource, string Amount, string DRWAccNo, string ChequeNo, string waspdc);
-        Task<IActionResult> getSearchList(string Currency, string ChequeSource, string WASPDC, string Branchs, string order, string inputerr, string ChequeStatus, string vip);
-        Task<IActionResult> GetTotalPerAccountAndBnk(string ChqSrc, string Cur, string Branchs, string WASPDC, string order, string inputerr);
-        Task<IActionResult> PresentmentDIS_Or_PDC_return(Outward_Trans _out_, string CHQ);
+        Task<object> Update_Out_ChqDate(UpdateChqDateViewModel model);
+        Task<object> Update_Out_ChqDate_Accept(UpdateChqDateViewModel model);
+        Task<object> getSearchListDis_PMA(string Branchs, string STATUS, string BenAccNo, string AccType, string FromBank, string ToBank, string Currency, string ChequeSource, string Amount, string DRWAccNo, string ChequeNo, string waspdc);
+        Task<object> getSearchList(string Currency, string ChequeSource, string WASPDC, string Branchs, string order, string inputerr, string ChequeStatus, string vip);
+        Task<object> GetTotalPerAccountAndBnk(string ChqSrc, string Cur, string Branchs, string WASPDC, string order, string inputerr);
+        Task<bool> PresentmentDIS_Or_PDC_return(Outward_Trans _out_, string CHQ);
         Task<bool> PresentmentDIS_Or_PDC_timeout(Outward_Trans _out_, string CHQ);
         Task<bool> PresentmentPMA_OR_PDC(Outward_Trans _out_, string CHQ);
         Task<OutChqsViewModel> outward_views(string id, string userName, int userId);
         Task<OutChqsViewModel> Update_oUTWORD_Details(string id);
         Task<string> getDocType(int id);
-        Task<IActionResult> update_Post_Outword(string id);
-        Task<IActionResult> update_Post_Outword_Post(string id, string Note, string returnchq, string chqNu, string chq, string chqAm, string chqBn, string chqBr, string chqAc, string chqdate, string reas, string reas1, string reas2, string reas3, string reas4, string reas5, string reas6, string reas7, string reas8, string reas9, string reas10, string reas11, string reas12, string reas13, string reas14, string reas15, string reas16, string reas17, string reas18, string reas19, string reas20, string reas21, string reas22, string reas23, string reas24, string reas25, string reas26, string reas27, string reas28, string reas29, string reas30, string reas31, string reas32, string reas33, string reas34, string reas35, string reas36, string reas37, string reas38, string reas39, string reas40, string reas41, string reas42, string reas43, string reas44, string reas45, string reas46, string reas47, string reas48, string reas49, string reas50, string reas51, string reas52, string reas53, string reas54, string reas55, string reas56, string reas57, string reas58, string reas59, string reas60, string reas61, string reas62, string reas63, string reas64, string reas65, string reas66, string reas67, string reas68, string reas69, string reas70, string reas71, string reas72, string reas73, string reas74, string reas75, string reas76, string reas77, string reas78, string reas79, string reas80, string reas81, string reas82, string reas83, string reas84, string reas85, string reas86, string reas87, string reas88, string reas89, string reas90, string reas91, string reas92, string reas93, string reas94, string reas95, string reas96, string reas97, string reas98, string reas99);
-        Task<IActionResult> Return_Owtward_chq(string id);
-        Task<IActionResult> Return_Owtward_chq_Post(string id, string Note, string returnchq, string chqNu, string chq, string chqAm, string chqBn, string chqBr, string chqAc, string chqdate, string reas, string reas1, string reas2, string reas3, string reas4, string reas5, string reas6, string reas7, string reas8, string reas9, string reas10, string reas11, string reas12, string reas13, string reas14, string reas15, string reas16, string reas17, string reas18, string reas19, string reas20, string reas21, string reas22, string reas23, string reas24, string reas25, string reas26, string reas27, string reas28, string reas29, string reas30, string reas31, string reas32, string reas33, string reas34, string reas35, string reas36, string reas37, string reas38, string reas39, string reas40, string reas41, string reas42, string reas43, string reas44, string reas45, string reas46, string reas47, string reas48, string reas49, string reas50, string reas51, string reas52, string reas53, string reas54, string reas55, string reas56, string reas57, string reas58, string reas59, string reas60, string reas61, string reas62, string reas63, string reas64, string reas65, string reas66, string reas67, string reas68, string reas69, string reas70, string reas71, string reas72, string reas73, string reas74, string reas75, string reas76, string reas77, string reas78, string reas79, string reas80, string reas81, string reas82, string reas83, string reas84, string reas85, string reas86, string reas87, string reas88, string reas89, string reas90, string reas91, string reas92, string reas93, string reas94, string reas95, string reas96, string reas97, string reas98, string reas99);
-        Task<IActionResult> Return_Owtward_chq_list();
-        Task<IActionResult> Return_Owtward_chq_list_Search(string Branchs, string STATUS, string BenAccNo, string AccType, string FromBank, string ToBank, string Currency, string ChequeSource, string Amount, string DRWAccNo, string ChequeNo, string waspdc);
-        Task<IActionResult> Return_Onus_chq(string id);
-        Task<IActionResult> Return_Onus_chq_Post(string id, string Note, string returnchq, string chqNu, string chq, string chqAm, string chqBn, string chqBr, string chqAc, string chqdate, string reas, string reas1, string reas2, string reas3, string reas4, string reas5, string reas6, string reas7, string reas8, string reas9, string reas10, string reas11, string reas12, string reas13, string reas14, string reas15, string reas16, string reas17, string reas18, string reas19, string reas20, string reas21, string reas22, string reas23, string reas24, string reas25, string reas26, string reas27, string reas28, string reas29, string reas30, string reas31, string reas32, string reas33, string reas34, string reas35, string reas36, string reas37, string reas38, string reas39, string reas40, string reas41, string reas42, string reas43, string reas44, string reas45, string reas46, string reas47, string reas48, string reas49, string reas50, string reas51, string reas52, string reas53, string reas54, string reas55, string reas56, string reas57, string reas58, string reas59, string reas60, string reas61, string reas62, string reas63, string reas64, string reas65, string reas66, string reas67, string reas68, string reas69, string reas70, string reas71, string reas72, string reas73, string reas74, string reas75, string reas76, string reas77, string reas78, string reas79, string reas80, string reas81, string reas82, string reas83, string reas84, string reas85, string reas86, string reas87, string reas88, string reas89, string reas90, string reas91, string reas92, string reas93, string reas94, string reas95, string reas96, string reas97, string reas98, string reas99);
-        Task<IActionResult> Get_Outward_Slip_CCS(string slip_id);
+        Task<object> update_Post_Outword(string id);
+        Task<object> update_Post_Outword_Post(string id, string Note, string returnchq, string chqNu, string chq, string chqAm, string chqBn, string chqBr, string chqAc, string chqdate, string reas, string reas1, string reas2, string reas3, string reas4, string reas5, string reas6, string reas7, string reas8, string reas9, string reas10, string reas11, string reas12, string reas13, string reas14, string reas15, string reas16, string reas17, string reas18, string reas19, string reas20, string reas21, string reas22, string reas23, string reas24, string reas25, string reas26, string reas27, string reas28, string reas29, string reas30, string reas31, string reas32, string reas33, string reas34, string reas35, string reas36, string reas37, string reas38, string reas39, string reas40, string reas41, string reas42, string reas43, string reas44, string reas45, string reas46, string reas47, string reas48, string reas49, string reas50, string reas51, string reas52, string reas53, string reas54, string reas55, string reas56, string reas57, string reas58, string reas59, string reas60, string reas61, string reas62, string reas63, string reas64, string reas65, string reas66, string reas67, string reas68, string reas69, string reas70, string reas71, string reas72, string reas73, string reas74, string reas75, string reas76, string reas77, string reas78, string reas79, string reas80, string reas81, string reas82, string reas83, string reas84, string reas85, string reas86, string reas87, string reas88, string reas89, string reas90, string reas91, string reas92, string reas93, string reas94, string reas95, string reas96, string reas97, string reas98, string reas99);
+        Task<object> Return_Owtward_chq(string id);
+        Task<object> Return_Owtward_chq_Post(string id, string Note, string returnchq, string chqNu, string chq, string chqAm, string chqBn, string chqBr, string chqAc, string chqdate, string reas, string reas1, string reas2, string reas3, string reas4, string reas5, string reas6, string reas7, string reas8, string reas9, string reas10, string reas11, string reas12, string reas13, string reas14, string reas15, string reas16, string reas17, string reas18, string reas19, string reas20, string reas21, string reas22, string reas23, string reas24, string reas25, string reas26, string reas27, string reas28, string reas29, string reas30, string reas31, string reas32, string reas33, string reas34, string reas35, string reas36, string reas37, string reas38, string reas39, string reas40, string reas41, string reas42, string reas43, string reas44, string reas45, string reas46, string reas47, string reas48, string reas49, string reas50, string reas51, string reas52, string reas53, string reas54, string reas55, string reas56, string reas57, string reas58, string reas59, string reas60, string reas61, string reas62, string reas63, string reas64, string reas65, string reas66, string reas67, string reas68, string reas69, string reas70, string reas71, string reas72, string reas73, string reas74, string reas75, string reas76, string reas77, string reas78, string reas79, string reas80, string reas81, string reas82, string reas83, string reas84, string reas85, string reas86, string reas87, string reas88, string reas89, string reas90, string reas91, string reas92, string reas93, string reas94, string reas95, string reas96, string reas97, string reas98, string reas99);
+        Task<object> Return_Owtward_chq_list();
+        Task<object> Return_Owtward_chq_list_Search(string Branchs, string STATUS, string BenAccNo, string AccType, string FromBank, string ToBank, string Currency, string ChequeSource, string Amount, string DRWAccNo, string ChequeNo, string waspdc);
+        Task<object> Return_Onus_chq(string id);
+        Task<object> Return_Onus_chq_Post(string id, string Note, string returnchq, string chqNu, string chq, string chqAm, string chqBn, string chqBr, string chqAc, string chqdate, string reas, string reas1, string reas2, string reas3, string reas4, string reas5, string reas6, string reas7, string reas8, string reas9, string reas10, string reas11, string reas12, string reas13, string reas14, string reas15, string reas16, string reas17, string reas18, string reas19, string reas20, string reas21, string reas22, string reas23, string reas24, string reas25, string reas26, string reas27, string reas28, string reas29, string reas30, string reas31, string reas32, string reas33, string reas34, string reas35, string reas36, string reas37, string reas38, string reas39, string reas40, string reas41, string reas42, string reas43, string reas44, string reas45, string reas46, string reas47, string reas48, string reas49, string reas50, string reas51, string reas52, string reas53, string reas54, string reas55, string reas56, string reas57, string reas58, string reas59, string reas60, string reas61, string reas62, string reas63, string reas64, string reas65, string reas66, string reas67, string reas68, string reas69, string reas70, string reas71, string reas72, string reas73, string reas74, string reas75, string reas76, string reas77, string reas78, string reas79, string reas80, string reas81, string reas82, string reas83, string reas84, string reas85, string reas86, string reas87, string reas88, string reas89, string reas90, string reas91, string reas92, string reas93, string reas94, string reas95, string reas96, string reas97, string reas98, string reas99);
+        Task<GetOutwardSlipCCSViewModel> Get_Outward_Slip_CCS(string slip_id);
         Task<string> Get_URL(string slip_id);
         Task<string> Get_Account_List(string CUST_NO, int Language);
         Task<string> Get_Cheque_Info(string Account_No, int Cheque_No, int Language);
         Task<string> Convert_Numbers_To_Words_AR(string _Number);
         Task<OutwordSearchViewModel> OutwardSearch();
-        Task<IActionResult> OutwardSearch(OutwardSearchClass search);
-        Task<IActionResult> GetTotalPerAccount(string ChqSrc, string Cur, string Branchs, string WASPDC, string order, string inputerr, string ChequeStatus, string vip);
-        Task<IActionResult> GetTotalPerBnk(string ChqSrc, string Cur, string Branchs, string WASPDC, string order, string inputerr, string ChequeStatus, string vip);
+        Task<object> OutwardSearch(OutwardSearchClass search);
+        Task<object> GetTotalPerAccount(string ChqSrc, string Cur, string Branchs, string WASPDC, string order, string inputerr, string ChequeStatus, string vip);
+        Task<object> GetTotalPerBnk(string ChqSrc, string Cur, string Branchs, string WASPDC, string order, string inputerr, string ChequeStatus, string vip);
         Task Delete(string id);
         Task Delete_Outward_Trans_Discount_Old(string id);
         Task Auth_Tran(string id, string status);
         Task Resend_Request(string id);
-        Task<IActionResult> GetSlip(string id);
+        Task<object> GetSlip(string id);
         Task<byte[]> PrintAll(string[] Ids);
-        Task<IActionResult> PrintOutwordRecipt();
-        Task<IActionResult> getCustomerAccounts(string customer_number);
-        Task<IActionResult> validatebranch(string brnch, string Bnk);
-        Task<IActionResult> validatebank(string Bnk);
-        Task<IActionResult> PrintCheques(string _customerID, string _accountNo, string _Slides);
+        Task<object> PrintOutwordRecipt();
+        Task<object> getCustomerAccounts(string customer_number);
+        Task<object> validatebranch(string brnch, string Bnk);
+        Task<object> validatebank(string Bnk);
+        Task<object> PrintCheques(string _customerID, string _accountNo, string _Slides);
         Task<string> Get_OFS_HttpLink();
         Task<string> GetMethodName();
         Task<string> Get_Auto_Post_Flag();
@@ -160,86 +158,24 @@ namespace SAFA_ECC_Core_Clean.Services
         Task<string> Get_Auto_Post_Cr_Cus_Add9();
         Task<string> Get_Auto_Post_Dr_Cus_Add10();
         Task<string> Get_Auto_Post_Cr_Cus_Add10();
+        Task<ReturnOwtwardViewModel> ReturnOwtward(string userName, int userId, string groupId);
+        Task<List<ReturnedChequeViewModel>> retunedchqstate(string ChequeSource, string ChequeStat, string drqchqnumber, string drwAccNo, string Fromdate, string Todate, string BenfBranch, string BnfAccNo, string userName, int userId, string companyId, string branchId);
+        Task<List<Outward_Trans>> getPospondingChq(string ChequeSource, string Bank, string UnlockDate, string BenfBranch, string filedate, string CHQStatus, string CHQSt, string BenfrBranch, string userName, int userId, string companyId, string branchId);
+        Task<List<ReturnedChequeDetailsViewModel>> getreturnList(string ClrCenter, string STATUS, string TransDate, string chqNo, string payAcc, string userName, int userId, string companyId, string branchId);
+        Task<ReturnOWTWORDScreenViewModel> ReturnOWTWORDScreen(string serial, string RC, string userName, int userId, string companyId, string branchId, string pageId);
+        Task<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> FillClearCenter();
+        Task<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> FillClearCenterout();
+        Task<List<Outward_Trans>> getMagicscreenList(string ClrCenter, string TransDate, string chqNo, string userName, int userId, string companyId, string branchId);
+        Task<string> savepostedstatus(string serial, string TBLNAME, string posted, string userName, int userId);
+        Task<AllInwardOutwardChqViewModel> AllInwardoutwardChq(string Currency, string FromDate, string ToDate, string vip, string userName, int userId);
+        Task<AllInwOutChqViewModel> All_INW_OUT_CHQ(string Currency, string FromDate, string ToDate, string vip, string userName, int userId);
+        Task<string> deleteoutchq(string serial, string userName, int userId);
+        Task<string> deletetimeoutchq(string serial, string userName, int userId);
+        Task<RepresentReturnDisViewModel> RepresentReturnDis(string serial, string userName, int userId);
+        Task<FindChqViewModel> FindChq(string serial, string userName, int userId);
+        Task<FindChqdisViewModel> FindChqdis(string serial, string userName, int userId);
+        Task<UpdateChqDateRepresnetViewModel> Update_ChqDate_Represnet(string serial, string userName, int userId);
+        Task<PospondingChqViewModel> PospondingChq(string serial, string userName, int userId);
     }
 }
-
-
-
-        Task<ReturnOwtwardViewModel> ReturnOwtward(string userName, int userId, string groupId);
-
-
-
-        Task<ReturnOwtwardViewModel> ReturnOwtward(string userName, int userId, string groupId);
-
-
-
-        Task<List<ReturnedChequeViewModel>> retunedchqstate(string ChequeSource, string ChequeStat, string drqchqnumber, string drwAccNo, string Fromdate, string Todate, string BenfBranch, string BnfAccNo, string userName, int userId, string companyId, string branchId);
-
-
-
-        Task<List<Outward_Trans>> getPospondingChq(string ChequeSource, string Bank, string UnlockDate, string BenfBranch, string filedate, string CHQStatus, string CHQSt, string BenfrBranch, string userName, int userId, string companyId, string branchId);
-
-
-
-        Task<List<ReturnedChequeDetailsViewModel>> getreturnList(string ClrCenter, string STATUS, string TransDate, string chqNo, string payAcc, string userName, int userId, string companyId, string branchId);
-
-
-
-        Task<ReturnOWTWORDScreenViewModel> ReturnOWTWORDScreen(string serial, string RC, string userName, int userId, string companyId, string branchId, string pageId);
-
-
-
-        Task<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> FillClearCenter();
-
-
-
-        Task<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> FillClearCenterout();
-
-
-
-        Task<List<Outward_Trans>> getMagicscreenList(string ClrCenter, string TransDate, string chqNo, string userName, int userId, string companyId, string branchId);
-
-
-
-        Task<string> savepostedstatus(string serial, string TBLNAME, string posted, string userName, int userId);
-
-
-
-        Task<AllInwardOutwardChqViewModel> AllInwardoutwardChq(string userName, int userId);
-
-
-
-        Task<AllInwOutChqViewModel> All_INW_OUT_CHQ(string Currency, string FromDate, string ToDate, string vip, string userName, int userId);
-
-
-
-        Task<string> deleteoutchq(string serial, string userName, int userId);
-
-
-
-        Task<string> deletetimeoutchq(string serial, string userName, int userId);
-
-
-
-        Task<RepresentReturnDisViewModel> RepresentReturnDis(string userName, int userId);
-
-
-
-        Task<FindChqViewModel> FindChq(string DrwChqNo, string DrwBankNo, string DrwBranchNo, string DrwAcctNo, string BenAccountNo, string userName, int userId);
-
-
-
-        Task<GetOutwardSlipCCSViewModel> Get_Outward_Slip_CCS(string serial, string userName, int userId);
-
-
-
-        Task<FindChqdisViewModel> FindChqdis(string DrwChqNo, string DrwBankNo, string DrwBranchNo, string DrwAcctNo, string userName, int userId);
-
-
-
-        Task<UpdateChqDateRepresnetViewModel> Update_ChqDate_Represnet(string Serial, string BenName, string BenfAccBranch, string AcctType, string DrwChqNo, string DrwBankNo, string DrwBranchNo, string DrwAcctNo, double Amount, DateTime DueDate, string Currency, string BenfBnk, string BenfCardType, string BenfCardId, string BenAccountNo, string BenfNationality, string NeedTechnicalVerification, string WithUV, string SpecialHandling, string IsVIP, string DrwName, string userName, int userId);
-
-
-
-        Task<PospondingChqViewModel> PospondingChq(string userName, int userId);
 

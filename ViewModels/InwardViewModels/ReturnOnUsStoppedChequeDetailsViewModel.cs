@@ -27,3 +27,21 @@ namespace SAFA_ECC_Core_Clean.ViewModels.InwardViewModels
 }
 
 
+
+
+        [Display(Name = "رقم الشيك")]
+        public string? ChequeNumber { get; set; }
+
+        [Display(Name = "المبلغ")]
+        public decimal Amount { get; set; }
+
+        [Display(Name = "اسم البنك")]
+        public string? BankName { get; set; }
+
+        [Display(Name = "تاريخ الإرجاع")]
+        [DataType(DataType.Date)]
+        public DateTime? ReturnDate { get; set; }
+
+        [Display(Name = "سبب الإيقاف")]
+        public string? StopReason { get; set; }
+
